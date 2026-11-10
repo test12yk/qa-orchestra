@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "qa-orchestra",
+  "description": "QA 오케스트라 플러그인 배포처",
+  "owner": {"name": "test12yk"},
+  "plugins": [
+    {
+      "name": "qa-orchestra",
+      "description": "링크만 주면 문서를 가져와 기획 분석서를 만드는 QA 에이전트 모음",
+      "source": "./",
+      "category": "testing"
+    }
+  ]
+}

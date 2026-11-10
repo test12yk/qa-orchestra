@@ -1,0 +1,199 @@
+<title>장바구니 쿠폰 할인 기획 분석서</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: 문서형 단일 컬럼(최대 1080px), 상단 요약 → 섹션별 표·다이어그램, 넓은 화면에서만 2열 */
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --fg: #1b2130; --muted: #5b6477; --line: #dde2ea; --soft: #eef1f6;
+  --accent: #1f3a8a;
+  --plan: #3b6fe0; --policy: #7a4fd6; --dev: #0d8a80; --design: #c9437a; --slack: #b97e0c;
+  --red: #c4362c; --amber: #b0721a; --green: #2d8549;
+  --red-bg: #fbeceb; --amber-bg: #fbf2e4; --green-bg: #e8f4ec;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11141b; --surface: #191e28; --fg: #e5e8ee; --muted: #9aa3b4; --line: #2a3140; --soft: #1f2532;
+  --accent: #9db1ff;
+  --plan: #6f98ff; --policy: #a985ff; --dev: #38c2b5; --design: #f07aa8; --slack: #e6ad3c;
+  --red: #ff7b70; --amber: #f0b354; --green: #5ccb80;
+  --red-bg: #3a1f1d; --amber-bg: #392c18; --green-bg: #1b3324; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11141b; --surface: #191e28; --fg: #e5e8ee; --muted: #9aa3b4; --line: #2a3140; --soft: #1f2532;
+  --accent: #9db1ff;
+  --plan: #6f98ff; --policy: #a985ff; --dev: #38c2b5; --design: #f07aa8; --slack: #e6ad3c;
+  --red: #ff7b70; --amber: #f0b354; --green: #5ccb80;
+  --red-bg: #3a1f1d; --amber-bg: #392c18; --green-bg: #1b3324; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: baseline; gap: 10px; }
+h2 .no { font-family: var(--f-mono); font-size: .8rem; color: var(--muted); font-weight: 500; }
+h3 { font-size: .95rem; font-weight: 600; }
+p { margin: 0; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.eyebrow { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+header.top { display: grid; gap: 12px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); font-size: .85rem; }
+.docs { display: flex; flex-wrap: wrap; gap: 8px; }
+.doc { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; padding: 3px 10px 3px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+.dot { width: 9px; height: 9px; border-radius: 2px; display: inline-block; flex: none; }
+.s-plan { background: var(--plan); } .s-policy { background: var(--policy); } .s-dev { background: var(--dev); } .s-design { background: var(--design); } .s-slack { background: var(--slack); }
+
+nav.toc { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .85rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 10px; }
+nav.toc a { color: var(--accent); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { text-decoration: underline; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 2px; }
+.kpi b { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.kpi span { font-size: .8rem; color: var(--muted); }
+.kpi.warn b { color: var(--red); }
+.kpi.caution b { color: var(--amber); }
+
+section { display: grid; gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.summary { display: grid; gap: 8px; }
+.summary dl { display: grid; grid-template-columns: 7em 1fr; gap: 6px 12px; margin: 0; }
+.summary dt { color: var(--muted); font-size: .88rem; }
+.summary dd { margin: 0; }
+
+/* tree */
+.tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+.tree ul { margin-left: 14px; padding-left: 16px; border-left: 1px solid var(--line); }
+.tree li { position: relative; padding: 5px 0; }
+.tree ul > li::before { content: ""; position: absolute; left: -16px; top: 17px; width: 12px; border-top: 1px solid var(--line); }
+.node-group { font-weight: 600; }
+.req { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.rid { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); }
+.srcs { display: inline-flex; gap: 3px; }
+.srcs .dot { width: 10px; height: 10px; }
+.srcs .off { background: transparent; border: 1px solid var(--line); }
+.flag { font-size: .75rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.flag.red { color: var(--red); background: var(--red-bg); }
+.flag.amber { color: var(--amber); background: var(--amber-bg); }
+.flag.green { color: var(--green); background: var(--green-bg); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .8rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+
+/* venn */
+.venn svg { width: 100%; height: auto; display: block; }
+.venn .c { stroke-width: 1.5; fill-opacity: .10; }
+.venn .c-plan { fill: var(--plan); stroke: var(--plan); }
+.venn .c-policy { fill: var(--policy); stroke: var(--policy); }
+.venn .c-dev { fill: var(--dev); stroke: var(--dev); }
+.venn .lbl { font-family: var(--f-body); font-size: 15px; font-weight: 700; }
+.venn .chip rect { fill: var(--surface); stroke: var(--line); }
+.venn .chip text { font-family: var(--f-body); font-size: 12px; font-weight: 500; fill: var(--fg); }
+.venn .chip .cid { font-family: var(--f-mono); font-size: 10.5px; font-weight: 400; fill: var(--muted); }
+.venn .chip.warn rect { stroke: var(--red); }
+.venn .empty { font-size: 12px; fill: var(--muted); font-family: var(--f-mono); }
+.outside { display: grid; gap: 6px; font-size: .85rem; border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 6px; }
+
+/* tables */
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .78rem; color: var(--muted); font-weight: 600; letter-spacing: .02em; white-space: nowrap; background: var(--soft); }
+td.c, th.c { text-align: center; }
+.mx td.c { font-size: 1rem; }
+.mx .yes { color: var(--fg); }
+.mx .no { color: var(--line); }
+.mx .x { color: var(--red); font-weight: 700; }
+.quote { display: block; font-size: .8rem; color: var(--muted); margin-top: 3px; }
+.verdict { white-space: nowrap; }
+
+/* risk grid */
+.rgrid { display: grid; grid-template-columns: 3.2em repeat(3, minmax(0, 1fr)); gap: 4px; font-size: .8rem; }
+.rgrid .ax { color: var(--muted); display: flex; align-items: center; justify-content: center; text-align: center; }
+.rgrid .cell { min-height: 74px; border-radius: 6px; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.cell.hi { background: var(--red-bg); } .cell.md { background: var(--amber-bg); } .cell.lo { background: var(--green-bg); }
+.cell .it { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; line-height: 1.35; }
+.axis-x { grid-column: 2 / -1; text-align: center; color: var(--muted); font-size: .78rem; }
+
+/* impact tree */
+.impact li .tag { font-size: .72rem; margin-left: 6px; }
+
+.scope { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+.scope ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: .9rem; }
+.scope .out h3 { color: var(--muted); }
+.prep { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.prep ul { margin: 6px 0 0; padding-left: 18px; font-size: .9rem; display: grid; gap: 3px; }
+
+footer { font-size: .8rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+
+@media (max-width: 760px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .two, .scope { grid-template-columns: minmax(0, 1fr); }
+  h1 { font-size: 1.45rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+html { scroll-behavior: smooth; }
+</style>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">QA 오케스트라 · 기획 분석가 산출물</div>
+    <h1>장바구니 쿠폰 할인 · 기획 분석서</h1>
+    <div class="meta"><span>분석일 2026-11-09</span><span>쿠폰 할인 1차</span></div>
+    <div class="docs" aria-label="입력 문서"><span class="doc"><i class="dot s-plan"></i>기획서 v1.0 (커머스기획팀) · 10/28</span><span class="doc"><i class="dot s-policy"></i>쿠폰 운영 정책 개정 (프로모션운영팀) · 10/30</span><span class="doc"><i class="dot s-dev"></i>쿠폰 적용 API 설계 v0.3 (주문개발팀) · 11/03</span><span class="doc"><i class="dot s-design"></i>주문서 쿠폰 영역 가이드 v1.1 (프로덕트디자인팀) · 11/01</span><span class="doc"><i class="dot s-slack"></i>슬랙 #proj-coupon 발췌 · 11/04~06</span></div>
+  </header>
+  <div class="kpis">
+    <div class="kpi"><b>18</b><span>요구사항</span></div>
+    <div class="kpi warn"><b>6</b><span>문서 간 충돌</span></div>
+    <div class="kpi caution"><b>2</b><span>문서에 없는 결정·규칙</span></div>
+    <div class="kpi"><b>11</b><span>확인 질문</span></div>
+    <div class="kpi warn"><b>5</b><span>고위험 영역</span></div>
+  </div>
+  <nav class="toc" aria-label="목차"><a href="#summary">기능 요약</a><a href="#tree">요구사항 트리</a><a href="#coverage">문서 커버리지</a><a href="#conflict">문서 간 충돌</a><a href="#impact">영향 범위</a><a href="#risk">위험 분석</a><a href="#questions">확인 질문</a><a href="#scope">범위·준비</a></nav>
+  <section id="summary"><h2><span class="no">1</span>기능 요약</h2>
+    <div class="card summary"><dl><dt>목적</dt><dd>첫 구매 전환율 개선을 위해 주문서에서 보유 쿠폰을 쓸 수 있게 한다.</dd><dt>대상</dt><dd>쿠폰을 보유한 회원(주문서 진입 사용자)</dd><dt>핵심 흐름</dt><dd>주문서 진입 → 최대 할인 쿠폰 자동 선택(변경 가능) → 쿠폰 할인 → 포인트 차감 → 결제 승인 → 쿠폰 USED → 취소 시 조건부 복구</dd><dt>QA 핵심</dt><dd>최소 주문 금액 판정, 정률 한도·절사·최소 결제액, 쿠폰 동시 사용, 취소(전체·부분·만료) 시 복구</dd></dl></div></section>
+  <section id="tree"><h2><span class="no">2</span>요구사항 트리</h2>
+    <div class="legend"><span><i class="dot s-plan"></i>기획서</span><span><i class="dot s-policy"></i>정책</span><span><i class="dot s-dev"></i>개발</span><span><i class="dot s-design"></i>디자인</span><span><i class="dot s-slack"></i>슬랙</span><span>· 네모 순서 = 기획/정책/개발/디자인/슬랙, 빈 네모 = 언급 없음</span></div>
+    <div class="card"><ul class="tree"><li><span class="node-group">장바구니 쿠폰 할인</span><ul><li><span class="node-group">사용 조건</span><ul><li class="req"><span class="rid">REQ-01</span>주문 금액 30,000원 이상일 때만 쿠폰을 쓸 수 있다(배송비 포함 여부 충돌) <span class="srcs"><i class="dot s-plan" title="기획서"></i><i class="dot s-policy" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag red">충돌 C1</span></li><li class="req"><span class="rid">REQ-02</span>혼합 장바구니에서 상품권·e쿠폰 상품 금액은 최소 주문 금액 계산에서 뺀다 <span class="srcs"><i class="dot off" title="기획서"></i><i class="dot s-policy" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag red">충돌 C5</span></li><li class="req"><span class="rid">REQ-03</span>주문 1건에 쿠폰은 1장만 쓸 수 있고, 이미 적용된 주문에 다시 적용하면 409 COUPON_ALREADY_APPLIED <span class="srcs"><i class="dot s-plan" title="기획서"></i><i class="dot s-policy" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag green">일치</span></li><li class="req"><span class="rid">REQ-04</span>상품권(GIFT_CARD)·e쿠폰(E_COUPON) 카테고리 상품은 할인 대상에서 제외한다 <span class="srcs"><i class="dot off" title="기획서"></i><i class="dot s-policy" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot s-design" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag amber">기획서 누락</span></li></ul></li><li><span class="node-group">할인 계산</span><ul><li class="req"><span class="rid">REQ-05</span>쿠폰은 정률(예: 10%)과 정액(예: 5,000원) 두 종류다 <span class="srcs"><i class="dot s-plan" title="기획서"></i><i class="dot s-policy" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag amber">정액 계산식 미기재 Q9</span></li><li class="req"><span class="rid">REQ-06</span>정률 쿠폰 할인액은 한도를 넘지 않는다(일괄 10,000원 vs 쿠폰별 설정값) <span class="srcs"><i class="dot off" title="기획서"></i><i class="dot s-policy" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag red">충돌 C2</span></li><li class="req"><span class="rid">REQ-07</span>할인 금액은 원 단위 미만을 절사한다 <span class="srcs"><i class="dot off" title="기획서"></i><i class="dot off" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag amber">개발 문서에만 있음</span></li><li class="req"><span class="rid">REQ-08</span>할인 후 결제 금액은 최소 100원이다(0원 결제 불가) <span class="srcs"><i class="dot off" title="기획서"></i><i class="dot off" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag amber">개발 문서에만 있음 Q7</span></li></ul></li><li><span class="node-group">쿠폰 선택</span><ul><li class="req"><span class="rid">REQ-09</span>주문서 진입 시 할인 금액이 가장 큰 쿠폰을 자동 선택하고 &quot;최대 할인 적용됨&quot; 라벨을 보여 주며, 사용자가 변경할 수 있다 <span class="srcs"><i class="dot s-plan" title="기획서"></i><i class="dot off" title="정책"></i><i class="dot off" title="개발"></i><i class="dot s-design" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag amber">동률·변경 후 라벨 미정 Q10</span></li><li class="req"><span class="rid">REQ-10</span>쿠폰 목록은 할인액이 큰 순으로 정렬한다 <span class="srcs"><i class="dot off" title="기획서"></i><i class="dot off" title="정책"></i><i class="dot off" title="개발"></i><i class="dot s-design" title="디자인"></i><i class="dot off" title="슬랙"></i></span></li><li class="req"><span class="rid">REQ-11</span>만료 3일 이내 쿠폰에 &quot;곧 만료&quot; 배지(D-3, D-2, D-1)를 단다 <span class="srcs"><i class="dot off" title="기획서"></i><i class="dot off" title="정책"></i><i class="dot off" title="개발"></i><i class="dot s-design" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag amber">D-day 기준 미정 Q11</span></li><li class="req"><span class="rid">REQ-12</span>사용 불가 상품이 있으면 &quot;상품권·e쿠폰 상품은 할인에서 제외돼요&quot; 문구를 보여 준다 <span class="srcs"><i class="dot off" title="기획서"></i><i class="dot s-policy" title="정책"></i><i class="dot off" title="개발"></i><i class="dot s-design" title="디자인"></i><i class="dot off" title="슬랙"></i></span></li></ul></li><li><span class="node-group">결제 금액</span><ul><li class="req"><span class="rid">REQ-13</span>결제 금액은 쿠폰 할인 → 포인트 사용 순서로 계산한다(화면 표시 순서와 다름) <span class="srcs"><i class="dot s-plan" title="기획서"></i><i class="dot off" title="정책"></i><i class="dot off" title="개발"></i><i class="dot s-design" title="디자인"></i><i class="dot s-slack" title="슬랙"></i></span><span class="flag red">충돌 C3</span></li></ul></li><li><span class="node-group">쿠폰 상태</span><ul><li class="req"><span class="rid">REQ-14</span>쿠폰 상태는 결제 승인 완료 후 USED로 바꾼다 <span class="srcs"><i class="dot off" title="기획서"></i><i class="dot off" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag red">동시성 위험 Q6</span></li><li class="req"><span class="rid">REQ-15</span>주문 전체 취소 시 쿠폰을 AVAILABLE로 복구한다 <span class="srcs"><i class="dot s-plan" title="기획서"></i><i class="dot off" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot s-slack" title="슬랙"></i></span><span class="flag red">충돌 C4</span></li><li class="req"><span class="rid">REQ-16</span>부분 취소 시 쿠폰은 복구하지 않는다 <span class="srcs"><i class="dot s-plan" title="기획서"></i><i class="dot off" title="정책"></i><i class="dot s-dev" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot s-slack" title="슬랙"></i></span><span class="flag red">충돌 C4</span><span class="flag amber">기획서 미반영</span></li><li class="req"><span class="rid">REQ-17</span>취소 시점에 유효기간이 지난 쿠폰은 복구하지 않는다 <span class="srcs"><i class="dot s-plan" title="기획서"></i><i class="dot off" title="정책"></i><i class="dot off" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot s-slack" title="슬랙"></i></span><span class="flag red">충돌 C6</span><span class="flag amber">문서 미반영(슬랙만)</span></li></ul></li><li><span class="node-group">정산</span><ul><li class="req"><span class="rid">REQ-18</span>쿠폰 할인 비용은 회사가 전액 부담하고 판매자 정산 금액에 영향을 주지 않는다 <span class="srcs"><i class="dot off" title="기획서"></i><i class="dot s-policy" title="정책"></i><i class="dot off" title="개발"></i><i class="dot off" title="디자인"></i><i class="dot off" title="슬랙"></i></span><span class="flag amber">구현 문서 없음</span></li></ul></li></ul></li></ul></div></section>
+  <section id="coverage"><h2><span class="no">3</span>문서 커버리지</h2><div class="two">
+    <div class="card venn"><h3>주요 문서 3종에서 요구사항이 어디에 적혀 있나</h3><svg viewBox="0 0 680 600" role="img" aria-label="기획서, 정책, 개발 문서의 요구사항 벤다이어그램">
+<circle class="c c-plan" cx="245" cy="220" r="180"/>
+<circle class="c c-policy" cx="435" cy="220" r="180"/>
+<circle class="c c-dev" cx="340" cy="375" r="180"/>
+<text class="lbl" x="18" y="36" style="fill: var(--plan)">기획서</text>
+<text class="lbl" x="662" y="36" text-anchor="end" style="fill: var(--policy)">정책</text>
+<text class="lbl" x="340" y="592" text-anchor="middle" style="fill: var(--dev)">개발 문서</text>
+<g class="chip warn"><title>REQ-01 주문 금액 30,000원 이상일 때만 쿠폰을 쓸 수 있다(배송비 포함 여부 충돌)</title><rect x="290" y="224" width="100" height="22" rx="4"/><text x="340" y="239" text-anchor="middle"><tspan class="cid">01</tspan> 최소 주문금액</text></g>
+<g class="chip"><title>REQ-03 주문 1건에 쿠폰은 1장만 쓸 수 있고, 이미 적용된 주문에 다시 적용하면 409 COUPON_ALREADY_APPLIED</title><rect x="290" y="250" width="100" height="22" rx="4"/><text x="340" y="265" text-anchor="middle"><tspan class="cid">03</tspan> 1주문 1쿠폰</text></g>
+<g class="chip"><title>REQ-05 쿠폰은 정률(예: 10%)과 정액(예: 5,000원) 두 종류다</title><rect x="290" y="276" width="100" height="22" rx="4"/><text x="340" y="291" text-anchor="middle"><tspan class="cid">05</tspan> 정률·정액</text></g>
+<g class="chip warn"><title>REQ-02 혼합 장바구니에서 상품권·e쿠폰 상품 금액은 최소 주문 금액 계산에서 뺀다</title><rect x="402" y="312" width="100" height="22" rx="4"/><text x="452" y="327" text-anchor="middle"><tspan class="cid">02</tspan> 제외상품 금액</text></g>
+<g class="chip"><title>REQ-04 상품권(GIFT_CARD)·e쿠폰(E_COUPON) 카테고리 상품은 할인 대상에서 제외한다</title><rect x="402" y="338" width="100" height="22" rx="4"/><text x="452" y="353" text-anchor="middle"><tspan class="cid">04</tspan> 제외 카테고리</text></g>
+<g class="chip warn"><title>REQ-06 정률 쿠폰 할인액은 한도를 넘지 않는다(일괄 10,000원 vs 쿠폰별 설정값)</title><rect x="402" y="364" width="100" height="22" rx="4"/><text x="452" y="379" text-anchor="middle"><tspan class="cid">06</tspan> 정률 한도</text></g>
+<g class="chip"><title>REQ-07 할인 금액은 원 단위 미만을 절사한다</title><rect x="290" y="428" width="100" height="22" rx="4"/><text x="340" y="443" text-anchor="middle"><tspan class="cid">07</tspan> 원 단위 절사</text></g>
+<g class="chip"><title>REQ-08 할인 후 결제 금액은 최소 100원이다(0원 결제 불가)</title><rect x="290" y="454" width="100" height="22" rx="4"/><text x="340" y="469" text-anchor="middle"><tspan class="cid">08</tspan> 최소결제 100원</text></g>
+<g class="chip"><title>REQ-14 쿠폰 상태는 결제 승인 완료 후 USED로 바꾼다</title><rect x="290" y="480" width="100" height="22" rx="4"/><text x="340" y="495" text-anchor="middle"><tspan class="cid">14</tspan> 승인 후 USED</text></g>
+<g class="chip"><title>REQ-09 주문서 진입 시 할인 금액이 가장 큰 쿠폰을 자동 선택하고 &quot;최대 할인 적용됨&quot; 라벨을 보여 주며, 사용자가 변경할 수 있다</title><rect x="118" y="132" width="100" height="22" rx="4"/><text x="168" y="147" text-anchor="middle"><tspan class="cid">09</tspan> 최대할인 자동</text></g>
+<g class="chip warn"><title>REQ-13 결제 금액은 쿠폰 할인 → 포인트 사용 순서로 계산한다(화면 표시 순서와 다름)</title><rect x="118" y="158" width="100" height="22" rx="4"/><text x="168" y="173" text-anchor="middle"><tspan class="cid">13</tspan> 쿠폰→포인트</text></g>
+<g class="chip warn"><title>REQ-17 취소 시점에 유효기간이 지난 쿠폰은 복구하지 않는다</title><rect x="118" y="184" width="100" height="22" rx="4"/><text x="168" y="199" text-anchor="middle"><tspan class="cid">17</tspan> 만료쿠폰 미복구</text></g>
+<g class="chip"><title>REQ-12 사용 불가 상품이 있으면 &quot;상품권·e쿠폰 상품은 할인에서 제외돼요&quot; 문구를 보여 준다</title><rect x="458" y="140" width="100" height="22" rx="4"/><text x="508" y="155" text-anchor="middle"><tspan class="cid">12</tspan> 제외 안내문구</text></g>
+<g class="chip"><title>REQ-18 쿠폰 할인 비용은 회사가 전액 부담하고 판매자 정산 금액에 영향을 주지 않는다</title><rect x="458" y="166" width="100" height="22" rx="4"/><text x="508" y="181" text-anchor="middle"><tspan class="cid">18</tspan> 회사 부담</text></g>
+<g class="chip warn"><title>REQ-15 주문 전체 취소 시 쿠폰을 AVAILABLE로 복구한다</title><rect x="182" y="328" width="100" height="22" rx="4"/><text x="232" y="343" text-anchor="middle"><tspan class="cid">15</tspan> 전체취소 복구</text></g>
+<g class="chip warn"><title>REQ-16 부분 취소 시 쿠폰은 복구하지 않는다</title><rect x="182" y="354" width="100" height="22" rx="4"/><text x="232" y="369" text-anchor="middle"><tspan class="cid">16</tspan> 부분취소 미복구</text></g>
+</svg>
+      <div class="outside"><div><b>세 문서 밖에만 있는 것</b></div><div><i class="dot s-design"></i> 10 할인액순 정렬 — 쿠폰 목록은 할인액이 큰 순으로 정렬한다</div><div><i class="dot s-design"></i> 11 곧 만료 배지 — 만료 3일 이내 쿠폰에 &quot;곧 만료&quot; 배지(D-3, D-2, D-1)를 단다</div>
+      <p class="muted" style="font-size:.82rem">숫자는 요구사항 번호(REQ-xx), 항목에 마우스를 올리면 전체 내용이 보여요. 빨간 테두리 = 문서 간 충돌, 한 문서에만 있는 항목은 확인 대상이에요.</p></div></div>
+    <div class="card"><h3>문서별 언급 매트릭스</h3><div class="tbl"><table class="mx"><thead><tr><th>요구사항</th><th class="c">기획서</th><th class="c">정책</th><th class="c">개발</th><th class="c">디자인</th><th class="c">슬랙</th></tr></thead><tbody><tr><td><span class="rid">01</span> 최소 주문금액</td><td class="c x">✕</td><td class="c yes">●</td><td class="c yes">●</td><td class="c no">·</td><td class="c no">·</td></tr><tr><td><span class="rid">02</span> 제외상품 금액</td><td class="c no">·</td><td class="c x">✕</td><td class="c x">✕</td><td class="c no">·</td><td class="c no">·</td></tr><tr><td><span class="rid">03</span> 1주문 1쿠폰</td><td class="c yes">●</td><td class="c yes">●</td><td class="c yes">●</td><td class="c no">·</td><td class="c no">·</td></tr><tr><td><span class="rid">04</span> 제외 카테고리</td><td class="c no">·</td><td class="c yes">●</td><td class="c yes">●</td><td class="c yes">●</td><td class="c no">·</td></tr><tr><td><span class="rid">05</span> 정률·정액</td><td class="c yes">●</td><td class="c yes">●</td><td class="c yes">●</td><td class="c no">·</td><td class="c no">·</td></tr><tr><td><span class="rid">06</span> 정률 한도</td><td class="c no">·</td><td class="c x">✕</td><td class="c x">✕</td><td class="c no">·</td><td class="c no">·</td></tr><tr><td><span class="rid">07</span> 원 단위 절사</td><td class="c no">·</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td><td class="c no">·</td></tr><tr><td><span class="rid">08</span> 최소결제 100원</td><td class="c no">·</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td><td class="c no">·</td></tr><tr><td><span class="rid">09</span> 최대할인 자동</td><td class="c yes">●</td><td class="c no">·</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td></tr><tr><td><span class="rid">10</span> 할인액순 정렬</td><td class="c no">·</td><td class="c no">·</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td></tr><tr><td><span class="rid">11</span> 곧 만료 배지</td><td class="c no">·</td><td class="c no">·</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td></tr><tr><td><span class="rid">12</span> 제외 안내문구</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td></tr><tr><td><span class="rid">13</span> 쿠폰→포인트</td><td class="c yes">●</td><td class="c no">·</td><td class="c no">·</td><td class="c x">✕</td><td class="c yes">●</td></tr><tr><td><span class="rid">14</span> 승인 후 USED</td><td class="c no">·</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td><td class="c no">·</td></tr><tr><td><span class="rid">15</span> 전체취소 복구</td><td class="c x">✕</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td><td class="c yes">●</td></tr><tr><td><span class="rid">16</span> 부분취소 미복구</td><td class="c x">✕</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td><td class="c yes">●</td></tr><tr><td><span class="rid">17</span> 만료쿠폰 미복구</td><td class="c x">✕</td><td class="c no">·</td><td class="c no">·</td><td class="c no">·</td><td class="c x">✕</td></tr><tr><td><span class="rid">18</span> 회사 부담</td><td class="c no">·</td><td class="c yes">●</td><td class="c no">·</td><td class="c no">·</td><td class="c no">·</td></tr></tbody></table></div><p class="muted" style="font-size:.8rem; margin-top:8px">● 언급하고 서로 일치 · ✕ 언급했지만 다른 문서와 내용이 다름 · 언급 없음</p></div>
+  </div></section>
+  <section id="conflict"><h2><span class="no">4</span>문서 간 충돌</h2><div class="card tbl"><table><thead><tr><th>#</th><th>항목</th><th>기획서</th><th>정책</th><th>개발</th><th>디자인 · 슬랙</th><th>판단</th></tr></thead><tbody><tr><td class="mono">C1</td><td><b>최소 주문 금액에 배송비 포함 여부</b><span class="quote">REQ-01</span></td><td>상품 금액 합계 30,000원 이상, 배송비 제외<span class="quote">기획서 2절(p.3)</span></td><td>쿠폰 적용 전 주문 금액(배송비 포함) 30,000원 이상<span class="quote">정책 1항</span></td><td>totalPrice(상품 금액+배송비) &gt;= 30000<span class="quote">API 검증 로직</span></td><td class="muted">–</td><td class="verdict"><span class="flag red">충돌 → Q1</span></td></tr><tr><td class="mono">C2</td><td><b>정률 쿠폰 할인 한도: 일괄 값 vs 쿠폰별 설정값</b><span class="quote">REQ-06</span></td><td class="muted">–</td><td>정률 쿠폰 할인 한도 최대 10,000원(일괄)<span class="quote">정책 3항</span></td><td>min(대상금액 × rate, maxDiscount), maxDiscount는 쿠폰별 설정값<span class="quote">API 할인 계산</span></td><td class="muted">–</td><td class="verdict"><span class="flag red">충돌 → Q2</span></td></tr><tr><td class="mono">C3</td><td><b>계산 순서(쿠폰→포인트) vs 화면 표시 순서(포인트→쿠폰)</b><span class="quote">REQ-13</span></td><td>쿠폰 할인 → 포인트 사용 순서<span class="quote">기획서 4절(p.5)</span></td><td class="muted">–</td><td class="muted">–</td><td>🎨 결제 요약에 포인트 사용(-2,000원)이 쿠폰 할인(-5,000원) 위에 표시 · 💬 11/04 박기획(PM): 기획서대로 쿠폰 먼저, 그다음 포인트</td><td class="verdict"><span class="flag amber">표시 순서 불일치 → Q3</span></td></tr><tr><td class="mono">C4</td><td><b>주문 취소 시 쿠폰 복구 범위(전체·부분 취소)</b><span class="quote">REQ-15 · REQ-16</span></td><td>주문 취소 시 쿠폰 즉시 복구(조건 없음)<span class="quote">기획서 5절(p.6)</span></td><td class="muted">–</td><td>전체 취소 시에만 AVAILABLE 복구, 부분 취소는 복구 안 함<span class="quote">API 쿠폰 상태 변경</span></td><td>💬 11/05 박기획(PM): 부분 취소는 복구 안 함, 기획서는 나중에 업데이트 (문서 미반영)</td><td class="verdict"><span class="flag red">충돌·문서 미반영 → Q4</span></td></tr><tr><td class="mono">C5</td><td><b>최소 주문 금액 계산에서 제외 카테고리 상품 금액 차감 여부</b><span class="quote">REQ-02 · REQ-04</span></td><td class="muted">–</td><td>혼합 장바구니는 제외 상품 금액을 최소 주문 금액 계산에서도 뺀다<span class="quote">정책 4항</span></td><td>최소 금액 검증은 totalPrice(상품+배송비) 전체, 제외 카테고리는 할인 계산에서만 제외<span class="quote">API 검증 로직</span></td><td class="muted">–</td><td class="verdict"><span class="flag red">충돌 → Q5</span></td></tr><tr><td class="mono">C6</td><td><b>취소 시점에 만료된 쿠폰의 복구 여부</b><span class="quote">REQ-17</span></td><td>주문 취소 시 쿠폰 즉시 복구(만료 예외 없음)<span class="quote">기획서 5절(p.6)</span></td><td class="muted">–</td><td>만료 쿠폰 처리 언급 없음<span class="quote">API 쿠폰 상태 변경</span></td><td>💬 11/05 박기획(PM): 취소 시점에 유효기간 지난 쿠폰도 복구 안 함 (문서 미반영)</td><td class="verdict"><span class="flag red">슬랙 결정 미반영 → Q4</span></td></tr></tbody></table></div></section>
+  <section id="impact"><h2><span class="no">5</span>영향받는 기존 기능 <span class="muted" style="font-size:.8rem; font-weight:500">→ 회귀 TC 관리자에게 전달</span></h2><div class="card"><ul class="tree impact"><li><span class="node-group">장바구니 쿠폰 할인</span><ul><li><span class="node-group">주문·결제</span><ul><li>결제 금액 계산 <span class="flag red tag">직접</span></li><li>포인트 사용(차감 순서·금액) <span class="flag red tag">직접</span></li><li>주문서 결제 금액 요약 화면 <span class="flag red tag">직접</span></li><li>배송비 계산 <span class="flag amber tag">간접</span></li><li>PG 결제 승인 <span class="flag amber tag">간접</span></li></ul></li><li><span class="node-group">취소·환불</span><ul><li>주문 전체 취소 <span class="flag red tag">직접</span></li><li>주문 부분 취소 <span class="flag red tag">직접</span></li><li>환불 금액 계산 <span class="flag red tag">직접</span></li></ul></li><li><span class="node-group">쿠폰·혜택</span><ul><li>쿠폰 상태 관리(AVAILABLE/USED) <span class="flag red tag">직접</span></li><li>쿠폰 유효기간·만료 처리 <span class="flag amber tag">간접</span></li></ul></li><li><span class="node-group">상품·정산</span><ul><li>상품권·e쿠폰 카테고리 상품 주문 <span class="flag amber tag">간접</span></li><li>판매자 정산 금액 <span class="flag amber tag">간접</span></li></ul></li></ul></li></ul></div></section>
+  <section id="risk"><h2><span class="no">6</span>위험 분석</h2><div class="two"><div class="card"><h3 style="margin-bottom:10px">위험 매트릭스 (영향 × 발생 가능성)</h3><div class="rgrid"><div class="ax">영향<br>상</div><div class="cell md"><span class="it">결제 승인 실패·PG 연동</span></div><div class="cell hi"><span class="it">쿠폰 동시 사용</span><span class="it">부분 취소 환불 금액(쿠폰 할인 안분)</span></div><div class="cell hi"><span class="it">최소 주문 금액 판정</span><span class="it">할인 금액 계산(한도·절사·최소 100원)</span><span class="it">취소 시 쿠폰 복구</span></div><div class="ax">중</div><div class="cell lo"><span class="it">판매자 정산</span></div><div class="cell md"><span class="it">쿠폰·포인트 차감 순서와 표시</span><span class="it">쿠폰 자동 선택·정렬</span></div><div class="cell md"></div><div class="ax">하</div><div class="cell lo"></div><div class="cell lo"><span class="it">곧 만료 배지·안내 문구</span></div><div class="cell lo"></div><div></div><div class="axis-x" style="grid-column: 2 / 3">가능성 하</div><div class="axis-x" style="grid-column: 3 / 4">중</div><div class="axis-x" style="grid-column: 4 / 5">상</div></div></div><div class="card tbl"><table><thead><tr><th>영역</th><th>위험</th><th>근거</th><th>TC 우선순위</th></tr></thead><tbody><tr><td>최소 주문 금액 판정</td><td><span class="flag red">상</span></td><td>배송비·제외 상품 포함 여부가 문서마다 달라 경계값(29,999/30,000원) 판정이 바로 갈림(C1, C5)</td><td class="mono">P0</td></tr><tr><td>할인 금액 계산(한도·절사·최소 100원)</td><td><span class="flag red">상</span></td><td>한도 기준이 충돌(C2)하고 절사·최소 결제액은 개발 문서에만 있어 금전 손실 위험</td><td class="mono">P0</td></tr><tr><td>쿠폰 동시 사용</td><td><span class="flag red">상</span></td><td>USED 전환이 결제 승인 후라 승인 전 틈에 같은 쿠폰을 다른 주문에 쓸 수 있고, 409 검증은 같은 주문만 막음</td><td class="mono">P0</td></tr><tr><td>취소 시 쿠폰 복구</td><td><span class="flag red">상</span></td><td>기획서·개발 문서·슬랙 결정이 모두 다르고(C4, C6) 만료 쿠폰 처리는 구현 문서에 없음</td><td class="mono">P0</td></tr><tr><td>부분 취소 환불 금액(쿠폰 할인 안분)</td><td><span class="flag red">상</span></td><td>부분 취소 시 쿠폰 할인액을 환불에 어떻게 나누는지 어느 문서에도 없음</td><td class="mono">P1</td></tr><tr><td>쿠폰·포인트 차감 순서와 표시</td><td><span class="flag amber">중</span></td><td>계산 순서와 화면 표시 순서가 달라 사용자 혼동·표시 금액 오류 가능(C3)</td><td class="mono">P1</td></tr><tr><td>결제 승인 실패·PG 연동</td><td><span class="flag amber">중</span></td><td>승인 성공 후 USED 처리 실패나 승인 실패 시 쿠폰 상태 처리가 문서에 없음</td><td class="mono">P1</td></tr><tr><td>쿠폰 자동 선택·정렬</td><td><span class="flag amber">중</span></td><td>한도·제외 상품·최소 결제액이 반영된 실제 할인액 기준인지, 동률 기준이 미정</td><td class="mono">P2</td></tr><tr><td>판매자 정산</td><td><span class="flag green">하</span></td><td>정책상 영향 없어야 하나 구현 근거 문서가 없어 확인만 필요</td><td class="mono">P2</td></tr><tr><td>곧 만료 배지·안내 문구</td><td><span class="flag green">하</span></td><td>D-day 기준 시각 미정, 표시 오류는 금전 영향 없음</td><td class="mono">P3</td></tr></tbody></table></div></div></section>
+  <section id="questions"><h2><span class="no">7</span>확인 질문</h2><div class="card tbl"><table><thead><tr><th>#</th><th>질문</th><th>물어볼 사람</th><th>왜 중요한가</th><th>답 오기 전 임시 가정</th><th>관련</th></tr></thead><tbody><tr><td class="mono">Q1</td><td>최소 주문 금액 30,000원에 배송비가 포함되나요? (기획서는 제외, 정책·API는 포함)</td><td>PM(박기획) · 프로모션운영</td><td>경계값 TC 기대 결과가 정반대가 됨</td><td>정책 기준(배송비 포함). 근거: 금액 규칙은 정책이 기획서보다 우선이고 API도 같음</td><td class="mono">C1 · REQ-01</td></tr><tr><td class="mono">Q2</td><td>정률 쿠폰 한도는 일괄 10,000원인가요, 쿠폰별 maxDiscount인가요? 쿠폰별이면 10,000원 초과 설정을 막나요?</td><td>프로모션운영(이운영) · 주문개발(김개발)</td><td>한도 초과 할인은 바로 금전 손실, 한도 경계 TC 기준이 달라짐</td><td>할인액은 10,000원을 넘으면 안 됨(정책 우선). 쿠폰 설정값을 10,000원으로 두고 테스트하고, 10,000원 초과 설정 쿠폰은 결과를 판정 보류로 기록</td><td class="mono">C2 · REQ-06</td></tr><tr><td class="mono">Q3</td><td>결제 요약에서 쿠폰 할인을 포인트 사용보다 위에 표시하도록 디자인을 고칠까요?</td><td>프로덕트디자인 · PM(박기획)</td><td>표시 순서와 계산 순서가 달라 표시 TC 기대 결과가 애매함</td><td>계산은 쿠폰→포인트(기획서·슬랙 일치). 표시 순서는 디자인 v1.1대로 보고 금액 값만 검증</td><td class="mono">C3 · REQ-13</td></tr><tr><td class="mono">Q4</td><td>취소 시 복구 규칙을 확정하고 기획서에 반영해 주세요: 전체 취소만 복구, 부분 취소 미복구, 취소 시점 만료 쿠폰 미복구가 맞나요? 만료 미복구는 API에도 구현되나요?</td><td>PM(박기획) · 주문개발(김개발)</td><td>공식 문서(기획서)와 슬랙 결정이 다르고 만료 미복구는 구현 문서에 없음</td><td>슬랙 11/05 PM 결정 기준(전체 취소만 복구, 부분·만료 미복구). 근거: 가장 최신 결정이고 API도 부분 취소 미복구로 일치</td><td class="mono">C4 · C6 · REQ-15 · REQ-16 · REQ-17</td></tr><tr><td class="mono">Q5</td><td>혼합 장바구니에서 상품권·e쿠폰 금액을 최소 주문 금액 계산에서 빼나요? API는 totalPrice 전체로 검증합니다</td><td>주문개발(김개발) · 프로모션운영(이운영)</td><td>제외 상품으로 최소 금액을 채우는 우회가 가능해짐</td><td>정책 기준(제외 상품 금액을 뺀다). API가 다르면 결함 후보로 보고</td><td class="mono">C5 · REQ-02 · REQ-04</td></tr><tr><td class="mono">Q6</td><td>결제 승인 전(USED 전) 같은 쿠폰을 다른 주문에 동시에 적용·결제할 수 있나요? 승인 시점에 쿠폰 상태를 재검증하나요?</td><td>주문개발(김개발)</td><td>동일 쿠폰 중복 사용은 금전 손실, 동시성 TC 기대 결과 필요</td><td>한 쿠폰은 한 주문에서만 결제 완료되어야 함. 두 번째 결제가 성공하면 결함으로 판정</td><td class="mono">REQ-14 · REQ-03</td></tr><tr><td class="mono">Q7</td><td>쿠폰·포인트 적용 후 결제 금액이 100원 미만이 되면 어떻게 처리하나요? (할인액 조정, 적용 거부, 포인트 사용 제한 중 무엇인지)</td><td>주문개발(김개발) · PM(박기획)</td><td>처리 방식에 따라 기대 결과와 화면 문구가 달라짐, 기획서·디자인에 없음</td><td>최종 결제 금액이 100원 아래로 내려가지 않는 것만 검증하고 처리 방식은 판정 보류</td><td class="mono">REQ-08</td></tr><tr><td class="mono">Q8</td><td>부분 취소 시 쿠폰 할인액은 환불 금액에 어떻게 나누나요?</td><td>PM(박기획) · 주문개발(김개발)</td><td>환불 금액 오류는 금전 문제, 어느 문서에도 규칙 없음</td><td>규칙 확정 전에는 환불 총액이 실제 결제 금액을 넘지 않는지만 검증</td><td class="mono">REQ-16</td></tr><tr><td class="mono">Q9</td><td>할인 대상 금액에 배송비가 포함되나요? 정액 쿠폰이 대상 금액보다 크면 어떻게 계산하나요?</td><td>주문개발(김개발)</td><td>API에 정률 계산식만 있고 정액·대상 금액 정의가 없음</td><td>대상 금액 = 제외 카테고리를 뺀 상품 금액(배송비 제외)으로 보고 TC 작성, 답 후 수정</td><td class="mono">REQ-05 · REQ-07</td></tr><tr><td class="mono">Q10</td><td>할인액이 같은 쿠폰이 여럿이면 무엇을 자동 선택하나요? 사용자가 바꾸면 &quot;최대 할인 적용됨&quot; 라벨은 사라지나요?</td><td>PM(박기획) · 프로덕트디자인</td><td>자동 선택·라벨 TC 기대 결과가 정해지지 않음</td><td>동률일 때는 할인액만 최대인지 확인, 변경 후 라벨 동작은 판정 보류</td><td class="mono">REQ-09 · REQ-10</td></tr><tr><td class="mono">Q11</td><td>&quot;곧 만료&quot; D-3~D-1은 만료일 기준 며칠 전, 어느 시각 기준인가요? 당일 만료(D-0)는 어떻게 표시하나요?</td><td>프로덕트디자인 · 주문개발</td><td>배지 경계값 TC 기준 필요</td><td>만료일까지 남은 날짜 수(날짜 단위) 3·2·1일에만 배지, D-0은 판정 보류</td><td class="mono">REQ-11</td></tr></tbody></table></div></section>
+  <section id="scope"><h2><span class="no">8</span>테스트 범위 · 준비 사항</h2>
+    <div class="scope"><div class="card"><h3>이번에 테스트하는 것</h3><ul><li>REQ-01 ~ REQ-18 전체</li><li>취소·환불 연계(전체·부분 취소)</li><li>쿠폰 동시 사용</li><li>포인트 병행 사용</li></ul></div><div class="card out"><h3>이번에 테스트하지 않는 것</h3><ul><li>첫 구매 쿠폰 최소 금액 1만 원 인하 — 슬랙 11/06 박기획(PM): 이번 스프린트 범위 아님, 다음 차수 검토</li><li>판매자 정산 금액 상세 검증 — 정책상 영향 없음, 구현 문서 없음. 정산 금액 불변 확인만 회귀로 수행</li></ul></div></div>
+    <div class="card prep"><div><h3>테스트 계정</h3><ul><li>쿠폰 여러 장(정률·정액) 보유 회원</li><li>쿠폰 + 포인트 보유 회원</li><li>쿠폰 없는 회원</li></ul></div><div><h3>쿠폰 데이터</h3><ul><li>정률 10% 쿠폰(maxDiscount 10,000원 / 10,000원 초과 설정값)</li><li>정액 5,000원 쿠폰</li><li>할인액이 같은 쿠폰 2장</li><li>만료 D-3·D-2·D-1·D-0 쿠폰</li><li>취소 시점 직전에 만료되는 쿠폰</li></ul></div><div><h3>상품·장바구니</h3><ul><li>배송비 유료 상품(예: 상품 27,000원 + 배송비 3,000원 경계)</li><li>상품 29,999원 / 30,000원 경계</li><li>상품권·e쿠폰 카테고리 상품 + 일반 상품 혼합</li><li>정률 한도 경계(예: 100,000원 이상 상품)</li><li>결제 금액이 100원 근처가 되는 저가 상품</li></ul></div><div><h3>환경·도구</h3><ul><li>테스트 PG(승인 성공·실패·지연 재현)</li><li>동시 요청 도구(같은 쿠폰 두 주문 동시 결제)</li><li>API 직접 호출 도구(409 확인)</li><li>쿠폰 상태 조회 권한(DB 또는 관리자)</li></ul></div><div><h3>일정 위험</h3><ul><li>기획서 v1.0이 슬랙 결정(11/05) 미반영</li><li>API 설계 v0.3 초안 단계, 변경 가능</li><li>Q1·Q2·Q4·Q5 답 지연 시 P0 TC 기대 결과 재작업</li></ul></div></div></section>
+  <footer>QA 오케스트라 기획 분석가가 만든 문서예요. 원본 데이터: plan-analysis.json</footer>
+</div>

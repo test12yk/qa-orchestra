@@ -1,0 +1,57 @@
+{
+  "feature": {
+    "name": "장바구니 쿠폰 할인",
+    "date": "2026-11-09",
+    "sprint": "쿠폰 할인 1차",
+    "summary": {
+      "purpose": "주문서에서 보유 쿠폰을 쓸 수 있게 한다.",
+      "target": "쿠폰을 보유한 로그인 회원",
+      "flow": "주문서 진입 → 쿠폰 자동 선택 → 결제 → 쿠폰 사용 처리",
+      "qa_focus": "금액 계산, 동시 사용, 취소 시 복구"
+    }
+  },
+  "sources": [
+    {"type": "plan", "title": "기획서 v1.0", "date": "10/28", "path": "inputs/01_기획서.md"},
+    {"type": "slack", "title": "슬랙 #proj-coupon", "date": "11/04~06", "path": "inputs/05_슬랙대화.md"}
+  ],
+  "requirements": [
+    {
+      "id": "REQ-01",
+      "group": "사용 조건",
+      "keyword": "최소 주문금액",
+      "text": "최소 주문 금액 30,000원",
+      "sources": {"plan": "conflict", "policy": "conflict", "dev": "conflict", "design": "none", "slack": "none"},
+      "refs": ["기획서 p.3", "정책 1항", "API 검증 로직"],
+      "flags": [{"level": "red", "label": "충돌 C1"}]
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "C1",
+      "topic": "최소 주문 금액에 배송비 포함 여부",
+      "req_ids": ["REQ-01"],
+      "by_source": {
+        "plan": {"text": "상품 금액 합계, 배송비 제외", "ref": "p.3"},
+        "policy": {"text": "주문 금액, 배송비 포함", "ref": "정책 1항"}
+      },
+      "verdict": {"level": "red", "label": "충돌 → Q1"},
+      "question_id": "Q1"
+    }
+  ],
+  "impacts": [
+    {"group": "주문·결제", "items": [{"name": "결제 금액 계산", "level": "direct"}, {"name": "포인트 사용", "level": "indirect"}]}
+  ],
+  "risks": [
+    {"area": "할인 금액 계산", "impact": "high", "likelihood": "high", "level": "high", "reason": "금액 오류는 곧 금전 손실", "priority": "P0"}
+  ],
+  "questions": [
+    {"id": "Q1", "question": "최소 주문 금액에 배송비가 포함되나요?", "ask_to": "PM", "why": "경계값 TC가 달라짐", "assumption": "정책 기준(배송비 포함)", "refs": ["C1", "REQ-01"]}
+  ],
+  "scope": {
+    "in": ["REQ-01 ~ REQ-12 전체"],
+    "out": [{"item": "첫 구매 쿠폰 최소 금액 1만 원", "reason": "슬랙 11/06 PM: 다음 차수"}]
+  },
+  "prep": [
+    {"title": "테스트 계정 · 쿠폰", "items": ["정률 10% 쿠폰", "만료된 쿠폰"]}
+  ]
+}
