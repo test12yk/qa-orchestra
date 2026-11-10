@@ -1,0 +1,14 @@
+{
+  "name": "qa-bug-reporter",
+  "description": "QA 버그 리포터: 실패한 TC나 버그 메모로 재현 절차·환경·기대/실제 결과·심각도를 갖춘 버그 리포트를 쓰고, 중복을 확인한 뒤 지라에 등록한다(커넥터 또는 API 토큰, 없으면 초안 파일)",
+  "version": "0.1.0",
+  "author": {
+    "name": "test12yk"
+  },
+  "keywords": [
+    "qa",
+    "bug",
+    "jira",
+    "issue"
+  ]
+}

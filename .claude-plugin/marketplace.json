@@ -29,6 +29,12 @@
       "description": "신규 TC 작성가만",
       "source": "./plugins/qa-new-tc-writer",
       "category": "testing"
+    },
+    {
+      "name": "qa-bug-reporter",
+      "description": "버그 리포터만 (지라 등록)",
+      "source": "./plugins/qa-bug-reporter",
+      "category": "testing"
     }
   ]
 }

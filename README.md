@@ -24,7 +24,7 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 - [x] 문서 수집가 `doc-collector` — 링크로 가져오기·변경 감지·붙여넣기 대체 검증(노션)
 - [x] 기획 분석가 `plan-analyst` — 양식 확정, 블라인드·링크 입력 검증
 - [x] 신규 TC 작성가 `new-tc-writer` — 스프레드시트(한 탭, 기본기능·리그레이션·엣지케이스), 경계값·조합 필수, 커버리지 점검
-- [ ] 버그 리포터
+- [x] 버그 리포터 `bug-reporter` — 리포트 작성·중복 확인 → 승인 후 지라 등록(커넥터/API 토큰/초안)
 - [ ] 나머지 신규 기능 라인 → 회귀 라인
 
 ## 폴더
@@ -34,6 +34,7 @@ plugins/
   qa-orchestra/        전체 묶음 (다른 플러그인을 의존성으로 설치)
   qa-doc-collector/    문서 수집가: agents/, tools/save_snapshot.py, defaults.json
   qa-plan-analyst/     기획 분석가: agents/, tools/render_plan_analysis.py, tools/templates/, defaults.json
+  qa-bug-reporter/     버그 리포터: agents/, tools/bug_report.py(점검·지라 등록), defaults.json
   qa-new-tc-writer/    신규 TC 작성가: agents/, tools/render_test_cases.py(점검 포함), tools/templates/, defaults.json
 .claude/agents/        저장소를 받아 쓸 때를 위한 연결(plugins/*/agents 를 가리킴)
 qa-orchestra.config.json   팀 설정 견본
@@ -52,6 +53,7 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 | 문서 수집가만 | `/plugin install qa-doc-collector@qa-orchestra` | `doc-collector` + 저장 스크립트 |
 | 기획 분석가만 | `/plugin install qa-plan-analyst@qa-orchestra` | `plan-analyst` + 렌더러·양식 |
 | 신규 TC 작성가만 | `/plugin install qa-new-tc-writer@qa-orchestra` | `new-tc-writer` + 스프레드시트 렌더러·점검·양식 |
+| 버그 리포터만 | `/plugin install qa-bug-reporter@qa-orchestra` | `bug-reporter` + 점검·지라 등록 스크립트 |
 
 에이전트별 플러그인에는 그 에이전트가 쓰는 파일만 들어 있다(샘플·문서는 설치되지 않음). 나중에 전체를 설치하면 빠진 것만 추가된다. 비공개 저장소라면 접근 권한이 있는 GitHub 계정이 필요하다. 설치 뒤 Claude Code를 다시 시작한다.
 
@@ -60,6 +62,8 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 준비물: Claude Code, python3(추가 설치 없음). 문서 도구 커넥터(노션 등)는 문서 수집가를 쓸 때만 필요하다.
 
 **구글 시트로 받기**: Claude Code에서 `/mcp` → Google Drive를 연결해 두면 신규 TC 작성가가 TC를 내 드라이브에 구글 시트로 만들고 링크를 준다(비공개, 공유는 직접). 연결이 없으면 엑셀 파일(`test-cases.xlsx`)로 받는다. 끄려면 설정의 `output.google_sheets`를 `off`로.
+
+**지라 연결**: 설정의 `jira.site`·`jira.project_key`만 회사 지라로 바꾸면 된다. 등록은 claude.ai의 Atlassian 커넥터(각자 계정) → 없으면 API 토큰(`JIRA_EMAIL`·`JIRA_API_TOKEN` 환경변수) → 둘 다 없으면 붙여넣기용 초안 순서로 시도한다. 버그 리포터는 **사용자가 등록을 지시할 때만** 지라에 올린다.
 
 ## 처음 쓰는 사람
 1. Claude Code에 팀이 쓰는 문서 도구(노션·컨플루언스·슬랙 등)를 커넥터로 연결한다. 문서는 **각자의 권한으로** 가져온다.
@@ -79,6 +83,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 |---|---|---|---|
 | `doc-collector` 문서 수집가 | 링크 목록 | `work/<기능>/inputs/` | 링크만 주면 된다 |
 | `plan-analyst` 기획 분석가 | 문서 폴더 | 기획 분석서(JSON·HTML·MD) | 문서 파일을 폴더에 넣고 그 폴더를 주면 된다 |
+| `bug-reporter` 버그 리포터 | 실패한 TC·메모·로그 | 버그 리포트(MD) → 승인 시 지라 이슈 | 버그 메모만 줘도 된다 |
 | `new-tc-writer` 신규 TC 작성가 | 기획 분석서 (없으면 문서 폴더) | TC 스프레드시트(xlsx)·CSV·HTML·MD | 문서 폴더만 줘도 되지만, 분석서가 있어야 충돌·질문이 반영된다 |
 
 여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(예정)를 쓴다.

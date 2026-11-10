@@ -1,0 +1,1 @@
+../../plugins/qa-bug-reporter/agents/bug-reporter.md

@@ -1,0 +1,46 @@
+{
+  "team": {
+    "domain": "커머스·금융 서비스",
+    "language": "ko"
+  },
+  "bug": {
+    "severities": {
+      "Critical": "결제·금액 오류, 데이터 손실, 서비스 중단 등 출시를 막는 결함",
+      "Major": "핵심 기능이 동작하지 않거나 우회가 어려운 결함",
+      "Minor": "부가 기능 오류, 우회 가능한 결함",
+      "Trivial": "문구·정렬 등 사소한 표시 문제"
+    },
+    "priorities": {
+      "P1": "결제/금액 계산 오류로 이어지는 치명적 케이스",
+      "P2": "핵심 기능 오류",
+      "P3": "부가 기능/UX 이슈",
+      "P4": "사소한 케이스"
+    },
+    "lines": {
+      "신규기능": "new-feature",
+      "회귀": "regression",
+      "운영": "production"
+    },
+    "title_format": "[{platform}] {summary}",
+    "id_prefix": "BUG"
+  },
+  "jira": {
+    "_comment": "회사 지라로 바꿀 때 이 블록만 고친다. mode: auto = 커넥터 → API 토큰(JIRA_EMAIL·JIRA_API_TOKEN 환경변수) → 초안 파일 순서로 시도 / connector / token / draft",
+    "mode": "auto",
+    "site": "",
+    "project_key": "",
+    "issue_type": "Bug",
+    "priority_map": {
+      "P1": "Highest",
+      "P2": "High",
+      "P3": "Medium",
+      "P4": "Low"
+    },
+    "severity_field": "label",
+    "_severity_field_comment": "label = 'severity-critical' 같은 라벨로 표시 / customfield_xxxxx = 회사 지라의 심각도 필드 ID",
+    "labels": [
+      "qa-orchestra"
+    ],
+    "duplicate_check": true
+  }
+}
