@@ -1,0 +1,87 @@
+{
+  "team": {
+    "domain": "커머스·금융 서비스",
+    "language": "ko"
+  },
+  "tc": {
+    "id_prefix": "TC",
+    "columns": [
+      {
+        "key": "id",
+        "label": "TC ID"
+      },
+      {
+        "key": "group",
+        "label": "영역"
+      },
+      {
+        "key": "req_ids",
+        "label": "요구사항"
+      },
+      {
+        "key": "title",
+        "label": "제목"
+      },
+      {
+        "key": "type",
+        "label": "유형"
+      },
+      {
+        "key": "priority",
+        "label": "우선순위"
+      },
+      {
+        "key": "preconditions",
+        "label": "사전조건"
+      },
+      {
+        "key": "data",
+        "label": "테스트 데이터"
+      },
+      {
+        "key": "steps",
+        "label": "절차"
+      },
+      {
+        "key": "expected",
+        "label": "기대결과"
+      },
+      {
+        "key": "assumptions",
+        "label": "가정(질문)"
+      },
+      {
+        "key": "automation",
+        "label": "자동화"
+      },
+      {
+        "key": "refs",
+        "label": "근거"
+      },
+      {
+        "key": "result",
+        "label": "결과"
+      },
+      {
+        "key": "note",
+        "label": "비고"
+      }
+    ],
+    "types": [
+      "기능",
+      "경계값",
+      "예외",
+      "계산",
+      "상태 전이",
+      "동시성",
+      "화면",
+      "연동"
+    ],
+    "priorities": {
+      "P0": "출시 차단: 금전·핵심 흐름",
+      "P1": "주요 기능",
+      "P2": "보조 기능·표시",
+      "P3": "드문 경우·편의"
+    }
+  }
+}

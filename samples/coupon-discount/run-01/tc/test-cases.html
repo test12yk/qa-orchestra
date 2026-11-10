@@ -1,0 +1,592 @@
+<title>장바구니 쿠폰 할인 신규 TC</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* 신규 TC 양식: 기획 분석서와 같은 토큰. 상단 요약 → 커버리지 → 가정 의존 → TC 목록 */
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --fg: #1b2130; --muted: #5b6477; --line: #dde2ea; --soft: #eef1f6;
+  --accent: #1f3a8a;
+  --plan: #3b6fe0; --policy: #7a4fd6; --dev: #0d8a80; --design: #c9437a; --slack: #b97e0c;
+  --red: #c4362c; --amber: #b0721a; --green: #2d8549;
+  --red-bg: #fbeceb; --amber-bg: #fbf2e4; --green-bg: #e8f4ec;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11141b; --surface: #191e28; --fg: #e5e8ee; --muted: #9aa3b4; --line: #2a3140; --soft: #1f2532;
+  --accent: #9db1ff;
+  --plan: #6f98ff; --policy: #a985ff; --dev: #38c2b5; --design: #f07aa8; --slack: #e6ad3c;
+  --red: #ff7b70; --amber: #f0b354; --green: #5ccb80;
+  --red-bg: #3a1f1d; --amber-bg: #392c18; --green-bg: #1b3324; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11141b; --surface: #191e28; --fg: #e5e8ee; --muted: #9aa3b4; --line: #2a3140; --soft: #1f2532;
+  --accent: #9db1ff;
+  --plan: #6f98ff; --policy: #a985ff; --dev: #38c2b5; --design: #f07aa8; --slack: #e6ad3c;
+  --red: #ff7b70; --amber: #f0b354; --green: #5ccb80;
+  --red-bg: #3a1f1d; --amber-bg: #392c18; --green-bg: #1b3324; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: baseline; gap: 10px; }
+h2 .no { font-family: var(--f-mono); font-size: .8rem; color: var(--muted); font-weight: 500; }
+h3 { font-size: .95rem; font-weight: 600; }
+p { margin: 0; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.eyebrow { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+header.top { display: grid; gap: 12px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); font-size: .85rem; }
+.docs { display: flex; flex-wrap: wrap; gap: 8px; }
+.doc { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; padding: 3px 10px 3px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+.dot { width: 9px; height: 9px; border-radius: 2px; display: inline-block; flex: none; }
+.s-plan { background: var(--plan); } .s-policy { background: var(--policy); } .s-dev { background: var(--dev); } .s-design { background: var(--design); } .s-slack { background: var(--slack); }
+
+nav.toc { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .85rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 10px; }
+nav.toc a { color: var(--accent); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { text-decoration: underline; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 2px; }
+.kpi b { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.kpi span { font-size: .8rem; color: var(--muted); }
+.kpi.warn b { color: var(--red); }
+.kpi.caution b { color: var(--amber); }
+
+section { display: grid; gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+/* tables */
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .78rem; color: var(--muted); font-weight: 600; letter-spacing: .02em; white-space: nowrap; background: var(--soft); }
+td.c, th.c { text-align: center; }
+.mx td.c { font-size: 1rem; }
+.mx .yes { color: var(--fg); }
+.mx .no { color: var(--line); }
+.mx .x { color: var(--red); font-weight: 700; }
+.quote { display: block; font-size: .8rem; color: var(--muted); margin-top: 3px; }
+.verdict { white-space: nowrap; }
+.flag { font-size: .75rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.flag.red { color: var(--red); background: var(--red-bg); }
+.flag.amber { color: var(--amber); background: var(--amber-bg); }
+.flag.green { color: var(--green); background: var(--green-bg); }
+
+/* coverage */
+.cov td.n { font-family: var(--f-mono); text-align: center; }
+.cov tr.miss td { background: var(--red-bg); }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { font-size: .72rem; padding: 1px 7px; border-radius: 4px; background: var(--soft); border: 1px solid var(--line); white-space: nowrap; }
+.chip.p0 { color: var(--red); border-color: var(--red); background: var(--red-bg); }
+.chip.as { color: var(--amber); border-color: var(--amber); background: var(--amber-bg); }
+.dist { display: grid; gap: 4px; font-size: .82rem; }
+.dist th, .dist td { padding: 6px 8px; text-align: center; }
+.dist td.z { color: var(--line); }
+
+/* tc list */
+.filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: .82rem; }
+.filters button { font: inherit; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.filters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tc { display: grid; gap: 8px; border-bottom: 1px solid var(--line); padding-block: 14px; }
+.tc:last-child { border-bottom: 0; }
+.tc-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.tc-head .tid { font-family: var(--f-mono); font-size: .8rem; color: var(--muted); }
+.tc-head b { font-weight: 600; }
+.tc-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 18px; font-size: .88rem; }
+.tc-body h4 { margin: 0 0 3px; font-size: .75rem; color: var(--muted); font-weight: 600; }
+.tc-body ol, .tc-body ul { margin: 0; padding-left: 18px; display: grid; gap: 2px; }
+.tc-meta { font-size: .78rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.group-h { font-size: .9rem; font-weight: 700; padding-top: 6px; }
+.miss-box { border-left: 3px solid var(--red); padding-left: 12px; }
+
+@media (max-width: 760px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tc-body, .two { grid-template-columns: minmax(0, 1fr); }
+  h1 { font-size: 1.45rem; }
+}
+
+footer { font-size: .8rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+</style>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">QA 오케스트라 · 신규 TC 작성가 산출물</div>
+    <h1>장바구니 쿠폰 할인 · 신규 기능 테스트 케이스</h1>
+    <div class="meta"><span>작성일 2026-11-10</span><span>기준: analysis/plan-analysis.json</span></div>
+  </header>
+  <div class="kpis">
+    <div class="kpi"><b>55</b><span>테스트 케이스</span></div>
+    <div class="kpi warn"><b>94%</b><span>요구사항 커버리지 (17/18)</span></div>
+    <div class="kpi warn"><b>36</b><span>P0 (출시 차단)</span></div>
+    <div class="kpi caution"><b>36</b><span>가정에 기댄 TC</span></div>
+    <div class="kpi"><b>45</b><span>자동화 후보</span></div>
+  </div>
+  <nav class="toc" aria-label="목차"><a href="#cov">요구사항 커버리지</a><a href="#dist">우선순위 × 유형</a><a href="#assume">가정에 기댄 TC</a><a href="#list">TC 목록</a></nav>
+  <section id="cov"><h2><span class="no">1</span>요구사항 커버리지</h2>
+    <div class="card tbl"><table class="cov"><thead><tr><th>요구사항</th><th>내용</th><th class="c">TC</th><th>케이스</th></tr></thead><tbody><tr class=""><td class="mono">REQ-01</td><td><b>최소 주문금액</b><span class="quote">주문 금액 30,000원 이상일 때만 쿠폰을 쓸 수 있다(배송비 포함 여부 충돌)</span></td><td class="n">7</td><td><div class="chips"><span class="chip p0">TC-001 경계값</span><span class="chip p0">TC-002 경계값</span><span class="chip p0">TC-003 경계값</span><span class="chip p0">TC-004 경계값</span><span class="chip p0">TC-005 경계값</span><span class="chip p0">TC-006 경계값</span><span class="chip p0">TC-007 경계값</span></div></td></tr><tr class=""><td class="mono">REQ-02</td><td><b>제외상품 금액</b><span class="quote">혼합 장바구니에서 상품권·e쿠폰 상품 금액은 최소 주문 금액 계산에서 뺀다</span></td><td class="n">3</td><td><div class="chips"><span class="chip p0">TC-006 경계값</span><span class="chip p0">TC-007 경계값</span><span class="chip p0">TC-008 예외</span></div></td></tr><tr class=""><td class="mono">REQ-03</td><td><b>1주문 1쿠폰</b><span class="quote">주문 1건에 쿠폰은 1장만 쓸 수 있고, 이미 적용된 주문에 다시 적용하면 409 COUPON_ALREADY_APPLIED</span></td><td class="n">7</td><td><div class="chips"><span class="chip p0">TC-009 예외</span><span class="chip p0">TC-010 예외</span><span class="chip p0">TC-011 동시성</span><span class="chip">TC-012 기능</span><span class="chip p0">TC-047 동시성</span><span class="chip p0">TC-048 동시성</span><span class="chip">TC-049 예외</span></div></td></tr><tr class=""><td class="mono">REQ-04</td><td><b>제외 카테고리</b><span class="quote">상품권(GIFT_CARD)·e쿠폰(E_COUPON) 카테고리 상품은 할인 대상에서 제외한다</span></td><td class="n">4</td><td><div class="chips"><span class="chip p0">TC-008 예외</span><span class="chip p0">TC-013 계산</span><span class="chip p0">TC-014 계산</span><span class="chip">TC-030 기능</span></div></td></tr><tr class=""><td class="mono">REQ-05</td><td><b>정률·정액</b><span class="quote">쿠폰은 정률(예: 10%)과 정액(예: 5,000원) 두 종류다</span></td><td class="n">3</td><td><div class="chips"><span class="chip p0">TC-015 계산</span><span class="chip p0">TC-016 계산</span><span class="chip p0">TC-017 계산</span></div></td></tr><tr class=""><td class="mono">REQ-06</td><td><b>정률 한도</b><span class="quote">정률 쿠폰 할인액은 한도를 넘지 않는다(일괄 10,000원 vs 쿠폰별 설정값)</span></td><td class="n">6</td><td><div class="chips"><span class="chip p0">TC-018 경계값</span><span class="chip p0">TC-019 경계값</span><span class="chip p0">TC-020 경계값</span><span class="chip p0">TC-021 계산</span><span class="chip p0">TC-022 계산</span><span class="chip p0">TC-023 계산</span></div></td></tr><tr class=""><td class="mono">REQ-07</td><td><b>원 단위 절사</b><span class="quote">할인 금액은 원 단위 미만을 절사한다</span></td><td class="n">1</td><td><div class="chips"><span class="chip p0">TC-024 계산</span></div></td></tr><tr class=""><td class="mono">REQ-08</td><td><b>최소결제 100원</b><span class="quote">할인 후 결제 금액은 최소 100원이다(0원 결제 불가)</span></td><td class="n">3</td><td><div class="chips"><span class="chip p0">TC-025 경계값</span><span class="chip p0">TC-026 경계값</span><span class="chip p0">TC-027 예외</span></div></td></tr><tr class=""><td class="mono">REQ-09</td><td><b>최대할인 자동</b><span class="quote">주문서 진입 시 할인 금액이 가장 큰 쿠폰을 자동 선택하고 &quot;최대 할인 적용됨&quot; 라벨을 보여 주며, 사용자가 변경할 수 있다</span></td><td class="n">5</td><td><div class="chips"><span class="chip">TC-012 기능</span><span class="chip">TC-028 기능</span><span class="chip">TC-029 기능</span><span class="chip">TC-030 기능</span><span class="chip">TC-031 기능</span></div></td></tr><tr class=""><td class="mono">REQ-10</td><td><b>할인액순 정렬</b><span class="quote">쿠폰 목록은 할인액이 큰 순으로 정렬한다</span></td><td class="n">2</td><td><div class="chips"><span class="chip">TC-032 화면</span><span class="chip">TC-033 화면</span></div></td></tr><tr class=""><td class="mono">REQ-11</td><td><b>곧 만료 배지</b><span class="quote">만료 3일 이내 쿠폰에 &quot;곧 만료&quot; 배지(D-3, D-2, D-1)를 단다</span></td><td class="n">4</td><td><div class="chips"><span class="chip">TC-034 경계값</span><span class="chip">TC-035 경계값</span><span class="chip">TC-036 화면</span><span class="chip">TC-037 경계값</span></div></td></tr><tr class=""><td class="mono">REQ-12</td><td><b>제외 안내문구</b><span class="quote">사용 불가 상품이 있으면 &quot;상품권·e쿠폰 상품은 할인에서 제외돼요&quot; 문구를 보여 준다</span></td><td class="n">3</td><td><div class="chips"><span class="chip">TC-038 화면</span><span class="chip">TC-039 화면</span><span class="chip">TC-040 화면</span></div></td></tr><tr class=""><td class="mono">REQ-13</td><td><b>쿠폰→포인트</b><span class="quote">결제 금액은 쿠폰 할인 → 포인트 사용 순서로 계산한다(화면 표시 순서와 다름)</span></td><td class="n">3</td><td><div class="chips"><span class="chip p0">TC-025 경계값</span><span class="chip">TC-041 계산</span><span class="chip">TC-042 화면</span></div></td></tr><tr class=""><td class="mono">REQ-14</td><td><b>승인 후 USED</b><span class="quote">쿠폰 상태는 결제 승인 완료 후 USED로 바꾼다</span></td><td class="n">6</td><td><div class="chips"><span class="chip p0">TC-043 상태 전이</span><span class="chip p0">TC-044 상태 전이</span><span class="chip">TC-045 연동</span><span class="chip p0">TC-046 상태 전이</span><span class="chip p0">TC-047 동시성</span><span class="chip p0">TC-048 동시성</span></div></td></tr><tr class=""><td class="mono">REQ-15</td><td><b>전체취소 복구</b><span class="quote">주문 전체 취소 시 쿠폰을 AVAILABLE로 복구한다</span></td><td class="n">3</td><td><div class="chips"><span class="chip p0">TC-050 상태 전이</span><span class="chip p0">TC-051 상태 전이</span><span class="chip p0">TC-055 경계값</span></div></td></tr><tr class=""><td class="mono">REQ-16</td><td><b>부분취소 미복구</b><span class="quote">부분 취소 시 쿠폰은 복구하지 않는다</span></td><td class="n">2</td><td><div class="chips"><span class="chip p0">TC-052 상태 전이</span><span class="chip">TC-053 계산</span></div></td></tr><tr class=""><td class="mono">REQ-17</td><td><b>만료쿠폰 미복구</b><span class="quote">취소 시점에 유효기간이 지난 쿠폰은 복구하지 않는다</span></td><td class="n">2</td><td><div class="chips"><span class="chip p0">TC-054 상태 전이</span><span class="chip p0">TC-055 경계값</span></div></td></tr><tr class="miss"><td class="mono">REQ-18</td><td><b>회사 부담</b><span class="quote">쿠폰 할인 비용은 회사가 전액 부담하고 판매자 정산 금액에 영향을 주지 않는다</span></td><td class="n">0</td><td><div class="chips"><span class="muted">판매자 정산 금액 검증은 분석서 scope.out(정책상 영향 없음, 구현 문서 없음) → 정산 금액 불변 확인은 회귀 TC 관리자에게 넘김</span></div></td></tr></tbody></table></div></section>
+  <section id="dist"><h2><span class="no">2</span>우선순위 × 유형</h2>
+    <div class="card tbl"><table class="dist"><tr><th></th><th>기능</th><th>경계값</th><th>예외</th><th>계산</th><th>상태 전이</th><th>동시성</th><th>화면</th><th>연동</th><th>합계</th></tr><tr><th title="출시 차단: 금전·핵심 흐름">P0</th><td class="z">·</td><td class="">13</td><td class="">4</td><td class="">9</td><td class="">7</td><td class="">3</td><td class="z">·</td><td class="z">·</td><td><b>36</b></td></tr><tr><th title="주요 기능">P1</th><td class="">1</td><td class="z">·</td><td class="">1</td><td class="">2</td><td class="z">·</td><td class="z">·</td><td class="">1</td><td class="">1</td><td><b>6</b></td></tr><tr><th title="보조 기능·표시">P2</th><td class="">4</td><td class="z">·</td><td class="z">·</td><td class="z">·</td><td class="z">·</td><td class="z">·</td><td class="">2</td><td class="z">·</td><td><b>6</b></td></tr><tr><th title="드문 경우·편의">P3</th><td class="z">·</td><td class="">3</td><td class="z">·</td><td class="z">·</td><td class="z">·</td><td class="z">·</td><td class="">4</td><td class="z">·</td><td><b>7</b></td></tr></table></div></section>
+  <section id="assume"><h2><span class="no">3</span>가정에 기댄 TC <span class="muted" style="font-size:.8rem; font-weight:500">→ 답이 오면 이 TC부터 다시 본다</span></h2>
+    <div class="card tbl"><table><thead><tr><th>질문</th><th>내용 · 임시 가정</th><th>물어볼 사람</th><th>영향받는 TC</th></tr></thead><tbody><tr><td class="mono">Q1</td><td>최소 주문 금액 30,000원에 배송비가 포함되나요? (기획서는 제외, 정책·API는 포함)<span class="quote">임시 가정: 정책 기준(배송비 포함). 근거: 금액 규칙은 정책이 기획서보다 우선이고 API도 같음</span></td><td>PM(박기획) · 프로모션운영</td><td><div class="chips"><span class=chip>TC-001</span><span class=chip>TC-002</span><span class=chip>TC-003</span><span class=chip>TC-006</span><span class=chip>TC-007</span></div></td></tr><tr><td class="mono">Q2</td><td>정률 쿠폰 한도는 일괄 10,000원인가요, 쿠폰별 maxDiscount인가요? 쿠폰별이면 10,000원 초과 설정을 막나요?<span class="quote">임시 가정: 할인액은 10,000원을 넘으면 안 됨(정책 우선). 쿠폰 설정값을 10,000원으로 두고 테스트하고, 10,000원 초과 설정 쿠폰은 결과를 판정 보류로 기록</span></td><td>프로모션운영(이운영) · 주문개발(김개발)</td><td><div class="chips"><span class=chip>TC-018</span><span class=chip>TC-019</span><span class=chip>TC-020</span><span class=chip>TC-021</span><span class=chip>TC-022</span><span class=chip>TC-023</span></div></td></tr><tr><td class="mono">Q3</td><td>결제 요약에서 쿠폰 할인을 포인트 사용보다 위에 표시하도록 디자인을 고칠까요?<span class="quote">임시 가정: 계산은 쿠폰→포인트(기획서·슬랙 일치). 표시 순서는 디자인 v1.1대로 보고 금액 값만 검증</span></td><td>프로덕트디자인 · PM(박기획)</td><td><div class="chips"><span class=chip>TC-041</span><span class=chip>TC-042</span></div></td></tr><tr><td class="mono">Q4</td><td>취소 시 복구 규칙을 확정하고 기획서에 반영해 주세요: 전체 취소만 복구, 부분 취소 미복구, 취소 시점 만료 쿠폰 미복구가 맞나요? 만료 미복구는 API에도 구현되나요?<span class="quote">임시 가정: 슬랙 11/05 PM 결정 기준(전체 취소만 복구, 부분·만료 미복구). 근거: 가장 최신 결정이고 API도 부분 취소 미복구로 일치</span></td><td>PM(박기획) · 주문개발(김개발)</td><td><div class="chips"><span class=chip>TC-050</span><span class=chip>TC-051</span><span class=chip>TC-052</span><span class=chip>TC-054</span><span class=chip>TC-055</span></div></td></tr><tr><td class="mono">Q5</td><td>혼합 장바구니에서 상품권·e쿠폰 금액을 최소 주문 금액 계산에서 빼나요? API는 totalPrice 전체로 검증합니다<span class="quote">임시 가정: 정책 기준(제외 상품 금액을 뺀다). API가 다르면 결함 후보로 보고</span></td><td>주문개발(김개발) · 프로모션운영(이운영)</td><td><div class="chips"><span class=chip>TC-006</span><span class=chip>TC-007</span><span class=chip>TC-008</span><span class=chip>TC-030</span></div></td></tr><tr><td class="mono">Q6</td><td>결제 승인 전(USED 전) 같은 쿠폰을 다른 주문에 동시에 적용·결제할 수 있나요? 승인 시점에 쿠폰 상태를 재검증하나요?<span class="quote">임시 가정: 한 쿠폰은 한 주문에서만 결제 완료되어야 함. 두 번째 결제가 성공하면 결함으로 판정</span></td><td>주문개발(김개발)</td><td><div class="chips"><span class=chip>TC-046</span><span class=chip>TC-047</span><span class=chip>TC-048</span></div></td></tr><tr><td class="mono">Q7</td><td>쿠폰·포인트 적용 후 결제 금액이 100원 미만이 되면 어떻게 처리하나요? (할인액 조정, 적용 거부, 포인트 사용 제한 중 무엇인지)<span class="quote">임시 가정: 최종 결제 금액이 100원 아래로 내려가지 않는 것만 검증하고 처리 방식은 판정 보류</span></td><td>주문개발(김개발) · PM(박기획)</td><td><div class="chips"><span class=chip>TC-025</span><span class=chip>TC-026</span><span class=chip>TC-027</span></div></td></tr><tr><td class="mono">Q8</td><td>부분 취소 시 쿠폰 할인액은 환불 금액에 어떻게 나누나요?<span class="quote">임시 가정: 규칙 확정 전에는 환불 총액이 실제 결제 금액을 넘지 않는지만 검증</span></td><td>PM(박기획) · 주문개발(김개발)</td><td><div class="chips"><span class=chip>TC-053</span></div></td></tr><tr><td class="mono">Q9</td><td>할인 대상 금액에 배송비가 포함되나요? 정액 쿠폰이 대상 금액보다 크면 어떻게 계산하나요?<span class="quote">임시 가정: 대상 금액 = 제외 카테고리를 뺀 상품 금액(배송비 제외)으로 보고 TC 작성, 답 후 수정</span></td><td>주문개발(김개발)</td><td><div class="chips"><span class=chip>TC-001</span><span class=chip>TC-006</span><span class=chip>TC-013</span><span class=chip>TC-014</span><span class=chip>TC-017</span><span class=chip>TC-030</span><span class=chip>TC-041</span></div></td></tr><tr><td class="mono">Q10</td><td>할인액이 같은 쿠폰이 여럿이면 무엇을 자동 선택하나요? 사용자가 바꾸면 &quot;최대 할인 적용됨&quot; 라벨은 사라지나요?<span class="quote">임시 가정: 동률일 때는 할인액만 최대인지 확인, 변경 후 라벨 동작은 판정 보류</span></td><td>PM(박기획) · 프로덕트디자인</td><td><div class="chips"><span class=chip>TC-012</span><span class=chip>TC-031</span></div></td></tr><tr><td class="mono">Q11</td><td>&quot;곧 만료&quot; D-3~D-1은 만료일 기준 며칠 전, 어느 시각 기준인가요? 당일 만료(D-0)는 어떻게 표시하나요?<span class="quote">임시 가정: 만료일까지 남은 날짜 수(날짜 단위) 3·2·1일에만 배지, D-0은 판정 보류</span></td><td>프로덕트디자인 · 주문개발</td><td><div class="chips"><span class=chip>TC-034</span><span class=chip>TC-035</span><span class=chip>TC-036</span><span class=chip>TC-037</span></div></td></tr></tbody></table></div></section>
+  <section id="list"><h2><span class="no">4</span>TC 목록</h2>
+    <div class="filters" role="group" aria-label="TC 거르기"><button type="button" aria-pressed="true" data-f="all">전체</button><button type="button" aria-pressed="false" data-f="P0">P0</button><button type="button" aria-pressed="false" data-f="P1">P1</button><button type="button" aria-pressed="false" data-f="P2">P2</button><button type="button" aria-pressed="false" data-f="P3">P3</button><button type="button" aria-pressed="false" data-f="as">가정 의존</button></div>
+    <div class="card"><div class="group-h">사용 조건 <span class="muted mono">12</span></div><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-001</span><b>최소 주문 금액 경계: 상품 27,000원 + 배송비 3,000원(합계 30,000원)이면 쿠폰을 쓸 수 있다</b><span class="flag red">P0</span><span class="chip as">가정 Q1</span><span class="chip as">가정 Q9</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 1장 보유(AVAILABLE, 유효기간 남음)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 27,000원 1개, 배송비 3,000원 (합계 30,000원)</div></div>
+    <div><h4>절차</h4><ol><li>상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>쿠폰 영역과 결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>정액 5,000원 쿠폰이 적용된다</li><li>쿠폰 할인 -5,000원, 최종 결제 금액 25,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-01</span><span>근거 정책 1항; API 검증 로직 totalPrice</span><span>자동화 후보</span><span>비고 Q1 답이 &#x27;배송비 제외&#x27;(기획서)면 상품 27,000원 &lt; 30,000원이라 기대결과가 &#x27;사용 불가&#x27;로 바뀐다</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-002</span><b>최소 주문 금액 경계: 상품 26,999원 + 배송비 3,000원(합계 29,999원)이면 쿠폰을 쓸 수 없다</b><span class="flag red">P0</span><span class="chip as">가정 Q1</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 1장 보유(AVAILABLE)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 26,999원 1개, 배송비 3,000원 (합계 29,999원)</div></div>
+    <div><h4>절차</h4><ol><li>상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>쿠폰 영역을 확인한다</li><li>POST /orders/{orderId}/coupon 으로 같은 쿠폰 적용을 요청한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰이 적용되지 않는다(쿠폰 할인 0원)</li><li>최종 결제 금액 29,999원</li><li>API 요청이 성공 처리되지 않고 주문에 쿠폰이 붙지 않는다</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-01</span><span>근거 정책 1항; API 검증 로직 totalPrice</span><span>자동화 후보</span><span>비고 미달 시 응답 코드·화면 문구는 문서에 없음(확인 필요). Q1 답이 &#x27;배송비 제외&#x27;여도 결과는 같다(사용 불가)</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-003</span><b>최소 주문 금액 경계: 상품 27,001원 + 배송비 3,000원(합계 30,001원)이면 쿠폰을 쓸 수 있다</b><span class="flag red">P0</span><span class="chip as">가정 Q1</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 1장 보유(AVAILABLE)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 27,001원 1개, 배송비 3,000원 (합계 30,001원)</div></div>
+    <div><h4>절차</h4><ol><li>상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -5,000원</li><li>최종 결제 금액 25,001원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-01</span><span>근거 정책 1항; API 검증 로직 totalPrice</span><span>자동화 후보</span><span>비고 Q1 답이 &#x27;배송비 제외&#x27;면 상품 27,001원 &lt; 30,000원이라 &#x27;사용 불가&#x27;로 바뀐다</span></div>
+</article><article class="tc" data-p="P0" data-a="0">
+  <div class="tc-head"><span class="tid">TC-004</span><b>무료배송 상품 30,000원이면 쿠폰을 쓸 수 있다(배송비 해석과 무관)</b><span class="flag red">P0</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 1장 보유(AVAILABLE)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 30,000원 1개, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -5,000원</li><li>최종 결제 금액 25,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-01</span><span>근거 기획서 2절(p.3); 정책 1항; API 검증 로직 totalPrice</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="0">
+  <div class="tc-head"><span class="tid">TC-005</span><b>무료배송 상품 29,999원이면 쿠폰을 쓸 수 없다(배송비 해석과 무관)</b><span class="flag red">P0</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 1장 보유(AVAILABLE)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 29,999원 1개, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>쿠폰 영역과 결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰이 적용되지 않는다(쿠폰 할인 0원)</li><li>최종 결제 금액 29,999원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-01</span><span>근거 기획서 2절(p.3); 정책 1항; API 검증 로직 totalPrice</span><span>자동화 후보</span><span>비고 미달 시 쿠폰 목록 표시 방식(비활성·숨김)과 문구는 문서에 없음(확인 필요)</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-006</span><b>혼합 장바구니: 일반 27,000원 + e쿠폰 5,000원 + 배송비 3,000원이면 제외 금액을 빼도 30,000원이라 쓸 수 있다</b><span class="flag red">P0</span><span class="chip as">가정 Q5</span><span class="chip as">가정 Q1</span><span class="chip as">가정 Q9</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 1장 보유(AVAILABLE)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 27,000원, E_COUPON 카테고리 상품 5,000원, 배송비 3,000원 (전체 35,000원 / 판정 금액 30,000원)</div></div>
+    <div><h4>절차</h4><ol><li>두 상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -5,000원</li><li>최종 결제 금액 30,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-02, REQ-01</span><span>근거 정책 1항; 정책 4항</span><span>자동화 후보</span><span>비고 Q1 답이 &#x27;배송비 제외&#x27;면 판정 금액 27,000원이라 &#x27;사용 불가&#x27;로 바뀐다</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-007</span><b>혼합 장바구니: 일반 26,999원 + e쿠폰 5,000원 + 배송비 3,000원이면 제외 금액을 빼 29,999원이라 쓸 수 없다</b><span class="flag red">P0</span><span class="chip as">가정 Q5</span><span class="chip as">가정 Q1</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 1장 보유(AVAILABLE)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 26,999원, E_COUPON 카테고리 상품 5,000원, 배송비 3,000원 (전체 34,999원 / 판정 금액 29,999원)</div></div>
+    <div><h4>절차</h4><ol><li>두 상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>쿠폰 영역을 확인한다</li><li>POST /orders/{orderId}/coupon 으로 쿠폰 적용을 요청한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰이 적용되지 않는다(쿠폰 할인 0원)</li><li>최종 결제 금액 34,999원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-02, REQ-01</span><span>근거 정책 4항; API 검증 로직</span><span>자동화 후보</span><span>비고 API는 totalPrice 전체(34,999원)로 검증해 적용될 수 있음 → 적용되면 결함 후보로 보고(Q5 가정). Q5 답이 &#x27;totalPrice 전체&#x27;면 기대결과가 &#x27;사용 가능, 결제 29,999원&#x27;으로 바뀐다</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-008</span><b>상품권(GIFT_CARD) 50,000원만 담으면 쿠폰을 쓸 수 없다</b><span class="flag red">P0</span><span class="chip as">가정 Q5</span><span class="chip">예외</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰, 정률 10% 쿠폰(maxDiscount 10,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>GIFT_CARD 카테고리 상품 50,000원 1개, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>상품권을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>쿠폰 영역과 결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰이 적용되지 않는다(쿠폰 할인 0원)</li><li>최종 결제 금액 50,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-02, REQ-04</span><span>근거 정책 4항; API 검증 로직 excludedCategories</span><span>자동화 후보</span><span>비고 API 기준이면 totalPrice 50,000원으로 검증은 통과하고 할인 대상 금액 0원이 됨. 정액 쿠폰이 할인되면 결함</span></div>
+</article><article class="tc" data-p="P0" data-a="0">
+  <div class="tc-head"><span class="tid">TC-009</span><b>쿠폰이 이미 적용된 주문에 다른 쿠폰을 적용하면 409 COUPON_ALREADY_APPLIED</b><span class="flag red">P0</span><span class="chip">예외</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 A, 정률 10% 쿠폰 B 보유</li><li>주문서에서 쿠폰 A가 적용된 주문</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>POST /orders/{orderId}/coupon 에 couponId=B로 요청한다</li><li>응답을 확인한다</li><li>주문의 쿠폰·할인 금액을 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>응답 409, 코드 COUPON_ALREADY_APPLIED</li><li>주문에 적용된 쿠폰은 A 1장, 쿠폰 할인 -5,000원 그대로</li><li>최종 결제 금액 45,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-03</span><span>근거 기획서 2절(p.3); 정책 2항; API 검증 로직</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="0">
+  <div class="tc-head"><span class="tid">TC-010</span><b>쿠폰이 적용된 주문에 같은 쿠폰을 다시 적용하면 409 COUPON_ALREADY_APPLIED</b><span class="flag red">P0</span><span class="chip">예외</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 A 보유</li><li>쿠폰 A가 적용된 주문</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>POST /orders/{orderId}/coupon 에 couponId=A로 다시 요청한다</li><li>응답을 확인한다</li><li>주문의 할인 금액을 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>응답 409, 코드 COUPON_ALREADY_APPLIED</li><li>쿠폰 할인 -5,000원(중복 차감 -10,000원 아님)</li><li>최종 결제 금액 45,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-03</span><span>근거 정책 2항; API 검증 로직</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="0">
+  <div class="tc-head"><span class="tid">TC-011</span><b>쿠폰이 없는 주문에 쿠폰 A·B 적용을 동시에 요청하면 한 건만 성공하고 나머지는 409</b><span class="flag red">P0</span><span class="chip">동시성</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 A, 정률 10% 쿠폰 B 보유</li><li>쿠폰 미적용 주문</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 80,000원, 배송비 0원 (A 5,000원 / B 8,000원), 동시 요청 도구로 두 요청 동시 전송</div></div>
+    <div><h4>절차</h4><ol><li>POST /orders/{orderId}/coupon (couponId=A)와 (couponId=B)를 동시에 보낸다</li><li>두 응답 코드를 확인한다</li><li>주문의 쿠폰·할인 금액을 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>한 요청만 성공, 다른 요청은 409 COUPON_ALREADY_APPLIED</li><li>주문에 적용된 쿠폰은 1장</li><li>쿠폰 할인은 성공한 쿠폰 한 장 금액(A면 -5,000원, B면 -8,000원), 합산 -13,000원 아님</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-03</span><span>근거 정책 2항; API 검증 로직</span><span>자동화 후보</span><span>비고 두 요청이 모두 성공하거나 할인이 합산되면 결함</span></div>
+</article><article class="tc" data-p="P1" data-a="0">
+  <div class="tc-head"><span class="tid">TC-049</span><b>다른 회원이 가진 쿠폰 ID로 적용을 요청하면 할인되지 않는다</b><span class="flag amber">P1</span><span class="chip">예외</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>회원 A 로그인</li><li>회원 B 소유 정액 5,000원 쿠폰(AVAILABLE)의 couponId 확보</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>회원 A 주문: 일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>회원 A 세션으로 POST /orders/{orderId}/coupon 에 회원 B 쿠폰 couponId를 보낸다</li><li>응답과 주문 할인 금액을 확인한다</li><li>회원 B 쿠폰 상태를 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>회원 A 주문 쿠폰 할인 0원, 최종 결제 금액 50,000원</li><li>회원 B 쿠폰 상태 AVAILABLE 그대로</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-03</span><span>근거 API 검증 로직</span><span>자동화 후보</span><span>비고 API 문서에 소유자 검증과 응답 코드가 없음(확인 필요)</span></div>
+</article><div class="group-h">쿠폰 선택 <span class="muted mono">14</span></div><article class="tc" data-p="P1" data-a="1">
+  <div class="tc-head"><span class="tid">TC-012</span><b>주문서에서 다른 쿠폰으로 바꾸면 기존 쿠폰은 해제되고 1장만 적용된다</b><span class="flag amber">P1</span><span class="chip as">가정 Q10</span><span class="chip">기능</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원), 정액 5,000원 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 80,000원, 배송비 0원 (자동 선택: 정률 8,000원)</div></div>
+    <div><h4>절차</h4><ol><li>주문서에 들어간다</li><li>쿠폰 목록을 연다</li><li>정액 5,000원 쿠폰을 선택한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>선택된 쿠폰은 정액 5,000원 1장</li><li>쿠폰 할인 -5,000원, 최종 결제 금액 75,000원</li><li>정률 쿠폰은 선택 해제된다</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-03, REQ-09</span><span>근거 기획서 2절(p.3); 기획서 3절(p.4)</span><span>자동화 후보</span><span>비고 변경 후 &#x27;최대 할인 적용됨&#x27; 라벨 표시 여부는 Q10 답 전까지 판정 보류</span></div>
+</article><article class="tc" data-p="P2" data-a="0">
+  <div class="tc-head"><span class="tid">TC-028</span><b>상품 80,000원이면 정률 10%(8,000원)가 정액 5,000원보다 커서 자동 선택되고 &#x27;최대 할인 적용됨&#x27; 라벨이 보인다</b><span class="flag green">P2</span><span class="chip">기능</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원), 정액 5,000원 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 80,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에 들어간다</li><li>쿠폰 영역을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>정률 10% 쿠폰이 선택돼 있다</li><li>&quot;최대 할인 적용됨&quot; 라벨이 보인다</li><li>쿠폰 할인 -8,000원, 최종 결제 금액 72,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-09</span><span>근거 기획서 3절(p.4); 디자인 쿠폰 선택 영역</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P2" data-a="0">
+  <div class="tc-head"><span class="tid">TC-029</span><b>상품 40,000원이면 정액 5,000원이 정률 10%(4,000원)보다 커서 자동 선택된다</b><span class="flag green">P2</span><span class="chip">기능</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원), 정액 5,000원 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 40,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에 들어간다</li><li>쿠폰 영역을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>정액 5,000원 쿠폰이 선택돼 있다</li><li>&quot;최대 할인 적용됨&quot; 라벨이 보인다</li><li>쿠폰 할인 -5,000원, 최종 결제 금액 35,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-09</span><span>근거 기획서 3절(p.4); 디자인 쿠폰 선택 영역</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P2" data-a="1">
+  <div class="tc-head"><span class="tid">TC-030</span><b>일반 30,000원 + 상품권 50,000원이면 제외 금액을 뺀 실제 할인액 기준으로 정액 5,000원이 자동 선택된다</b><span class="flag green">P2</span><span class="chip as">가정 Q9</span><span class="chip as">가정 Q5</span><span class="chip">기능</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원), 정액 5,000원 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 30,000원, GIFT_CARD 상품 50,000원, 배송비 0원 (정률 실제 할인 3,000원 / 전체 기준이면 8,000원)</div></div>
+    <div><h4>절차</h4><ol><li>두 상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>쿠폰 영역을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>정액 5,000원 쿠폰이 선택돼 있다</li><li>쿠폰 할인 -5,000원, 최종 결제 금액 75,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-09, REQ-04</span><span>근거 기획서 3절(p.4); 정책 4항</span><span>자동화 후보</span><span>비고 정률 쿠폰이 선택되면 제외 금액을 반영하지 않은 결함 후보</span></div>
+</article><article class="tc" data-p="P2" data-a="1">
+  <div class="tc-head"><span class="tid">TC-031</span><b>할인액이 같은 정액 5,000원 쿠폰 2장이면 그중 1장이 자동 선택되고 할인은 5,000원</b><span class="flag green">P2</span><span class="chip as">가정 Q10</span><span class="chip">기능</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 2장(쿠폰 X, Y) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에 들어간다</li><li>쿠폰 영역을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 1장만 선택돼 있다</li><li>쿠폰 할인 -5,000원, 최종 결제 금액 45,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-09</span><span>근거 기획서 3절(p.4)</span><span>자동화 후보</span><span>비고 X·Y 중 무엇이 선택되는지는 Q10 답 전까지 판정 보류(실제 선택된 쿠폰을 기록)</span></div>
+</article><article class="tc" data-p="P2" data-a="0">
+  <div class="tc-head"><span class="tid">TC-032</span><b>상품 80,000원이면 쿠폰 목록이 정률 10%(8,000원) → 정액 5,000원 → 정액 3,000원 순으로 정렬된다</b><span class="flag green">P2</span><span class="chip">화면</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10%(maxDiscount 10,000원), 정액 5,000원, 정액 3,000원 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 80,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에 들어간다</li><li>쿠폰 목록을 연다</li><li>쿠폰 순서를 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>1번째 정률 10%(8,000원 할인)</li><li>2번째 정액 5,000원</li><li>3번째 정액 3,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-10</span><span>근거 디자인 쿠폰 선택 영역</span><span>자동화 수동</span></div>
+</article><article class="tc" data-p="P2" data-a="0">
+  <div class="tc-head"><span class="tid">TC-033</span><b>상품 40,000원이면 쿠폰 목록이 정액 5,000원 → 정률 10%(4,000원) → 정액 3,000원 순으로 바뀐다</b><span class="flag green">P2</span><span class="chip">화면</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10%(maxDiscount 10,000원), 정액 5,000원, 정액 3,000원 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 40,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에 들어간다</li><li>쿠폰 목록을 연다</li><li>쿠폰 순서를 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>1번째 정액 5,000원</li><li>2번째 정률 10%(4,000원 할인)</li><li>3번째 정액 3,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-10</span><span>근거 디자인 쿠폰 선택 영역</span><span>자동화 수동</span><span>비고 쿠폰 액면(10%)이 아니라 이 주문의 실제 할인액 기준 정렬인지 확인</span></div>
+</article><article class="tc" data-p="P3" data-a="1">
+  <div class="tc-head"><span class="tid">TC-034</span><b>만료까지 4일 남은 쿠폰에는 &#x27;곧 만료&#x27; 배지가 없다</b><span class="flag green">P3</span><span class="chip as">가정 Q11</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>오늘 2026-11-10</li><li>만료일 2026-11-14 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 쿠폰 만료일 2026-11-14</div></div>
+    <div><h4>절차</h4><ol><li>주문서에 들어간다</li><li>쿠폰 목록을 연다</li><li>해당 쿠폰의 배지를 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>&quot;곧 만료&quot; 배지가 없다</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-11</span><span>근거 디자인 쿠폰 선택 영역</span><span>자동화 수동</span></div>
+</article><article class="tc" data-p="P3" data-a="1">
+  <div class="tc-head"><span class="tid">TC-035</span><b>만료까지 3일 남은 쿠폰에는 &#x27;곧 만료&#x27; D-3 배지가 보인다</b><span class="flag green">P3</span><span class="chip as">가정 Q11</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>오늘 2026-11-10</li><li>만료일 2026-11-13 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 쿠폰 만료일 2026-11-13</div></div>
+    <div><h4>절차</h4><ol><li>주문서에 들어간다</li><li>쿠폰 목록을 연다</li><li>해당 쿠폰의 배지를 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>&quot;곧 만료&quot; 배지와 D-3 표시</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-11</span><span>근거 디자인 쿠폰 선택 영역</span><span>자동화 수동</span></div>
+</article><article class="tc" data-p="P3" data-a="1">
+  <div class="tc-head"><span class="tid">TC-036</span><b>만료까지 2일 남은 쿠폰에는 &#x27;곧 만료&#x27; D-2 배지가 보인다</b><span class="flag green">P3</span><span class="chip as">가정 Q11</span><span class="chip">화면</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>오늘 2026-11-10</li><li>만료일 2026-11-12 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 쿠폰 만료일 2026-11-12</div></div>
+    <div><h4>절차</h4><ol><li>주문서에 들어간다</li><li>쿠폰 목록을 연다</li><li>해당 쿠폰의 배지를 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>&quot;곧 만료&quot; 배지와 D-2 표시</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-11</span><span>근거 디자인 쿠폰 선택 영역</span><span>자동화 수동</span></div>
+</article><article class="tc" data-p="P3" data-a="1">
+  <div class="tc-head"><span class="tid">TC-037</span><b>만료까지 1일 남은 쿠폰에는 &#x27;곧 만료&#x27; D-1 배지가 보인다</b><span class="flag green">P3</span><span class="chip as">가정 Q11</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>오늘 2026-11-10</li><li>만료일 2026-11-11 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 쿠폰 만료일 2026-11-11</div></div>
+    <div><h4>절차</h4><ol><li>주문서에 들어간다</li><li>쿠폰 목록을 연다</li><li>해당 쿠폰의 배지를 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>&quot;곧 만료&quot; 배지와 D-1 표시</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-11</span><span>근거 디자인 쿠폰 선택 영역</span><span>자동화 수동</span><span>비고 당일 만료(D-0) 표시는 Q11 답 전까지 판정 보류라 TC로 쓰지 않음</span></div>
+</article><article class="tc" data-p="P3" data-a="0">
+  <div class="tc-head"><span class="tid">TC-038</span><b>장바구니에 상품권이 섞이면 &#x27;상품권·e쿠폰 상품은 할인에서 제외돼요&#x27; 문구가 보인다</b><span class="flag green">P3</span><span class="chip">화면</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 40,000원, GIFT_CARD 상품 20,000원</div></div>
+    <div><h4>절차</h4><ol><li>두 상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>쿠폰 영역 안내 문구를 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>&quot;상품권·e쿠폰 상품은 할인에서 제외돼요&quot; 문구가 글자 그대로 보인다</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-12</span><span>근거 디자인 쿠폰 선택 영역; 정책 4항</span><span>자동화 수동</span></div>
+</article><article class="tc" data-p="P3" data-a="0">
+  <div class="tc-head"><span class="tid">TC-039</span><b>장바구니에 e쿠폰이 섞이면 같은 제외 안내 문구가 보인다</b><span class="flag green">P3</span><span class="chip">화면</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 40,000원, E_COUPON 상품 10,000원</div></div>
+    <div><h4>절차</h4><ol><li>두 상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>쿠폰 영역 안내 문구를 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>&quot;상품권·e쿠폰 상품은 할인에서 제외돼요&quot; 문구가 보인다</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-12</span><span>근거 디자인 쿠폰 선택 영역; 정책 4항</span><span>자동화 수동</span></div>
+</article><article class="tc" data-p="P3" data-a="0">
+  <div class="tc-head"><span class="tid">TC-040</span><b>일반 상품만 담으면 제외 안내 문구가 보이지 않는다</b><span class="flag green">P3</span><span class="chip">화면</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 40,000원만</div></div>
+    <div><h4>절차</h4><ol><li>상품을 장바구니에 담는다</li><li>주문서에 들어간다</li><li>쿠폰 영역을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>&quot;상품권·e쿠폰 상품은 할인에서 제외돼요&quot; 문구가 없다</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-12</span><span>근거 디자인 쿠폰 선택 영역</span><span>자동화 수동</span></div>
+</article><div class="group-h">할인 계산 <span class="muted mono">15</span></div><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-013</span><b>일반 40,000원 + 상품권 20,000원에 정률 10%면 일반 상품만 할인돼 4,000원</b><span class="flag red">P0</span><span class="chip as">가정 Q9</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 40,000원, GIFT_CARD 상품 20,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>두 상품을 장바구니에 담는다</li><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -4,000원(60,000원 기준 6,000원 아님)</li><li>최종 결제 금액 56,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-04</span><span>근거 정책 4항; API 검증 로직 excludedCategories; API 할인 계산</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-014</span><b>일반 35,000원 + e쿠폰 30,000원에 정률 10%면 일반 상품만 할인돼 3,500원</b><span class="flag red">P0</span><span class="chip as">가정 Q9</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 35,000원, E_COUPON 상품 30,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>두 상품을 장바구니에 담는다</li><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -3,500원(65,000원 기준 6,500원 아님)</li><li>최종 결제 금액 61,500원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-04</span><span>근거 정책 4항; API 검증 로직 excludedCategories; API 할인 계산</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="0">
+  <div class="tc-head"><span class="tid">TC-015</span><b>정액 5,000원 쿠폰을 상품 50,000원에 쓰면 5,000원 할인</b><span class="flag red">P0</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정액 5,000원 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -5,000원</li><li>최종 결제 금액 45,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-05</span><span>근거 기획서 3절(p.4); 정책 3항</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="0">
+  <div class="tc-head"><span class="tid">TC-016</span><b>정률 10% 쿠폰을 상품 52,000원에 쓰면 5,200원 할인</b><span class="flag red">P0</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 52,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -5,200원</li><li>최종 결제 금액 46,800원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-05</span><span>근거 기획서 3절(p.4); API 할인 계산</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-017</span><b>정률 10%의 할인 대상 금액에 배송비는 들어가지 않는다(상품 40,000원 + 배송비 3,000원 → 4,000원)</b><span class="flag red">P0</span><span class="chip as">가정 Q9</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 40,000원, 배송비 3,000원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -4,000원</li><li>최종 결제 금액 39,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-05</span><span>근거 API 할인 계산</span><span>자동화 후보</span><span>비고 Q9 답이 &#x27;배송비 포함&#x27;이면 할인 -4,300원, 최종 38,700원으로 바뀐다</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-018</span><b>정률 한도 경계: 상품 99,990원에 10%면 9,999원(한도 미만) 할인</b><span class="flag red">P0</span><span class="chip as">가정 Q2</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 99,990원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -9,999원</li><li>최종 결제 금액 89,991원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-06</span><span>근거 정책 3항; API 할인 계산 maxDiscount</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-019</span><b>정률 한도 경계: 상품 100,000원에 10%면 10,000원(한도와 같음) 할인</b><span class="flag red">P0</span><span class="chip as">가정 Q2</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 100,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -10,000원</li><li>최종 결제 금액 90,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-06</span><span>근거 정책 3항; API 할인 계산 maxDiscount</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-020</span><b>정률 한도 경계: 상품 100,010원에 10%(10,001원)면 한도 10,000원만 할인</b><span class="flag red">P0</span><span class="chip as">가정 Q2</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 100,010원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -10,000원(10,001원 아님)</li><li>최종 결제 금액 90,010원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-06</span><span>근거 정책 3항; API 할인 계산 maxDiscount</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-021</span><b>정률 10%를 상품 200,000원에 쓰면 20,000원이 아니라 한도 10,000원만 할인</b><span class="flag red">P0</span><span class="chip as">가정 Q2</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 200,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -10,000원</li><li>최종 결제 금액 190,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-06</span><span>근거 정책 3항; API 할인 계산 maxDiscount</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-022</span><b>maxDiscount 15,000원(10,000원 초과 설정) 정률 10%를 상품 200,000원에 쓰면 할인이 10,000원을 넘지 않는다</b><span class="flag red">P0</span><span class="chip as">가정 Q2</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 15,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 200,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -10,000원(정책 일괄 한도)</li><li>최종 결제 금액 190,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-06</span><span>근거 정책 3항; API 할인 계산 maxDiscount</span><span>자동화 후보</span><span>비고 Q2 가정에 따라 이 TC는 판정 보류로 기록. API대로면 -15,000원·185,000원이 나옴. Q2 답이 &#x27;쿠폰별 설정값&#x27;이면 기대결과가 -15,000원으로 바뀌고, &#x27;10,000원 초과 설정 불가&#x27;면 쿠폰 생성 단계 차단 확인으로 바뀐다</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-023</span><b>maxDiscount 5,000원 정률 10%를 상품 80,000원에 쓰면 8,000원이 아니라 5,000원 할인</b><span class="flag red">P0</span><span class="chip as">가정 Q2</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 5,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 80,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -5,000원</li><li>최종 결제 금액 75,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-06</span><span>근거 API 할인 계산 maxDiscount</span><span>자동화 후보</span><span>비고 Q2 답이 &#x27;일괄 10,000원(쿠폰별 설정 무시)&#x27;이면 기대결과가 -8,000원·72,000원으로 바뀐다</span></div>
+</article><article class="tc" data-p="P0" data-a="0">
+  <div class="tc-head"><span class="tid">TC-024</span><b>정률 10%를 상품 33,339원에 쓰면 3,333.9원을 절사해 3,333원 할인(반올림 3,334원 아님)</b><span class="flag red">P0</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 33,339원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -3,333원</li><li>최종 결제 금액 30,006원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-07</span><span>근거 API 할인 계산</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-025</span><b>쿠폰·포인트 적용 후 최종 결제 금액이 정확히 100원이면 결제할 수 있다</b><span class="flag red">P0</span><span class="chip as">가정 Q7</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 보유</li><li>포인트 30,000P 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 30,000원, 배송비 0원, 쿠폰 정액 5,000원, 포인트 24,900P 사용</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정액 5,000원 쿠폰을 적용한다</li><li>포인트 24,900P를 입력한다</li><li>결제 금액 요약을 확인한다</li><li>결제한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -5,000원, 포인트 사용 -24,900원</li><li>최종 결제 금액 100원</li><li>결제 승인 완료</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-08, REQ-13</span><span>근거 API 할인 계산; 기획서 4절(p.5)</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-026</span><b>쿠폰·포인트 적용 후 최종 결제 금액이 99원이 되면 100원 미만으로 결제되지 않는다</b><span class="flag red">P0</span><span class="chip as">가정 Q7</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 보유</li><li>포인트 30,000P 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 30,000원, 배송비 0원, 쿠폰 정액 5,000원, 포인트 24,901P 사용 시도</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정액 5,000원 쿠폰을 적용한다</li><li>포인트 24,901P를 입력한다</li><li>결제 금액 요약을 확인한다</li><li>결제를 시도한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>최종 결제 금액이 99원으로 승인되지 않는다</li><li>승인된 결제 금액은 100원 이상</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-08</span><span>근거 API 할인 계산</span><span>자동화 후보</span><span>비고 처리 방식(포인트 입력 제한·할인액 조정·적용 거부)과 화면 문구는 Q7 답 전까지 판정 보류. 실제 동작을 기록한다</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-027</span><b>쿠폰·포인트로 결제 금액 전액(0원)을 덮으려 하면 0원 결제가 되지 않는다</b><span class="flag red">P0</span><span class="chip as">가정 Q7</span><span class="chip">예외</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 보유</li><li>포인트 30,000P 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 30,000원, 배송비 0원, 쿠폰 정액 5,000원, 포인트 25,000P 사용 시도</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정액 5,000원 쿠폰을 적용한다</li><li>포인트 25,000P를 입력한다</li><li>결제를 시도한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>0원으로 주문이 완료되지 않는다</li><li>승인된 결제 금액은 100원 이상</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-08</span><span>근거 API 할인 계산</span><span>자동화 후보</span><span>비고 처리 방식은 Q7 답 전까지 판정 보류</span></div>
+</article><div class="group-h">결제 금액 <span class="muted mono">2</span></div><article class="tc" data-p="P1" data-a="1">
+  <div class="tc-head"><span class="tid">TC-041</span><b>정률 10% 쿠폰과 포인트 2,000P를 함께 쓰면 쿠폰을 먼저 계산해 최종 47,800원</b><span class="flag amber">P1</span><span class="chip as">가정 Q3</span><span class="chip as">가정 Q9</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정률 10% 쿠폰(maxDiscount 10,000원) 보유</li><li>포인트 2,000P 이상 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 52,000원, 배송비 3,000원, 포인트 2,000P</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정률 10% 쿠폰을 적용한다</li><li>포인트 2,000P를 입력한다</li><li>결제 금액 요약을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인 -5,200원, 포인트 사용 -2,000원</li><li>최종 결제 금액 47,800원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-13</span><span>근거 기획서 4절(p.5); 슬랙 11/04 14:20 박기획</span><span>자동화 후보</span><span>비고 포인트를 먼저 빼고 쿠폰을 계산하면 쿠폰 -5,000원, 최종 48,000원이 나옴 → 결함. Q9 답이 &#x27;배송비 포함&#x27;이면 쿠폰 -5,500원, 최종 47,500원으로 바뀐다</span></div>
+</article><article class="tc" data-p="P1" data-a="1">
+  <div class="tc-head"><span class="tid">TC-042</span><b>결제 금액 요약이 디자인 v1.1 순서와 금액으로 보인다(상품 52,000원·배송비 3,000원·포인트 2,000P·정액 5,000원)</b><span class="flag amber">P1</span><span class="chip as">가정 Q3</span><span class="chip">화면</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 보유</li><li>포인트 2,000P 이상 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 52,000원, 배송비 3,000원, 정액 5,000원 쿠폰, 포인트 2,000P</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 정액 5,000원 쿠폰을 적용한다</li><li>포인트 2,000P를 입력한다</li><li>결제 금액 요약 영역을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>행 순서: 상품 금액 52,000원 / 배송비 3,000원 / 포인트 사용 -2,000원 / 쿠폰 할인 -5,000원</li><li>최종 결제 금액 48,000원</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-13</span><span>근거 디자인 결제 금액 요약</span><span>자동화 수동</span><span>비고 Q3 답이 &#x27;쿠폰을 포인트 위로&#x27;면 행 순서 기대결과가 쿠폰 할인 → 포인트 사용으로 바뀐다(금액은 동일)</span></div>
+</article><div class="group-h">쿠폰 상태 <span class="muted mono">12</span></div><article class="tc" data-p="P0" data-a="0">
+  <div class="tc-head"><span class="tid">TC-043</span><b>결제 승인이 완료되면 쿠폰 상태가 AVAILABLE에서 USED로 바뀐다</b><span class="flag red">P0</span><span class="chip">상태 전이</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰(AVAILABLE) 보유</li><li>테스트 PG 승인 성공 설정</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 쿠폰을 적용한다</li><li>결제하고 PG 승인 완료를 기다린다</li><li>관리자/DB에서 쿠폰 상태를 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>결제 금액 45,000원 승인 완료</li><li>쿠폰 상태 USED</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-14</span><span>근거 API 쿠폰 상태 변경</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="0">
+  <div class="tc-head"><span class="tid">TC-044</span><b>쿠폰을 적용만 하고 결제 승인 전이면 쿠폰 상태는 AVAILABLE 그대로다</b><span class="flag red">P0</span><span class="chip">상태 전이</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰(AVAILABLE) 보유</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 쿠폰을 적용한다</li><li>결제 버튼을 누르지 않고 멈춘다</li><li>쿠폰 상태를 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 상태 AVAILABLE</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-14</span><span>근거 API 쿠폰 상태 변경</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P1" data-a="0">
+  <div class="tc-head"><span class="tid">TC-045</span><b>PG 결제 승인이 실패하면 쿠폰은 USED로 바뀌지 않는다</b><span class="flag amber">P1</span><span class="chip">연동</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰(AVAILABLE) 보유</li><li>테스트 PG 승인 실패 설정</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문서에서 쿠폰을 적용한다</li><li>결제를 시도한다(PG 승인 실패 응답)</li><li>쿠폰 상태를 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>결제 미완료</li><li>쿠폰 상태 AVAILABLE(USED 아님)</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-14</span><span>근거 API 쿠폰 상태 변경</span><span>자동화 후보</span><span>비고 승인 실패 후 쿠폰이 원래 주문에 붙어 있는지, 다른 주문에 바로 쓸 수 있는지는 문서에 없음(확인 필요)</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-046</span><b>이미 USED인 쿠폰을 다른 주문에 적용하면 할인되지 않는다</b><span class="flag red">P0</span><span class="chip as">가정 Q6</span><span class="chip">상태 전이</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>주문 A 결제 완료로 USED가 된 정액 5,000원 쿠폰</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>새 주문 B: 일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문 B의 주문서에 들어가 쿠폰 목록을 확인한다</li><li>POST /orders/{주문B}/coupon 에 USED 쿠폰 couponId로 요청한다</li><li>주문 B 할인 금액을 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>주문 B 쿠폰 할인 0원, 최종 결제 금액 50,000원</li><li>API 요청이 성공 처리되지 않는다</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-14</span><span>근거 API 쿠폰 상태 변경</span><span>자동화 후보</span><span>비고 응답 코드·목록 표시 방식은 문서에 없음(확인 필요)</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-047</span><b>같은 쿠폰을 승인 전 주문 A·B에 적용하고 A가 먼저 승인되면 B는 쿠폰 할인으로 결제 완료되지 않는다</b><span class="flag red">P0</span><span class="chip as">가정 Q6</span><span class="chip">동시성</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 1장(AVAILABLE)</li><li>두 기기(또는 두 세션)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>주문 A·B 각각 일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>세션 1에서 주문 A에 쿠폰을 적용한다</li><li>세션 2에서 주문 B에 같은 쿠폰을 적용한다</li><li>주문 A를 결제 승인 완료한다</li><li>주문 B를 결제한다</li><li>두 주문의 결제 금액과 쿠폰 상태를 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>주문 A 45,000원 결제 완료, 쿠폰 USED</li><li>주문 B는 45,000원(쿠폰 할인 포함)으로 결제 완료되지 않는다</li><li>쿠폰이 붙은 결제 완료 주문은 1건</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-14, REQ-03</span><span>근거 API 쿠폰 상태 변경; API 검증 로직</span><span>자동화 후보</span><span>비고 주문 B가 쿠폰 할인으로 결제되면 결함(Q6 가정). B에 대한 처리 방식(쿠폰 해제·결제 거부)과 문구는 확인 필요</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-048</span><b>같은 쿠폰이 적용된 주문 A·B의 결제를 동시에 승인 요청하면 한 건만 쿠폰 할인으로 완료된다</b><span class="flag red">P0</span><span class="chip as">가정 Q6</span><span class="chip">동시성</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰 1장(AVAILABLE)</li><li>주문 A·B 모두 같은 쿠폰 적용 상태</li><li>동시 요청 도구</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>주문 A·B 각각 일반 상품 50,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>주문 A·B 결제 요청을 동시에 보낸다</li><li>두 결제 결과를 확인한다</li><li>쿠폰 상태와 쿠폰 사용 이력을 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 할인(45,000원)으로 결제 완료된 주문은 정확히 1건</li><li>쿠폰 상태 USED, 사용 이력 1건</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-14, REQ-03</span><span>근거 API 쿠폰 상태 변경</span><span>자동화 후보</span><span>비고 두 건 모두 완료되면 결함(Q6 가정). 10회 이상 반복해 경쟁 상태 확인 권장</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-050</span><b>유효기간이 남은 쿠폰을 쓴 주문을 전체 취소하면 쿠폰이 USED에서 AVAILABLE로 복구된다</b><span class="flag red">P0</span><span class="chip as">가정 Q4</span><span class="chip">상태 전이</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰(만료일 2026-12-31)으로 결제 완료된 주문(쿠폰 USED)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 결제 45,000원</div></div>
+    <div><h4>절차</h4><ol><li>주문을 전체 취소한다</li><li>쿠폰 상태를 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 상태 AVAILABLE</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-15</span><span>근거 API 쿠폰 상태 변경; 슬랙 11/05 16:55 박기획; 기획서 5절(p.6)</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-051</span><b>전체 취소로 복구된 쿠폰을 새 주문에 다시 쓸 수 있다</b><span class="flag red">P0</span><span class="chip as">가정 Q4</span><span class="chip">상태 전이</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>TC-050으로 전체 취소 후 AVAILABLE로 복구된 정액 5,000원 쿠폰</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>새 주문: 일반 상품 40,000원, 배송비 0원</div></div>
+    <div><h4>절차</h4><ol><li>새 주문서에 들어간다</li><li>쿠폰 목록에서 복구된 쿠폰을 확인한다</li><li>적용하고 결제한다</li><li>쿠폰 상태를 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰이 목록에 보이고 적용된다</li><li>쿠폰 할인 -5,000원, 결제 금액 35,000원 승인 완료</li><li>쿠폰 상태 USED</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-15</span><span>근거 API 쿠폰 상태 변경</span><span>자동화 후보</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-052</span><b>상품 2개 중 1개만 부분 취소하면 쿠폰은 USED 그대로다</b><span class="flag red">P0</span><span class="chip as">가정 Q4</span><span class="chip">상태 전이</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰으로 결제 완료된 주문(쿠폰 USED)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>상품 A 20,000원 + 상품 B 20,000원, 배송비 0원, 결제 35,000원</div></div>
+    <div><h4>절차</h4><ol><li>상품 A만 부분 취소한다</li><li>쿠폰 상태를 조회한다</li><li>쿠폰 목록에서 해당 쿠폰을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 상태 USED</li><li>사용 가능한 쿠폰 목록에 나오지 않는다</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-16</span><span>근거 API 쿠폰 상태 변경; 슬랙 11/05 16:55 박기획</span><span>자동화 후보</span><span>비고 기획서 5절(즉시 복구, 조건 없음)대로면 AVAILABLE이 됨. Q4 답이 기획서 쪽이면 기대결과가 AVAILABLE로 바뀐다</span></div>
+</article><article class="tc" data-p="P1" data-a="1">
+  <div class="tc-head"><span class="tid">TC-053</span><b>쿠폰 쓴 주문에서 상품을 하나씩 부분 취소해도 환불 총액이 실제 결제 금액 35,000원을 넘지 않는다</b><span class="flag amber">P1</span><span class="chip as">가정 Q8</span><span class="chip">계산</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>정액 5,000원 쿠폰으로 결제 완료된 주문</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>상품 A 20,000원 + 상품 B 20,000원, 배송비 0원, 결제 35,000원</div></div>
+    <div><h4>절차</h4><ol><li>상품 A를 부분 취소하고 환불 금액을 기록한다</li><li>상품 B를 부분 취소하고 환불 금액을 기록한다</li><li>환불 금액 합계를 계산한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>환불 합계 35,000원 이하(40,000원 아님)</li><li>상품 A 부분 취소 환불 금액은 20,000원 이하</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-16</span><span>근거 API 쿠폰 상태 변경</span><span>자동화 후보</span><span>비고 할인 안분 방식(Q8)은 판정 보류, 각 회차 환불 금액은 기록만. 마지막 상품까지 부분 취소한 뒤 쿠폰 상태는 문서에 없음(확인 필요)</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-054</span><b>취소 시점에 유효기간이 지난 쿠폰은 전체 취소해도 복구되지 않는다</b><span class="flag red">P0</span><span class="chip as">가정 Q4</span><span class="chip">상태 전이</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>만료 2026-11-10 23:59:59 정액 5,000원 쿠폰으로 11/10에 결제 완료된 주문(쿠폰 USED)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 결제 45,000원, 취소 시각 2026-11-11 00:00:01</div></div>
+    <div><h4>절차</h4><ol><li>만료 시각이 지난 뒤 주문을 전체 취소한다</li><li>쿠폰 상태를 조회한다</li><li>쿠폰 목록을 확인한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 상태 AVAILABLE로 바뀌지 않는다</li><li>사용 가능한 쿠폰 목록에 나오지 않는다</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-17</span><span>근거 슬랙 11/05 16:55 박기획</span><span>자동화 후보</span><span>비고 슬랙 결정이라 API 구현 여부 미확인. 기획서 5절대로면 AVAILABLE. Q4 답이 기획서 쪽이면 기대결과가 AVAILABLE로 바뀐다. 미복구 시 쿠폰 상태값(USED 유지/EXPIRED)은 확인 필요</span></div>
+</article><article class="tc" data-p="P0" data-a="1">
+  <div class="tc-head"><span class="tid">TC-055</span><b>만료 직전(만료 1분 전)에 전체 취소하면 쿠폰이 AVAILABLE로 복구된다</b><span class="flag red">P0</span><span class="chip as">가정 Q4</span><span class="chip">경계값</span></div>
+  <div class="tc-body">
+    <div><h4>사전조건</h4><ul><li>로그인 회원</li><li>만료 2026-11-10 23:59:59 정액 5,000원 쿠폰으로 결제 완료된 주문(쿠폰 USED)</li></ul><h4 style="margin-top:8px">테스트 데이터</h4><div>일반 상품 50,000원, 결제 45,000원, 취소 시각 2026-11-10 23:58:59</div></div>
+    <div><h4>절차</h4><ol><li>만료 1분 전에 주문을 전체 취소한다</li><li>쿠폰 상태를 조회한다</li></ol></div>
+    <div style="grid-column:1/-1"><h4>기대결과</h4><ul><li>쿠폰 상태 AVAILABLE</li></ul></div>
+  </div>
+  <div class="tc-meta"><span>요구사항 REQ-17, REQ-15</span><span>근거 API 쿠폰 상태 변경; 슬랙 11/05 16:55 박기획</span><span>자동화 후보</span><span>비고 만료 판정 시각 기준(초 단위/날짜 단위)은 문서에 없음(확인 필요)</span></div>
+</article></div>
+    <div class="card"><h3>메모</h3><ul><li>테스트 데이터 준비: 정률 10% 쿠폰 3종(maxDiscount 10,000원 / 15,000원 / 5,000원), 정액 5,000원 2장, 정액 3,000원 1장(정렬 확인용으로 추가), 만료일 11/11~11/14 쿠폰, 만료 2026-11-10 23:59:59 쿠폰, 포인트 30,000P 보유 회원</li><li>범위 제외: 첫 구매 쿠폰 최소 금액 1만 원 인하(슬랙 11/06 박기획, 다음 차수)</li><li>확인 필요: 최소 주문 금액 미달·USED·타인 쿠폰 적용 시 API 응답 코드와 화면 문구가 문서에 없음</li><li>확인 필요: 부분 취소를 반복해 모든 상품이 취소되면 &#x27;전체 취소&#x27;로 보고 쿠폰을 복구하는지 문서에 없음</li><li>확인 필요: PG 승인 지연(타임아웃) 중 쿠폰 상태와, 승인 성공 후 USED 처리 실패 시 동작이 문서에 없어 TC를 쓰지 않음</li><li>확인 필요: 쿠폰을 하나도 갖지 않은 회원의 주문서 쿠폰 영역 표시, 당일 만료(D-0) 배지와 쿠폰 사용 가능 여부</li><li>확인 필요: 정액 쿠폰이 할인 대상 금액보다 큰 경우(Q9) — Q1·Q5 가정에서는 대상 금액이 최소 27,000원 이상이라 정액 5,000원으로는 재현되지 않아 TC를 쓰지 않음</li><li>전체 취소 환불 금액 규칙은 문서에 없어 쿠폰 상태만 검증함</li></ul></div></section>
+  <footer>QA 오케스트라 신규 TC 작성가가 만든 문서예요. 원본 데이터: test-cases.json · 엑셀용: test-cases.csv</footer>
+</div>
+<script>
+document.querySelectorAll('.filters button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.filters button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  const f = b.dataset.f;
+  document.querySelectorAll('.tc').forEach(t => {
+    t.hidden = !(f === 'all' || (f === 'as' ? t.dataset.a === '1' : t.dataset.p === f));
+  });
+}));
+</script>

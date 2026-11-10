@@ -1,0 +1,1 @@
+../../plugins/qa-new-tc-writer/agents/new-tc-writer.md

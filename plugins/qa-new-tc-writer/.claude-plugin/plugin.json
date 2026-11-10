@@ -1,0 +1,13 @@
+{
+  "name": "qa-new-tc-writer",
+  "description": "QA 신규 TC 작성가: 기획 분석서(또는 문서)를 받아 신규 기능 테스트 케이스를 쓰고, 요구사항 커버리지·가정 의존 TC를 점검해 엑셀용 CSV·HTML·마크다운으로 낸다",
+  "version": "0.1.0",
+  "author": {
+    "name": "test12yk"
+  },
+  "keywords": [
+    "qa",
+    "test-case",
+    "tc"
+  ]
+}
