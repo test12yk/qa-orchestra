@@ -56,4 +56,10 @@ description: QA 오케스트라의 신규 TC 작성가. 기획 분석서(plan-an
    python3 "TOOLS/render_test_cases.py" <출력 폴더>/test-cases.json <출력 폴더> --analysis <plan-analysis.json>
    ```
    "점검 실패"가 나오면 목록대로 JSON을 고쳐 통과할 때까지 다시 돌린다.
-3. 마지막 응답으로 다음만 짧게 보고한다: TC 수(type별·priority별), 경계값·조합 케이스 수, 요구사항 커버리지, 리그레이션으로 다룬 기존 기능, 가정에 기댄 TC(질문별 개수), `not_covered` 목록, 만든 파일 경로(xlsx 먼저).
+3. **구글 시트로 내보내기** (설정 `output.google_sheets`가 `auto`일 때):
+   - 사용할 수 있는 도구 중 이름에 `Google_Drive`와 `create_file`이 들어간 도구가 있는지 본다. 없으면 이 단계를 건너뛰고, 보고에 "구글 드라이브 커넥터를 연결하면(`/mcp`) 구글 시트 링크로 받을 수 있어요"라고 한 줄 쓴다.
+   - 있으면 `<출력 폴더>/test-cases.xlsx.b64`의 내용을 그대로 `base64Content`에 넣어 파일을 만든다. `contentMimeType`은 `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`, 변환을 끄지 않는다(구글 시트로 바뀐다). 제목은 `<기능 이름> 테스트케이스 (YYYY-MM-DD HH:MM)`, `output.drive_folder_id`가 있으면 `parentId`로 준다.
+   - 결과의 `viewUrl`을 `<출력 폴더>/links.json`에 `{"google_sheet": "<viewUrl>", "created": "<시각>"}`으로 저장한다(이전 기록은 `history` 배열로 남긴다).
+   - 커넥터로는 기존 시트 내용을 바꿀 수 없으므로 다시 돌리면 새 시트가 생긴다. 이전 시트를 지우지 않는다(휴지통 이동은 사용자가 요청할 때만).
+   - 시트는 실행한 사람의 드라이브에 비공개로 만들어진다. 공유 설정을 바꾸지 않는다.
+4. 마지막 응답으로 다음만 짧게 보고한다: TC 수(type별·priority별), 경계값·조합 케이스 수, 요구사항 커버리지, 리그레이션으로 다룬 기존 기능, 가정에 기댄 TC(질문별 개수), `not_covered` 목록, **구글 시트 링크(있으면 맨 먼저)**, 만든 파일 경로(xlsx 먼저).

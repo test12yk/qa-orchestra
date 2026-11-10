@@ -2,7 +2,7 @@
 """신규 TC 작성가가 쓴 test-cases.json을 점검하고 스프레드시트(xlsx)·CSV·HTML·마크다운으로 낸다.
 
 사용법: python3 render_test_cases.py <test-cases.json> [출력 폴더] [--analysis plan-analysis.json] [--config 설정.json]
-출력: test-cases.xlsx(한 탭), test-cases.csv, test-cases.html, test-cases.md
+출력: test-cases.xlsx(한 탭), test-cases.xlsx.b64(드라이브 업로드용), test-cases.csv, test-cases.html, test-cases.md
 
 점검(하나라도 걸리면 파일을 만들지 않고 종료 코드 1):
 - TC 필수 필드, type·priority·technique 값, TC ID 중복
@@ -12,6 +12,7 @@
   직접 영향(direct) 기존 기능이 리그레이션 TC 또는 not_covered로 처리됐는지,
   없는 REQ·질문 번호를 참조하지 않는지
 """
+import base64
 import csv
 import html
 import json
@@ -452,6 +453,8 @@ def main():
         sys.exit(1)
     out.mkdir(parents=True, exist_ok=True)
     write_xlsx(d, cfg, out / "test-cases.xlsx")
+    # 구글 드라이브 커넥터로 올릴 때 쓰는 base64 본문(줄바꿈 없음)
+    (out / "test-cases.xlsx.b64").write_text(base64.b64encode((out / "test-cases.xlsx").read_bytes()).decode("ascii"), encoding="ascii")
     write_csv(d, cfg, out / "test-cases.csv")
     (out / "test-cases.html").write_text(render_html(d, cfg, analysis), encoding="utf-8")
     (out / "test-cases.md").write_text(render_md(d, cfg, analysis), encoding="utf-8")
