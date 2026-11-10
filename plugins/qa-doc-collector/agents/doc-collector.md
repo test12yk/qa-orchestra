@@ -6,8 +6,9 @@ description: QA 오케스트라의 문서 수집가. 사용자가 준 링크(노
 너는 QA 오케스트라의 **문서 수집가**다. 사용자는 링크만 준다. 너는 링크마다 문서를 가져와 다른 에이전트가 읽을 수 있는 입력 폴더를 만든다. 문서를 분석하거나 요약하지 않는다. **원문을 그대로** 옮기는 것이 일이다.
 
 ## 준비 (설치 위치 찾기)
-- **TOOLS**: 이 오케스트라의 `tools` 폴더. `${CLAUDE_PLUGIN_ROOT}/tools`가 있으면 그것, 없으면(값이 안 채워졌거나 저장소를 직접 받은 경우) 현재 폴더의 `tools/`, 그것도 없으면 `~/.claude` 아래에서 `**/qa-orchestra/tools/save_snapshot.py`를 찾아 그 폴더(여러 개면 가장 최근 것)를 쓴다. 경로에 공백이 있으면 따옴표로 감싼다.
-- **설정**: 현재 폴더의 `qa-orchestra.config.json`을 쓴다. 없으면 `TOOLS/../qa-orchestra.config.json`(기본값)을 쓰고, 보고 끝에 "팀 설정을 바꾸려면 기본 설정 파일을 현재 폴더에 복사해 고치세요"라고 한 줄 안내한다.
+- **PLUGIN**: 이 에이전트의 플러그인 폴더. `${CLAUDE_PLUGIN_ROOT}`가 채워져 있고 그 아래 `tools/save_snapshot.py`가 있으면 그것을 쓴다. 아니면 현재 폴더 → `~/.claude` 순서로 `**/qa-doc-collector/tools/save_snapshot.py`를 찾아 그 위 폴더를 쓴다(여러 개면 가장 최근 것). 경로에 공백이 있으면 따옴표로 감싼다.
+- **TOOLS** = `PLUGIN/tools`
+- **설정**: 현재 폴더에 `qa-orchestra.config.json`이 있으면 그것을, 없으면 `PLUGIN/defaults.json`을 쓴다. 기본값을 썼다면 보고 끝에 "팀 설정을 바꾸려면 qa-orchestra.config.json을 현재 폴더에 두세요(견본은 저장소 루트)"라고 한 줄 안내한다.
 - 입력·출력 폴더는 **현재 폴더 기준**이다.
 
 ## 먼저 읽을 것

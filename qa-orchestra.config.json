@@ -1,5 +1,5 @@
 {
-  "_comment": "팀마다 바꾸는 설정. 에이전트 정의(.claude/agents)는 고치지 말고 이 파일만 고친다.",
+  "_comment": "팀 설정 견본. 이 파일을 작업 폴더에 복사해 고치면 모든 에이전트가 이것을 쓴다. 없으면 각 플러그인의 defaults.json을 쓴다.",
   "team": {
     "domain": "커머스·금융 서비스",
     "language": "ko"
@@ -7,23 +7,91 @@
   "sources": {
     "_comment": "링크 도메인 → 가져오는 방법. connector는 Claude Code에 연결된 MCP 이름(앞부분 일치). 연결이 없으면 fallback 으로 붙여넣기를 요청한다.",
     "routes": [
-      {"match": ["notion.so", "notion.site", "app.notion.com"], "connector": "Notion", "fetch_hint": "notion-fetch 에 링크를 그대로 넣는다. page_last_edited_at 을 version 으로 쓴다."},
-      {"match": ["atlassian.net/wiki"], "connector": "Atlassian", "fetch_hint": "Confluence 페이지 조회. version.number 를 version 으로 쓴다."},
-      {"match": ["atlassian.net/browse", "atlassian.net/jira"], "connector": "Atlassian", "fetch_hint": "Jira 이슈 조회. 설명·댓글까지 가져온다."},
-      {"match": ["slack.com/archives"], "connector": "Slack", "fetch_hint": "채널/스레드 메시지를 시각·작성자와 함께 가져온다."},
-      {"match": ["figma.com"], "connector": "Figma", "fetch_hint": "프레임의 텍스트·주석을 가져온다. 이미지는 저장하지 않는다."},
-      {"match": ["docs.google.com", "drive.google.com"], "connector": "Google_Drive", "fetch_hint": "문서 본문을 가져온다. modifiedTime 을 version 으로 쓴다."}
+      {
+        "match": [
+          "notion.so",
+          "notion.site",
+          "app.notion.com"
+        ],
+        "connector": "Notion",
+        "fetch_hint": "notion-fetch 에 링크를 그대로 넣는다. page_last_edited_at 을 version 으로 쓴다."
+      },
+      {
+        "match": [
+          "atlassian.net/wiki"
+        ],
+        "connector": "Atlassian",
+        "fetch_hint": "Confluence 페이지 조회. version.number 를 version 으로 쓴다."
+      },
+      {
+        "match": [
+          "atlassian.net/browse",
+          "atlassian.net/jira"
+        ],
+        "connector": "Atlassian",
+        "fetch_hint": "Jira 이슈 조회. 설명·댓글까지 가져온다."
+      },
+      {
+        "match": [
+          "slack.com/archives"
+        ],
+        "connector": "Slack",
+        "fetch_hint": "채널/스레드 메시지를 시각·작성자와 함께 가져온다."
+      },
+      {
+        "match": [
+          "figma.com"
+        ],
+        "connector": "Figma",
+        "fetch_hint": "프레임의 텍스트·주석을 가져온다. 이미지는 저장하지 않는다."
+      },
+      {
+        "match": [
+          "docs.google.com",
+          "drive.google.com"
+        ],
+        "connector": "Google_Drive",
+        "fetch_hint": "문서 본문을 가져온다. modifiedTime 을 version 으로 쓴다."
+      }
     ],
     "fallback": "paste",
     "allow_public_web": false
   },
   "doc_types": {
     "_comment": "문서 종류 판별 힌트(제목·본문에서 찾는 말). 위에서부터 먼저 맞는 것을 쓴다.",
-    "plan": ["기획서", "PRD", "요구사항", "기획"],
-    "policy": ["정책", "운영 정책", "약관", "규정"],
-    "dev": ["API", "개발", "설계", "ERD", "DB", "스펙"],
-    "design": ["디자인", "UI", "UX", "가이드", "Figma"],
-    "slack": ["슬랙", "slack", "대화", "스레드"]
+    "plan": [
+      "기획서",
+      "PRD",
+      "요구사항",
+      "기획"
+    ],
+    "policy": [
+      "정책",
+      "운영 정책",
+      "약관",
+      "규정"
+    ],
+    "dev": [
+      "API",
+      "개발",
+      "설계",
+      "ERD",
+      "DB",
+      "스펙"
+    ],
+    "design": [
+      "디자인",
+      "UI",
+      "UX",
+      "가이드",
+      "Figma"
+    ],
+    "slack": [
+      "슬랙",
+      "slack",
+      "대화",
+      "스레드"
+    ]
   },
   "workspace": "work",
   "_workspace_comment": "가져온 회사 문서는 work/<기능>/ 아래에 저장되고 git 에 올라가지 않는다(.gitignore)."

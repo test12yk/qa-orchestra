@@ -1,0 +1,14 @@
+{
+  "name": "qa-doc-collector",
+  "description": "QA 문서 수집가: 링크(노션·컨플루언스·지라·슬랙·피그마·구글 문서)로 문서를 가져와 버전·변경 내역과 함께 저장",
+  "version": "0.2.0",
+  "author": {
+    "name": "test12yk"
+  },
+  "keywords": [
+    "qa",
+    "documents",
+    "notion",
+    "snapshot"
+  ]
+}

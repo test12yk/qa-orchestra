@@ -2,12 +2,26 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "qa-orchestra",
   "description": "QA 오케스트라 플러그인 배포처",
-  "owner": {"name": "test12yk"},
+  "owner": {
+    "name": "test12yk"
+  },
   "plugins": [
     {
       "name": "qa-orchestra",
-      "description": "링크만 주면 문서를 가져와 기획 분석서를 만드는 QA 에이전트 모음",
-      "source": "./",
+      "description": "전체 묶음 (모든 에이전트)",
+      "source": "./plugins/qa-orchestra",
+      "category": "testing"
+    },
+    {
+      "name": "qa-doc-collector",
+      "description": "문서 수집가만",
+      "source": "./plugins/qa-doc-collector",
+      "category": "testing"
+    },
+    {
+      "name": "qa-plan-analyst",
+      "description": "기획 분석가만",
+      "source": "./plugins/qa-plan-analyst",
       "category": "testing"
     }
   ]

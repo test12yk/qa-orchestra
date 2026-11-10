@@ -29,34 +29,37 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 
 ## 폴더
 ```
-.claude-plugin/            플러그인·마켓플레이스 정보
-agents/                    에이전트 정의 (.claude/agents 는 여기로 연결)
-qa-orchestra.config.json   팀별 설정(서비스 영역, 링크→커넥터, 문서 종류)
-tools/save_snapshot.py     가져온 문서 저장·버전·변경 diff
-tools/render_plan_analysis.py   기획 분석서 JSON → HTML·마크다운
-work/                      가져온 실제 문서와 결과 (git 제외)
-tools/templates/           양식(CSS, JSON 예시)
-samples/coupon-discount/   가상 "쿠폰 할인" 기능
-  inputs/                  입력 문서 5종 (의도적 충돌 포함)
-  outputs/                 사람이 만든 기준 답안
-  run-01/                  에이전트 실행 결과
+.claude-plugin/marketplace.json   배포처(플러그인 목록)
+plugins/
+  qa-orchestra/        전체 묶음 (다른 플러그인을 의존성으로 설치)
+  qa-doc-collector/    문서 수집가: agents/, tools/save_snapshot.py, defaults.json
+  qa-plan-analyst/     기획 분석가: agents/, tools/render_plan_analysis.py, tools/templates/, defaults.json
+.claude/agents/        저장소를 받아 쓸 때를 위한 연결(plugins/*/agents 를 가리킴)
+qa-orchestra.config.json   팀 설정 견본
+samples/coupon-discount/   가상 "쿠폰 할인" 기능 (입력 5종, 기준 답안, 실행 결과)
+work/                  가져온 실제 문서와 결과 (git 제외)
 ```
 
 ## 설치
-**플러그인으로 (아무 폴더에서나 쓰기)** — Claude Code 안에서:
+Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** 설치한다.
 ```
 /plugin marketplace add test12yk/qa-orchestra
-/plugin install qa-orchestra@qa-orchestra
 ```
-비공개 저장소라면 그 저장소에 접근 권한이 있는 GitHub 계정으로 로그인돼 있어야 한다. 설치 뒤 Claude Code를 다시 시작한다.
+| 원하는 것 | 설치 명령 | 들어오는 것 |
+|---|---|---|
+| 전체 | `/plugin install qa-orchestra@qa-orchestra` | 모든 에이전트 (아래 플러그인들이 함께 설치됨) |
+| 문서 수집가만 | `/plugin install qa-doc-collector@qa-orchestra` | `doc-collector` + 저장 스크립트 |
+| 기획 분석가만 | `/plugin install qa-plan-analyst@qa-orchestra` | `plan-analyst` + 렌더러·양식 |
 
-**저장소를 받아서** — `git clone` 후 그 폴더에서 `claude`를 실행하면 에이전트가 바로 잡힌다.
+에이전트별 플러그인에는 그 에이전트가 쓰는 파일만 들어 있다(샘플·문서는 설치되지 않음). 나중에 전체를 설치하면 빠진 것만 추가된다. 비공개 저장소라면 접근 권한이 있는 GitHub 계정이 필요하다. 설치 뒤 Claude Code를 다시 시작한다.
+
+**저장소를 받아서** — `git clone` 후 그 폴더에서 `claude`를 실행하면 모든 에이전트가 바로 잡힌다.
 
 준비물: Claude Code, python3(추가 설치 없음). 문서 도구 커넥터(노션 등)는 문서 수집가를 쓸 때만 필요하다.
 
 ## 처음 쓰는 사람
 1. Claude Code에 팀이 쓰는 문서 도구(노션·컨플루언스·슬랙 등)를 커넥터로 연결한다. 문서는 **각자의 권한으로** 가져온다.
-2. `qa-orchestra.config.json`에서 서비스 영역, 링크 도메인, 문서 종류 힌트를 팀에 맞게 고친다.
+2. 팀에 맞게 바꾸려면 저장소 루트의 `qa-orchestra.config.json` 견본을 작업 폴더에 복사해 고친다(서비스 영역, 링크 도메인, 문서 종류 힌트). 없으면 각 플러그인의 기본값을 쓴다.
 3. 링크만 주고 시작한다.
 ```
 doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupon-discount
@@ -66,7 +69,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 가져온 문서는 `work/<기능>/inputs/`에 원본 링크·버전과 함께 저장되며 git에 올라가지 않는다. 연결 안 된 링크는 붙여넣기를 요청한다. 같은 요청을 다시 하면 바뀐 문서와 바뀐 줄을 알려 준다(`changes.md`).
 
 ## 에이전트 하나만 쓰기
-설치하면 모든 에이전트가 들어오지만, **이름을 부른 에이전트만** 실행된다(입력창에서 `@`로 골라도 된다). 에이전트마다 폴더를 받아 폴더로 결과를 내므로 앞 단계를 거치지 않아도 된다.
+필요한 에이전트의 플러그인만 설치하면 된다(위 표). 전체를 설치했더라도 **이름을 부른 에이전트만** 실행된다(입력창에서 `@`로 골라도 된다). 에이전트마다 폴더를 받아 폴더로 결과를 내므로 앞 단계를 거치지 않아도 된다.
 
 | 에이전트 | 입력 | 출력 | 혼자 쓸 때 |
 |---|---|---|---|
@@ -75,6 +78,8 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 
 여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(예정)를 쓴다.
 
+**에이전트를 새로 만들 때**: `plugins/qa-<이름>/`에 그 에이전트가 쓰는 파일만 넣고, 배포처(`marketplace.json`)와 전체 묶음의 `dependencies`에 추가한다. 다른 플러그인 폴더의 파일을 참조하지 않는다.
+
 ## 기획 분석가 실행
 Claude Code에서:
 ```
@@ -82,5 +87,5 @@ plan-analyst 에이전트로 samples/coupon-discount/inputs 를 분석해서 sam
 ```
 렌더러만 다시 돌릴 때:
 ```
-python3 tools/render_plan_analysis.py samples/coupon-discount/run-01/plan-analysis.json samples/coupon-discount/run-01
+python3 plugins/qa-plan-analyst/tools/render_plan_analysis.py samples/coupon-discount/run-01/plan-analysis.json samples/coupon-discount/run-01
 ```

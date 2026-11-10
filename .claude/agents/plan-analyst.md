@@ -1,0 +1,1 @@
+../../plugins/qa-plan-analyst/agents/plan-analyst.md

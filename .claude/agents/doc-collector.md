@@ -1,0 +1,1 @@
+../../plugins/qa-doc-collector/agents/doc-collector.md
