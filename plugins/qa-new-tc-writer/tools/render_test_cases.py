@@ -118,44 +118,76 @@ def col_letter(i):
     return s
 
 
+XML_HEAD = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+NS_MAIN = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+NS_REL = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+NS_PKG = "http://schemas.openxmlformats.org/package/2006/relationships"
+CT = "application/vnd.openxmlformats-officedocument"
+
+# 최소 테마. 엑셀은 없어도 열지만 구글 시트 등 일부 프로그램은 테마·문서 속성이 없으면 열지 못한다.
+THEME = (XML_HEAD + '<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Office Theme"><a:themeElements>'
+         '<a:clrScheme name="Office"><a:dk1><a:sysClr val="windowText" lastClr="000000"/></a:dk1><a:lt1><a:sysClr val="window" lastClr="FFFFFF"/></a:lt1>'
+         '<a:dk2><a:srgbClr val="1F497D"/></a:dk2><a:lt2><a:srgbClr val="EEECE1"/></a:lt2><a:accent1><a:srgbClr val="4F81BD"/></a:accent1>'
+         '<a:accent2><a:srgbClr val="C0504D"/></a:accent2><a:accent3><a:srgbClr val="9BBB59"/></a:accent3><a:accent4><a:srgbClr val="8064A2"/></a:accent4>'
+         '<a:accent5><a:srgbClr val="4BACC6"/></a:accent5><a:accent6><a:srgbClr val="F79646"/></a:accent6><a:hlink><a:srgbClr val="0000FF"/></a:hlink>'
+         '<a:folHlink><a:srgbClr val="800080"/></a:folHlink></a:clrScheme>'
+         '<a:fontScheme name="Office"><a:majorFont><a:latin typeface="Arial"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont>'
+         '<a:minorFont><a:latin typeface="Arial"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme>'
+         '<a:fmtScheme name="Office"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill>'
+         '<a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:fillStyleLst>'
+         '<a:lnStyleLst><a:ln w="9525"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="25400"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln>'
+         '<a:ln w="38100"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln></a:lnStyleLst>'
+         '<a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst>'
+         '<a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill>'
+         '<a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst></a:fmtScheme></a:themeElements></a:theme>')
+
+
 def write_xlsx(d, cfg, path):
+    """엑셀이 직접 저장할 때와 같은 구성(공유 문자열·테마·문서 속성)으로 쓴다. 표준 라이브러리만 쓴다."""
+    import datetime as dt
     t = cfg["tc"]
     cols = t["columns"]
     rows = [[c["label"] for c in cols]] + [[cell(tc, c["key"], cfg) for c in cols] for tc in d["cases"]]
     last = col_letter(len(cols) - 1)
     n = len(rows)
 
+    strings, index = [], {}
+    def sid(v):
+        if v not in index:
+            index[v] = len(strings)
+            strings.append(v)
+        return index[v]
+
     def row_xml(r, vals):
         style = 1 if r == 1 else 2
-        cells = "".join(
-            f'<c r="{col_letter(i)}{r}" t="inlineStr" s="{style}"><is><t xml:space="preserve">{xesc(v)}</t></is></c>'
-            for i, v in enumerate(vals))
+        cells = "".join(f'<c r="{col_letter(i)}{r}" s="{style}" t="s"><v>{sid(v)}</v></c>'
+                        if v != "" else f'<c r="{col_letter(i)}{r}" s="{style}"/>' for i, v in enumerate(vals))
         return f'<row r="{r}">{cells}</row>'
 
+    sheet_rows = "".join(row_xml(i + 1, r) for i, r in enumerate(rows))
     widths = "".join(f'<col min="{i+1}" max="{i+1}" width="{c.get("width", 16)}" customWidth="1"/>' for i, c in enumerate(cols))
     dv = []
     for key, values in (("type", list(t["types"])), ("priority", list(t["priorities"]))):
         idx = next((i for i, c in enumerate(cols) if c["key"] == key), None)
-        if idx is not None and n > 1:
+        if idx is not None:
             L = col_letter(idx)
-            dv.append(f'<dataValidation type="list" allowBlank="1" showErrorMessage="1" sqref="{L}2:{L}{max(n, 2) + 200}">'
+            dv.append(f'<dataValidation type="list" allowBlank="1" showErrorMessage="1" sqref="{L}2:{L}{n + 200}">'
                       f'<formula1>"{xesc(",".join(values))}"</formula1></dataValidation>')
-    sheet = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-             '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
-             'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    sheet = (XML_HEAD + f'<worksheet xmlns="{NS_MAIN}" xmlns:r="{NS_REL}">'
              f'<dimension ref="A1:{last}{n}"/>'
-             '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+             '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>'
+             '<selection pane="bottomLeft" activeCell="A2" sqref="A2"/></sheetView></sheetViews>'
              '<sheetFormatPr defaultRowHeight="15"/>'
-             f'<cols>{widths}</cols>'
-             f'<sheetData>{"".join(row_xml(i + 1, r) for i, r in enumerate(rows))}</sheetData>'
+             f'<cols>{widths}</cols><sheetData>{sheet_rows}</sheetData>'
              f'<autoFilter ref="A1:{last}{n}"/>'
              + (f'<dataValidations count="{len(dv)}">{"".join(dv)}</dataValidations>' if dv else "")
-             + '<pageMargins left="0.5" right="0.5" top="0.5" bottom="0.5" header="0.3" footer="0.3"/>'
-             '</worksheet>')
+             + '<pageMargins left="0.5" right="0.5" top="0.5" bottom="0.5" header="0.3" footer="0.3"/></worksheet>')
+    sst = (XML_HEAD + f'<sst xmlns="{NS_MAIN}" count="{sum(1 for r in rows for v in r if v != "")}" uniqueCount="{len(strings)}">'
+           + "".join(f'<si><t xml:space="preserve">{xesc(s)}</t></si>' for s in strings) + "</sst>")
     name = xesc(t.get("sheet_name", "TestCases")[:31])
-    styles = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-              '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-              '<fonts count="2"><font><sz val="10"/><name val="Arial"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Arial"/></font></fonts>'
+    styles = (XML_HEAD + f'<styleSheet xmlns="{NS_MAIN}">'
+              '<fonts count="2"><font><sz val="10"/><name val="Arial"/><family val="2"/></font>'
+              '<font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Arial"/><family val="2"/></font></fonts>'
               '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>'
               '<fill><patternFill patternType="solid"><fgColor rgb="FF1F3A8A"/><bgColor indexed="64"/></patternFill></fill></fills>'
               '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>'
@@ -165,37 +197,50 @@ def write_xlsx(d, cfg, path):
               '<cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
               '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
               '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf></cellXfs>'
-              '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>')
+              '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0"/></styleSheet>')
+    now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     files = {
-        "[Content_Types].xml": ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-                                '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+        "[Content_Types].xml": (XML_HEAD + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
                                 '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
                                 '<Default Extension="xml" ContentType="application/xml"/>'
-                                '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
-                                '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
-                                '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
-                                '</Types>'),
-        "_rels/.rels": ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-                        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-                        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
-                        '</Relationships>'),
-        "xl/workbook.xml": ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-                            '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
-                            'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+                                f'<Override PartName="/xl/workbook.xml" ContentType="{CT}.spreadsheetml.sheet.main+xml"/>'
+                                f'<Override PartName="/xl/worksheets/sheet1.xml" ContentType="{CT}.spreadsheetml.worksheet+xml"/>'
+                                f'<Override PartName="/xl/theme/theme1.xml" ContentType="{CT}.theme+xml"/>'
+                                f'<Override PartName="/xl/styles.xml" ContentType="{CT}.spreadsheetml.styles+xml"/>'
+                                f'<Override PartName="/xl/sharedStrings.xml" ContentType="{CT}.spreadsheetml.sharedStrings+xml"/>'
+                                '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>'
+                                f'<Override PartName="/docProps/app.xml" ContentType="{CT}.extended-properties+xml"/></Types>'),
+        "_rels/.rels": (XML_HEAD + f'<Relationships xmlns="{NS_PKG}">'
+                        f'<Relationship Id="rId1" Type="{NS_REL}/officeDocument" Target="xl/workbook.xml"/>'
+                        '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>'
+                        f'<Relationship Id="rId3" Type="{NS_REL}/extended-properties" Target="docProps/app.xml"/></Relationships>'),
+        "docProps/app.xml": (XML_HEAD + '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" '
+                             'xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>QA Orchestra</Application>'
+                             '<DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop><AppVersion>1.0</AppVersion></Properties>'),
+        "docProps/core.xml": (XML_HEAD + '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" '
+                              'xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" '
+                              'xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+                              f'<dc:title>{xesc(d["feature"]["name"])} 테스트 케이스</dc:title><dc:creator>QA Orchestra</dc:creator>'
+                              f'<dcterms:created xsi:type="dcterms:W3CDTF">{now}</dcterms:created>'
+                              f'<dcterms:modified xsi:type="dcterms:W3CDTF">{now}</dcterms:modified></cp:coreProperties>'),
+        "xl/workbook.xml": (XML_HEAD + f'<workbook xmlns="{NS_MAIN}" xmlns:r="{NS_REL}"><workbookPr/>'
+                            '<bookViews><workbookView xWindow="0" yWindow="0" windowWidth="28800" windowHeight="16000" activeTab="0"/></bookViews>'
                             f'<sheets><sheet name="{name}" sheetId="1" r:id="rId1"/></sheets>'
                             f'<definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">\'{name}\'!$A$1:${last}${n}</definedName></definedNames>'
-                            '</workbook>'),
-        "xl/_rels/workbook.xml.rels": ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-                                       '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-                                       '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'
-                                       '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
-                                       '</Relationships>'),
+                            '<calcPr calcId="191029"/></workbook>'),
+        "xl/_rels/workbook.xml.rels": (XML_HEAD + f'<Relationships xmlns="{NS_PKG}">'
+                                       f'<Relationship Id="rId1" Type="{NS_REL}/worksheet" Target="worksheets/sheet1.xml"/>'
+                                       f'<Relationship Id="rId2" Type="{NS_REL}/theme" Target="theme/theme1.xml"/>'
+                                       f'<Relationship Id="rId3" Type="{NS_REL}/styles" Target="styles.xml"/>'
+                                       f'<Relationship Id="rId4" Type="{NS_REL}/sharedStrings" Target="sharedStrings.xml"/></Relationships>'),
         "xl/worksheets/sheet1.xml": sheet,
+        "xl/theme/theme1.xml": THEME,
         "xl/styles.xml": styles,
+        "xl/sharedStrings.xml": sst,
     }
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         for k, v in files.items():
-            z.writestr(k, v)
+            z.writestr(k, v.encode("utf-8"))
 
 
 def write_csv(d, cfg, path):
