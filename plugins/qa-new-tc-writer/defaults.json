@@ -5,83 +5,84 @@
   },
   "tc": {
     "id_prefix": "TC",
+    "_columns_comment": "스프레드시트 열 순서와 머리글. key는 바꾸지 말고 label·순서만 바꾼다.",
     "columns": [
       {
         "key": "id",
-        "label": "TC ID"
+        "label": "CaseID",
+        "width": 10
       },
       {
-        "key": "group",
-        "label": "영역"
+        "key": "domain",
+        "label": "Domain",
+        "width": 14
       },
       {
-        "key": "req_ids",
-        "label": "요구사항"
-      },
-      {
-        "key": "title",
-        "label": "제목"
+        "key": "section",
+        "label": "section",
+        "width": 18
       },
       {
         "key": "type",
-        "label": "유형"
+        "label": "type",
+        "width": 11
       },
       {
-        "key": "priority",
-        "label": "우선순위"
+        "key": "title",
+        "label": "title",
+        "width": 44
       },
       {
         "key": "preconditions",
-        "label": "사전조건"
-      },
-      {
-        "key": "data",
-        "label": "테스트 데이터"
+        "label": "precondition",
+        "width": 32
       },
       {
         "key": "steps",
-        "label": "절차"
+        "label": "procedure",
+        "width": 44
       },
       {
         "key": "expected",
-        "label": "기대결과"
+        "label": "expected result",
+        "width": 48
       },
       {
-        "key": "assumptions",
-        "label": "가정(질문)"
-      },
-      {
-        "key": "automation",
-        "label": "자동화"
-      },
-      {
-        "key": "refs",
-        "label": "근거"
-      },
-      {
-        "key": "result",
-        "label": "결과"
-      },
-      {
-        "key": "note",
-        "label": "비고"
+        "key": "priority",
+        "label": "priority",
+        "width": 9
       }
     ],
-    "types": [
+    "types": {
+      "기본기능": "이번 기능의 정상 동작",
+      "리그레이션": "이번 변경으로 흔들릴 수 있는 기존 기능",
+      "엣지케이스": "경계값·조합·예외·동시성 등 드문 조건"
+    },
+    "priorities": {
+      "P1": "결제/금액 계산 오류로 이어지는 치명적 케이스",
+      "P2": "핵심 기능 오류",
+      "P3": "부가 기능/UX 이슈",
+      "P4": "사소한 케이스"
+    },
+    "techniques": [
       "기능",
       "경계값",
-      "예외",
-      "계산",
+      "조합",
       "상태 전이",
       "동시성",
+      "예외",
+      "계산",
       "화면",
       "연동"
     ],
-    "priorities": {
-      "P0": "출시 차단: 금전·핵심 흐름",
-      "P1": "주요 기능",
-      "P2": "보조 기능·표시",
-      "P3": "드문 경우·편의"
-    }
+    "required_techniques": [
+      "경계값",
+      "조합"
+    ],
+    "title_tags": [
+      "경계값",
+      "조합"
+    ],
+    "sheet_name": "TestCases"
   }
 }

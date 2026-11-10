@@ -94,5 +94,87 @@
     ]
   },
   "workspace": "work",
-  "_workspace_comment": "가져온 회사 문서는 work/<기능>/ 아래에 저장되고 git 에 올라가지 않는다(.gitignore)."
+  "_workspace_comment": "가져온 회사 문서는 work/<기능>/ 아래에 저장되고 git 에 올라가지 않는다(.gitignore).",
+  "tc": {
+    "id_prefix": "TC",
+    "_columns_comment": "스프레드시트 열 순서와 머리글. key는 바꾸지 말고 label·순서만 바꾼다.",
+    "columns": [
+      {
+        "key": "id",
+        "label": "CaseID",
+        "width": 10
+      },
+      {
+        "key": "domain",
+        "label": "Domain",
+        "width": 14
+      },
+      {
+        "key": "section",
+        "label": "section",
+        "width": 18
+      },
+      {
+        "key": "type",
+        "label": "type",
+        "width": 11
+      },
+      {
+        "key": "title",
+        "label": "title",
+        "width": 44
+      },
+      {
+        "key": "preconditions",
+        "label": "precondition",
+        "width": 32
+      },
+      {
+        "key": "steps",
+        "label": "procedure",
+        "width": 44
+      },
+      {
+        "key": "expected",
+        "label": "expected result",
+        "width": 48
+      },
+      {
+        "key": "priority",
+        "label": "priority",
+        "width": 9
+      }
+    ],
+    "types": {
+      "기본기능": "이번 기능의 정상 동작",
+      "리그레이션": "이번 변경으로 흔들릴 수 있는 기존 기능",
+      "엣지케이스": "경계값·조합·예외·동시성 등 드문 조건"
+    },
+    "priorities": {
+      "P1": "결제/금액 계산 오류로 이어지는 치명적 케이스",
+      "P2": "핵심 기능 오류",
+      "P3": "부가 기능/UX 이슈",
+      "P4": "사소한 케이스"
+    },
+    "techniques": [
+      "기능",
+      "경계값",
+      "조합",
+      "상태 전이",
+      "동시성",
+      "예외",
+      "계산",
+      "화면",
+      "연동"
+    ],
+    "required_techniques": [
+      "경계값",
+      "조합"
+    ],
+    "title_tags": [
+      "경계값",
+      "조합"
+    ],
+    "sheet_name": "TestCases"
+  }
 }

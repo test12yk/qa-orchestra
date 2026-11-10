@@ -23,7 +23,7 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 ## 진행 상황
 - [x] 문서 수집가 `doc-collector` — 링크로 가져오기·변경 감지·붙여넣기 대체 검증(노션)
 - [x] 기획 분석가 `plan-analyst` — 양식 확정, 블라인드·링크 입력 검증
-- [x] 신규 TC 작성가 `new-tc-writer` — 커버리지 점검·가정 표시·엑셀 CSV, 단독 플러그인 검증
+- [x] 신규 TC 작성가 `new-tc-writer` — 스프레드시트(한 탭, 기본기능·리그레이션·엣지케이스), 경계값·조합 필수, 커버리지 점검
 - [ ] 버그 리포터
 - [ ] 나머지 신규 기능 라인 → 회귀 라인
 
@@ -51,7 +51,7 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 | 전체 | `/plugin install qa-orchestra@qa-orchestra` | 모든 에이전트 (아래 플러그인들이 함께 설치됨) |
 | 문서 수집가만 | `/plugin install qa-doc-collector@qa-orchestra` | `doc-collector` + 저장 스크립트 |
 | 기획 분석가만 | `/plugin install qa-plan-analyst@qa-orchestra` | `plan-analyst` + 렌더러·양식 |
-| 신규 TC 작성가만 | `/plugin install qa-new-tc-writer@qa-orchestra` | `new-tc-writer` + 렌더러·점검·양식 |
+| 신규 TC 작성가만 | `/plugin install qa-new-tc-writer@qa-orchestra` | `new-tc-writer` + 스프레드시트 렌더러·점검·양식 |
 
 에이전트별 플러그인에는 그 에이전트가 쓰는 파일만 들어 있다(샘플·문서는 설치되지 않음). 나중에 전체를 설치하면 빠진 것만 추가된다. 비공개 저장소라면 접근 권한이 있는 GitHub 계정이 필요하다. 설치 뒤 Claude Code를 다시 시작한다.
 
@@ -77,7 +77,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 |---|---|---|---|
 | `doc-collector` 문서 수집가 | 링크 목록 | `work/<기능>/inputs/` | 링크만 주면 된다 |
 | `plan-analyst` 기획 분석가 | 문서 폴더 | 기획 분석서(JSON·HTML·MD) | 문서 파일을 폴더에 넣고 그 폴더를 주면 된다 |
-| `new-tc-writer` 신규 TC 작성가 | 기획 분석서 (없으면 문서 폴더) | TC(엑셀용 CSV·HTML·MD) | 문서 폴더만 줘도 되지만, 분석서가 있어야 충돌·질문이 반영된다 |
+| `new-tc-writer` 신규 TC 작성가 | 기획 분석서 (없으면 문서 폴더) | TC 스프레드시트(xlsx)·CSV·HTML·MD | 문서 폴더만 줘도 되지만, 분석서가 있어야 충돌·질문이 반영된다 |
 
 여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(예정)를 쓴다.
 
