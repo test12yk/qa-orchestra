@@ -143,6 +143,16 @@
         "key": "priority",
         "label": "priority",
         "width": 9
+      },
+      {
+        "key": "result",
+        "label": "결과",
+        "width": 9
+      },
+      {
+        "key": "issue",
+        "label": "이슈내용",
+        "width": 40
       }
     ],
     "types": {
@@ -156,6 +166,11 @@
       "P3": "부가 기능/UX 이슈",
       "P4": "사소한 케이스"
     },
+    "results": {
+      "pass": "Pass",
+      "fail": "Fail"
+    },
+    "_results_comment": "결과 열 드롭다운 값. key(pass/fail)는 그대로 두고 값만 팀 표기로 바꾼다(예: 통과/실패). 테스터가 Fail을 고르면 이슈내용 열에 실제로 본 현상을 쓰고, 버그 리포터가 이 행들을 버그 초안으로 만든다.",
     "techniques": [
       "기능",
       "경계값",
@@ -184,7 +199,8 @@
   },
   "bug": {
     "severities": {
-      "Critical": "결제·금액 오류, 데이터 손실, 서비스 중단 등 출시를 막는 결함",
+      "Blocker": "서비스 중단·테스트 진행 불가 등 우회 방법 없이 막히는 결함",
+      "Critical": "결제·금액 오류, 데이터 손실 등 출시를 막는 결함",
       "Major": "핵심 기능이 동작하지 않거나 우회가 어려운 결함",
       "Minor": "부가 기능 오류, 우회 가능한 결함",
       "Trivial": "문구·정렬 등 사소한 표시 문제"
@@ -209,6 +225,10 @@
     "site": "",
     "project_key": "",
     "issue_type": "Bug",
+    "language": "ko",
+    "_language_comment": "지라에 올리는 리포트 언어: ko / en. en이면 머리글·항목명이 영어로 나오고 버그 리포터가 제목·절차·결과도 영어로 쓴다.",
+    "priority_from": "priority",
+    "_priority_comment": "지라 Priority 칸에 무엇을 넣을지. priority = 우선순위(P1~P4)를 priority_map으로 바꿔 넣음 / severity = 심각도를 넣음(Priority 칸에 Blocker·Critical·Major·Minor·Trivial을 쓰는 회사). priority_map 키는 priority_from 쪽 값, 값은 지라의 Priority 이름 그대로. 예(severity): {\"Blocker\":\"Blocker\",\"Critical\":\"Critical\",\"Major\":\"Major\",\"Minor\":\"Minor\",\"Trivial\":\"Trivial\"}",
     "priority_map": {
       "P1": "Highest",
       "P2": "High",

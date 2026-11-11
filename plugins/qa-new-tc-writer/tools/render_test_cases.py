@@ -168,9 +168,10 @@ def write_xlsx(d, cfg, path):
     sheet_rows = "".join(row_xml(i + 1, r) for i, r in enumerate(rows))
     widths = "".join(f'<col min="{i+1}" max="{i+1}" width="{c.get("width", 16)}" customWidth="1"/>' for i, c in enumerate(cols))
     dv = []
-    for key, values in (("type", list(t["types"])), ("priority", list(t["priorities"]))):
+    for key, values in (("type", list(t["types"])), ("priority", list(t["priorities"])),
+                        ("result", list(t.get("results", {}).values()))):
         idx = next((i for i, c in enumerate(cols) if c["key"] == key), None)
-        if idx is not None:
+        if idx is not None and values:
             L = col_letter(idx)
             dv.append(f'<dataValidation type="list" allowBlank="1" showErrorMessage="1" sqref="{L}2:{L}{n + 200}">'
                       f'<formula1>"{xesc(",".join(values))}"</formula1></dataValidation>')

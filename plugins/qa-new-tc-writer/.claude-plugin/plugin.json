@@ -1,7 +1,7 @@
 {
   "name": "qa-new-tc-writer",
   "description": "QA 신규 TC 작성가: 기획 분석서(또는 문서)를 받아 테스트 케이스를 스프레드시트(xlsx, 한 탭)로 쓴다. 기본기능·리그레이션·엣지케이스 구분, 경계값·조합 필수, 커버리지 점검",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": {
     "name": "test12yk"
   },

@@ -51,6 +51,16 @@
         "key": "priority",
         "label": "priority",
         "width": 9
+      },
+      {
+        "key": "result",
+        "label": "결과",
+        "width": 9
+      },
+      {
+        "key": "issue",
+        "label": "이슈내용",
+        "width": 40
       }
     ],
     "types": {
@@ -64,6 +74,11 @@
       "P3": "부가 기능/UX 이슈",
       "P4": "사소한 케이스"
     },
+    "results": {
+      "pass": "Pass",
+      "fail": "Fail"
+    },
+    "_results_comment": "결과 열 드롭다운 값. key(pass/fail)는 그대로 두고 값만 팀 표기로 바꾼다(예: 통과/실패). 테스터가 Fail을 고르면 이슈내용 열에 실제로 본 현상을 쓰고, 버그 리포터가 이 행들을 버그 초안으로 만든다.",
     "techniques": [
       "기능",
       "경계값",

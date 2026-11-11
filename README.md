@@ -65,6 +65,10 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 
 **지라 연결**: 설정의 `jira.site`·`jira.project_key`만 회사 지라로 바꾸면 된다. 등록은 claude.ai의 Atlassian 커넥터(각자 계정) → 없으면 API 토큰(`JIRA_EMAIL`·`JIRA_API_TOKEN` 환경변수) → 둘 다 없으면 붙여넣기용 초안 순서로 시도한다. 버그 리포터는 **사용자가 등록을 지시할 때만** 지라에 올린다.
 
+**지라 Priority·언어**: `jira.priority_from`이 `priority`면 P1~P4를 `priority_map`(Highest~Low 등)으로, `severity`면 심각도(Blocker·Critical·Major·Minor·Trivial)를 지라 Priority 칸에 넣는다. `jira.language`를 `en`으로 하면 지라 리포트를 영어로 쓴다. 등록 전 1단계에서 이슈 유형·Priority 허용값을 미리 확인해 알려준다.
+
+**TC 실행 → 버그**: TC 시트 맨 뒤 `결과`(Pass/Fail 드롭다운)·`이슈내용` 열을 테스터가 채운다. 버그 리포터에 그 시트(xlsx·csv·구글 시트 링크)를 주면 Fail 행마다 초안을 만든다 — 사전조건·절차·기대결과·priority는 TC 그대로, 실제 결과는 이슈내용 그대로(`bug_report.py from-tc`).
+
 ## 처음 쓰는 사람
 1. Claude Code에 팀이 쓰는 문서 도구(노션·컨플루언스·슬랙 등)를 커넥터로 연결한다. 문서는 **각자의 권한으로** 가져온다.
 2. 팀에 맞게 바꾸려면 저장소 루트의 `qa-orchestra.config.json` 견본을 작업 폴더에 복사해 고친다(서비스 영역, 링크 도메인, 문서 종류 힌트). 없으면 각 플러그인의 기본값을 쓴다.
@@ -83,7 +87,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 |---|---|---|---|
 | `doc-collector` 문서 수집가 | 링크 목록 | `work/<기능>/inputs/` | 링크만 주면 된다 |
 | `plan-analyst` 기획 분석가 | 문서 폴더 | 기획 분석서(JSON·HTML·MD) | 문서 파일을 폴더에 넣고 그 폴더를 주면 된다 |
-| `bug-reporter` 버그 리포터 | 실패한 TC·메모·로그 | 버그 리포트(MD) → 승인 시 지라 이슈 | 버그 메모만 줘도 된다 |
+| `bug-reporter` 버그 리포터 | TC 실행 시트(Fail 행)·메모·로그 | 버그 리포트(MD) → 승인 시 지라 이슈 | 버그 메모만 줘도 된다 |
 | `new-tc-writer` 신규 TC 작성가 | 기획 분석서 (없으면 문서 폴더) | TC 스프레드시트(xlsx)·CSV·HTML·MD | 문서 폴더만 줘도 되지만, 분석서가 있어야 충돌·질문이 반영된다 |
 
 여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(예정)를 쓴다.
