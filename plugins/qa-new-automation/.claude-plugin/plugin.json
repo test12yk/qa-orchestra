@@ -1,0 +1,14 @@
+{
+  "name": "qa-new-automation",
+  "description": "QA 신규 기능 자동화: TC와 API 문서로 pytest API 테스트를 만들고 QA 서버에서 돌린 뒤, 결과(Pass/Fail·이슈내용)를 TC 시트에 적는다",
+  "version": "0.1.0",
+  "author": {
+    "name": "test12yk"
+  },
+  "keywords": [
+    "qa",
+    "automation",
+    "api",
+    "pytest"
+  ]
+}

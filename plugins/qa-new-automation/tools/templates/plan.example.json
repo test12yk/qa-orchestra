@@ -1,0 +1,11 @@
+{
+  "feature": "장바구니 쿠폰 할인",
+  "tc_source": "tc/test-cases.json",
+  "api_docs": ["inputs/api-spec.md"],
+  "cases": [
+    {"id": "TC-017", "mode": "api"},
+    {"id": "TC-022", "mode": "api", "note": "Q2 판정 보류 조건을 hold()로 처리"},
+    {"id": "TC-012", "mode": "manual", "reason": "화면 안내 문구 확인 — API 응답에 문구 없음"},
+    {"id": "TC-043", "mode": "blocked", "reason": "동시 요청 순서를 정할 방법 없음 — 준비 API 필요"}
+  ]
+}

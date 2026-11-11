@@ -1,0 +1,283 @@
+{
+  "run_at": "2026-11-11T15:34:32+09:00",
+  "base_url": "http://127.0.0.1:8765",
+  "summary": {
+    "error": 0,
+    "fail": 3,
+    "hold": 5,
+    "manual": 0,
+    "pass": 46
+  },
+  "results": {
+    "TC-001": {
+      "result": "pass",
+      "message": "",
+      "test": "test_min_order_amount::test_TC_001_free_shipping_30000_coupon_usable"
+    },
+    "TC-002": {
+      "result": "pass",
+      "message": "",
+      "test": "test_min_order_amount::test_TC_002_free_shipping_29999_coupon_unusable"
+    },
+    "TC-003": {
+      "result": "pass",
+      "message": "",
+      "test": "test_min_order_amount::test_TC_003_26999_plus_shipping_3000_coupon_unusable"
+    },
+    "TC-004": {
+      "result": "pass",
+      "message": "",
+      "test": "test_min_order_amount::test_TC_004_27000_plus_shipping_3000_coupon_usable"
+    },
+    "TC-005": {
+      "result": "pass",
+      "message": "",
+      "test": "test_min_order_amount::test_TC_005_27001_plus_shipping_3000_coupon_usable"
+    },
+    "TC-006": {
+      "result": "pass",
+      "message": "",
+      "test": "test_min_order_amount::test_TC_006_points_do_not_affect_min_amount"
+    },
+    "TC-007": {
+      "result": "pass",
+      "message": "",
+      "test": "test_excluded_items::test_TC_007_rate_coupon_only_on_general_items"
+    },
+    "TC-008": {
+      "result": "pass",
+      "message": "",
+      "test": "test_excluded_items::test_TC_008_fixed_coupon_with_e_coupon_item"
+    },
+    "TC-009": {
+      "result": "fail",
+      "message": "쿠폰 적용 응답: 실제 200 성공 (기대 거부(판정 기준 29,999원))\n쿠폰 할인: 실제 5,000원 (기대 0원)\n최종 결제 금액: 실제 34,999원 (기대 39,999원)",
+      "test": "test_excluded_items::test_TC_009_gift_card_excluded_from_min_amount_29999"
+    },
+    "TC-010": {
+      "result": "pass",
+      "message": "",
+      "test": "test_excluded_items::test_TC_010_gift_card_excluded_from_min_amount_30000"
+    },
+    "TC-011": {
+      "result": "fail",
+      "message": "정률 10% 쿠폰 상태: 실제 USED (기대 AVAILABLE)",
+      "test": "test_excluded_items::test_TC_011_gift_card_only_cart"
+    },
+    "TC-014": {
+      "result": "pass",
+      "message": "",
+      "test": "test_one_coupon_per_order::test_TC_014_only_one_coupon_selected"
+    },
+    "TC-015": {
+      "result": "pass",
+      "message": "",
+      "test": "test_one_coupon_per_order::test_TC_015_second_coupon_rejected_409"
+    },
+    "TC-016": {
+      "result": "pass",
+      "message": "",
+      "test": "test_one_coupon_per_order::test_TC_016_same_coupon_twice_409"
+    },
+    "TC-017": {
+      "result": "pass",
+      "message": "",
+      "test": "test_discount_calc::test_TC_017_rate_10_on_50000"
+    },
+    "TC-018": {
+      "result": "pass",
+      "message": "",
+      "test": "test_discount_calc::test_TC_018_fixed_5000_on_40000"
+    },
+    "TC-019": {
+      "result": "pass",
+      "message": "",
+      "test": "test_discount_calc::test_TC_019_rate_10_on_99990_below_cap"
+    },
+    "TC-020": {
+      "result": "pass",
+      "message": "",
+      "test": "test_discount_calc::test_TC_020_rate_10_on_100000_equals_cap"
+    },
+    "TC-021": {
+      "result": "pass",
+      "message": "",
+      "test": "test_discount_calc::test_TC_021_rate_10_on_100010_stops_at_cap"
+    },
+    "TC-022": {
+      "result": "hold",
+      "message": "쿠폰 할인 -15,000원(최종 188,000원) — Q2 답(정책 일괄 한도 vs 쿠폰별 maxDiscount) 필요",
+      "test": "test_discount_calc::test_TC_022_coupon_max_15000_capped_by_policy"
+    },
+    "TC-023": {
+      "result": "pass",
+      "message": "",
+      "test": "test_discount_calc::test_TC_023_rate_15_truncates_below_won"
+    },
+    "TC-024": {
+      "result": "pass",
+      "message": "",
+      "test": "test_discount_calc::test_TC_024_rate_with_gift_card_and_points"
+    },
+    "TC-025": {
+      "result": "pass",
+      "message": "",
+      "test": "test_discount_calc::test_TC_025_pay_amount_101"
+    },
+    "TC-026": {
+      "result": "pass",
+      "message": "",
+      "test": "test_discount_calc::test_TC_026_pay_amount_100"
+    },
+    "TC-027": {
+      "result": "hold",
+      "message": "처리 방식: 포인트 24,900P만 사용, 결제 금액 100원 — Q7 답(처리 방식·문구) 필요",
+      "test": "test_discount_calc::test_TC_027_pay_amount_never_below_100"
+    },
+    "TC-030": {
+      "result": "pass",
+      "message": "",
+      "test": "test_auto_select::test_TC_030_auto_select_uses_actual_discount_with_gift_card"
+    },
+    "TC-031": {
+      "result": "hold",
+      "message": "할인 재계산은 정상(-4,000원, 39,000원). \"최대 할인 적용됨\" 라벨 표시 여부는 화면 확인 + Q10 답 필요",
+      "test": "test_auto_select::test_TC_031_switch_to_rate_recalculates"
+    },
+    "TC-032": {
+      "result": "hold",
+      "message": "정률 10% 쿠폰이 자동 선택됨 — Q10 답(동률 기준) 필요",
+      "test": "test_auto_select::test_TC_032_tie_selects_one"
+    },
+    "TC-033": {
+      "result": "pass",
+      "message": "",
+      "test": "test_auto_select::test_TC_033_list_sorted_by_discount"
+    },
+    "TC-034": {
+      "result": "pass",
+      "message": "",
+      "test": "test_expiry_badge::test_TC_034_d4_no_badge"
+    },
+    "TC-035": {
+      "result": "pass",
+      "message": "",
+      "test": "test_expiry_badge::test_TC_035_d3_badge"
+    },
+    "TC-036": {
+      "result": "pass",
+      "message": "",
+      "test": "test_expiry_badge::test_TC_036_d1_badge"
+    },
+    "TC-037": {
+      "result": "pass",
+      "message": "",
+      "test": "test_payment_amount::test_TC_037_coupon_and_points_total_48000"
+    },
+    "TC-038": {
+      "result": "pass",
+      "message": "",
+      "test": "test_payment_amount::test_TC_038_coupon_before_points"
+    },
+    "TC-040": {
+      "result": "pass",
+      "message": "",
+      "test": "test_coupon_status::test_TC_040_used_after_payment_approval"
+    },
+    "TC-041": {
+      "result": "pass",
+      "message": "",
+      "test": "test_coupon_status::test_TC_041_leave_without_payment_keeps_available"
+    },
+    "TC-042": {
+      "result": "pass",
+      "message": "",
+      "test": "test_coupon_status::test_TC_042_pg_decline_keeps_available"
+    },
+    "TC-043": {
+      "result": "pass",
+      "message": "",
+      "test": "test_coupon_status::test_TC_043_concurrent_payments_only_one_discounted"
+    },
+    "TC-044": {
+      "result": "pass",
+      "message": "",
+      "test": "test_coupon_status::test_TC_044_coupon_used_elsewhere_blocks_payment"
+    },
+    "TC-045": {
+      "result": "pass",
+      "message": "",
+      "test": "test_cancel_restore::test_TC_045_full_cancel_restores_coupon"
+    },
+    "TC-046": {
+      "result": "pass",
+      "message": "",
+      "test": "test_cancel_restore::test_TC_046_restored_coupon_reusable"
+    },
+    "TC-047": {
+      "result": "pass",
+      "message": "",
+      "test": "test_cancel_restore::test_TC_047_partial_cancel_keeps_used"
+    },
+    "TC-048": {
+      "result": "hold",
+      "message": "건별 환불 B 18,000원 · A 30,000원(합계 48,000원), 쿠폰 상태 USED — Q8 답(안분 규칙)·Q4 답(쿠폰 복구) 필요",
+      "test": "test_cancel_restore::test_TC_048_refund_total_not_over_paid"
+    },
+    "TC-049": {
+      "result": "pass",
+      "message": "",
+      "test": "test_cancel_restore::test_TC_049_cancel_one_second_before_expiry_restores"
+    },
+    "TC-050": {
+      "result": "fail",
+      "message": "쿠폰 상태: 실제 AVAILABLE (기대 AVAILABLE 아님)",
+      "test": "test_cancel_restore::test_TC_050_cancel_after_expiry_not_restored"
+    },
+    "TC-051": {
+      "result": "pass",
+      "message": "",
+      "test": "test_payment_amount::test_TC_051_no_coupon_pay_goods_plus_shipping"
+    },
+    "TC-052": {
+      "result": "pass",
+      "message": "",
+      "test": "test_payment_amount::test_TC_052_points_only_payment"
+    },
+    "TC-053": {
+      "result": "pass",
+      "message": "",
+      "test": "test_payment_amount::test_TC_053_points_balance_after_coupon_and_points"
+    },
+    "TC-055": {
+      "result": "pass",
+      "message": "",
+      "test": "test_payment_amount::test_TC_055_shipping_unchanged_by_coupon"
+    },
+    "TC-056": {
+      "result": "pass",
+      "message": "",
+      "test": "test_payment_amount::test_TC_056_pg_amount_equals_pay_amount"
+    },
+    "TC-058": {
+      "result": "pass",
+      "message": "",
+      "test": "test_cancel_restore::test_TC_058_no_coupon_full_cancel_refund"
+    },
+    "TC-060": {
+      "result": "pass",
+      "message": "",
+      "test": "test_cancel_restore::test_TC_060_coupon_order_refunds_paid_amount_only"
+    },
+    "TC-061": {
+      "result": "pass",
+      "message": "",
+      "test": "test_coupon_status::test_TC_061_unused_coupon_stays_available"
+    },
+    "TC-062": {
+      "result": "pass",
+      "message": "",
+      "test": "test_coupon_status::test_TC_062_expired_coupon_not_selected"
+    }
+  }
+}

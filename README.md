@@ -25,6 +25,7 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 - [x] 기획 분석가 `plan-analyst` — 양식 확정, 블라인드·링크 입력 검증
 - [x] 신규 TC 작성가 `new-tc-writer` — 스프레드시트(한 탭, 기본기능·리그레이션·엣지케이스), 경계값·조합 필수, 커버리지 점검
 - [x] 버그 리포터 `bug-reporter` — 리포트 작성·중복 확인 → 승인 후 지라 등록(커넥터/API 토큰/초안)
+- [x] 신규 기능 자동화 `new-automation` — TC·API 문서 → pytest API 테스트 → QA 서버 실행 → TC 시트 결과·이슈내용 기록(가짜 쿠폰 서버로 검증)
 - [ ] 나머지 신규 기능 라인 → 회귀 라인
 
 ## 폴더
@@ -36,6 +37,7 @@ plugins/
   qa-plan-analyst/     기획 분석가: agents/, tools/render_plan_analysis.py, tools/templates/, defaults.json
   qa-bug-reporter/     버그 리포터: agents/, tools/bug_report.py(점검·지라 등록), defaults.json
   qa-new-tc-writer/    신규 TC 작성가: agents/, tools/render_test_cases.py(점검 포함), tools/templates/, defaults.json
+  qa-new-automation/   신규 기능 자동화: agents/, tools/run_automation.py(준비·점검·실행·결과 기록), tools/templates/, defaults.json
 .claude/agents/        저장소를 받아 쓸 때를 위한 연결(plugins/*/agents 를 가리킴)
 qa-orchestra.config.json   팀 설정 견본
 samples/coupon-discount/   가상 "쿠폰 할인" 기능 (입력 5종, 기준 답안, 실행 결과)
@@ -54,6 +56,7 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 | 기획 분석가만 | `/plugin install qa-plan-analyst@qa-orchestra` | `plan-analyst` + 렌더러·양식 |
 | 신규 TC 작성가만 | `/plugin install qa-new-tc-writer@qa-orchestra` | `new-tc-writer` + 스프레드시트 렌더러·점검·양식 |
 | 버그 리포터만 | `/plugin install qa-bug-reporter@qa-orchestra` | `bug-reporter` + 점검·지라 등록 스크립트 |
+| 신규 기능 자동화만 | `/plugin install qa-new-automation@qa-orchestra` | `new-automation` + 스위트 준비·실행·결과 기록 스크립트 (테스트 실행에 pytest 필요) |
 
 에이전트별 플러그인에는 그 에이전트가 쓰는 파일만 들어 있다(샘플·문서는 설치되지 않음). 나중에 전체를 설치하면 빠진 것만 추가된다. 비공개 저장소라면 접근 권한이 있는 GitHub 계정이 필요하다. 설치 뒤 Claude Code를 다시 시작한다.
 
@@ -87,6 +90,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 |---|---|---|---|
 | `doc-collector` 문서 수집가 | 링크 목록 | `work/<기능>/inputs/` | 링크만 주면 된다 |
 | `plan-analyst` 기획 분석가 | 문서 폴더 | 기획 분석서(JSON·HTML·MD) | 문서 파일을 폴더에 넣고 그 폴더를 주면 된다 |
+| `new-automation` 신규 기능 자동화 | TC(json·시트) + API 문서 + QA 서버 주소 | pytest 스위트, 실행 리포트, 결과·이슈내용이 채워진 TC 시트 | TC 시트만 줘도 된다(모든 행을 후보로 봄) |
 | `bug-reporter` 버그 리포터 | TC 실행 시트(Fail 행)·메모·로그 | 버그 리포트(MD) → 승인 시 지라 이슈 | 버그 메모만 줘도 된다 |
 | `new-tc-writer` 신규 TC 작성가 | 기획 분석서 (없으면 문서 폴더) | TC 스프레드시트(xlsx)·CSV·HTML·MD | 문서 폴더만 줘도 되지만, 분석서가 있어야 충돌·질문이 반영된다 |
 
@@ -103,3 +107,8 @@ plan-analyst 에이전트로 samples/coupon-discount/inputs 를 분석해서 sam
 ```
 python3 plugins/qa-plan-analyst/tools/render_plan_analysis.py samples/coupon-discount/run-01/plan-analysis.json samples/coupon-discount/run-01
 ```
+
+## 신규 기능 자동화 (API)
+- 설정 `automation`: `base_url`(QA 서버), `allowed_hosts`(실행해도 되는 호스트 — 여기 없는 서버에는 요청하지 않음), `auth`(헤더 이름, 토큰 환경변수 이름). 토큰은 환경변수로만 받는다.
+- 결과: Pass/Fail은 결과 칸, Fail 내용은 이슈내용 칸. 판정 보류·자동화 오류는 결과를 비우고 이슈내용에 `[판정 보류]`·`[자동화 오류]` — 버그 리포터는 Fail 행만 버그 초안으로 만든다.
+- 샘플로 돌려 보기: `python3 samples/coupon-discount/automation/mock_server.py` (가짜 쿠폰 QA 서버, 토큰 `sample-token`) → `QA_API_TOKEN=sample-token`으로 `new-automation` 실행. 가짜 서버는 개발문서대로 동작해서 정책과 다른 부분이 Fail로 잡힌다. 결과 예: `samples/coupon-discount/run-01/automation/` (54개 자동화: Pass 46 · Fail 3 · 판정 보류 5, 사람 확인 3 · 준비 수단 필요 1).

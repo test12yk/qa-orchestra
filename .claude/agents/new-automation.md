@@ -1,0 +1,1 @@
+../../plugins/qa-new-automation/agents/new-automation.md

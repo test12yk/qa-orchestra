@@ -35,6 +35,12 @@
       "description": "버그 리포터만 (지라 등록)",
       "source": "./plugins/qa-bug-reporter",
       "category": "testing"
+    },
+    {
+      "name": "qa-new-automation",
+      "description": "신규 기능 자동화만 (API 테스트 → TC 시트 결과)",
+      "source": "./plugins/qa-new-automation",
+      "category": "testing"
     }
   ]
 }

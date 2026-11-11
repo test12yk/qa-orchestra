@@ -1,0 +1,9 @@
+{
+  "base_url": "http://127.0.0.1:8765",
+  "timeout": 10,
+  "auth": {
+    "header": "X-QA-Token",
+    "prefix": "",
+    "env": "QA_API_TOKEN"
+  }
+}
