@@ -1,0 +1,14 @@
+{
+  "name": "qa-new-reviewer",
+  "description": "QA 신규 기능 검토자: 실행 전에는 TC가 기획 분석서의 요구사항·충돌·위험·영향 범위를 빠짐없이 덮는지, 실행 후에는 결과·판정 보류·미실행·버그를 모아 빈틈과 보완 요청(담당별)을 HTML 보고서로 낸다",
+  "version": "0.2.0",
+  "author": {
+    "name": "test12yk"
+  },
+  "keywords": [
+    "qa",
+    "review",
+    "coverage",
+    "test-cases"
+  ]
+}

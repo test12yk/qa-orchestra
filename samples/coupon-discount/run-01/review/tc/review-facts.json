@@ -1,0 +1,1007 @@
+{
+  "feature": "장바구니 쿠폰 할인",
+  "stage": "tc",
+  "generated_at": "2026-11-18T17:40:34+09:00",
+  "inputs": {
+    "analysis": "samples/coupon-discount/run-01/plan-analysis.json",
+    "tc": "samples/coupon-discount/run-01/tc/test-cases.json"
+  },
+  "stats": {
+    "requirements": 18,
+    "tcs": 63,
+    "top_priority_share": 0.571,
+    "req_status": {
+      "ok": 16,
+      "weak": 2
+    },
+    "results": {}
+  },
+  "coverage": [
+    {
+      "req_id": "REQ-01",
+      "group": "사용 조건",
+      "keyword": "최소 주문금액",
+      "text": "주문 금액 30,000원 이상일 때만 쿠폰을 쓸 수 있다(배송비 포함 여부 충돌)",
+      "flags": [
+        {
+          "level": "red",
+          "label": "충돌 C1"
+        }
+      ],
+      "tcs": [
+        "TC-001",
+        "TC-002",
+        "TC-003",
+        "TC-004",
+        "TC-005",
+        "TC-006",
+        "TC-009",
+        "TC-010"
+      ],
+      "techniques": [
+        "경계값",
+        "기능",
+        "조합"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-02",
+      "group": "사용 조건",
+      "keyword": "제외상품 금액",
+      "text": "혼합 장바구니에서 상품권·e쿠폰 상품 금액은 최소 주문 금액 계산에서 뺀다",
+      "flags": [
+        {
+          "level": "red",
+          "label": "충돌 C5"
+        }
+      ],
+      "tcs": [
+        "TC-009",
+        "TC-010",
+        "TC-011"
+      ],
+      "techniques": [
+        "경계값",
+        "예외",
+        "조합"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-03",
+      "group": "사용 조건",
+      "keyword": "1주문 1쿠폰",
+      "text": "주문 1건에 쿠폰은 1장만 쓸 수 있고, 이미 적용된 주문에 다시 적용하면 409 COUPON_ALREADY_APPLIED",
+      "flags": [
+        {
+          "level": "green",
+          "label": "일치"
+        }
+      ],
+      "tcs": [
+        "TC-014",
+        "TC-015",
+        "TC-016",
+        "TC-043",
+        "TC-044"
+      ],
+      "techniques": [
+        "기능",
+        "동시성",
+        "상태 전이",
+        "예외"
+      ],
+      "status": "weak"
+    },
+    {
+      "req_id": "REQ-04",
+      "group": "사용 조건",
+      "keyword": "제외 카테고리",
+      "text": "상품권(GIFT_CARD)·e쿠폰(E_COUPON) 카테고리 상품은 할인 대상에서 제외한다",
+      "flags": [
+        {
+          "level": "amber",
+          "label": "기획서 누락"
+        }
+      ],
+      "tcs": [
+        "TC-007",
+        "TC-008",
+        "TC-011",
+        "TC-024",
+        "TC-030"
+      ],
+      "techniques": [
+        "계산",
+        "기능",
+        "예외",
+        "조합"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-05",
+      "group": "할인 계산",
+      "keyword": "정률·정액",
+      "text": "쿠폰은 정률(예: 10%)과 정액(예: 5,000원) 두 종류다",
+      "flags": [
+        {
+          "level": "amber",
+          "label": "정액 계산식 미기재 Q9"
+        }
+      ],
+      "tcs": [
+        "TC-007",
+        "TC-008",
+        "TC-017",
+        "TC-018",
+        "TC-038"
+      ],
+      "techniques": [
+        "계산",
+        "기능",
+        "조합"
+      ],
+      "status": "weak"
+    },
+    {
+      "req_id": "REQ-06",
+      "group": "할인 계산",
+      "keyword": "정률 한도",
+      "text": "정률 쿠폰 할인액은 한도를 넘지 않는다(일괄 10,000원 vs 쿠폰별 설정값)",
+      "flags": [
+        {
+          "level": "red",
+          "label": "충돌 C2"
+        }
+      ],
+      "tcs": [
+        "TC-019",
+        "TC-020",
+        "TC-021",
+        "TC-022",
+        "TC-024"
+      ],
+      "techniques": [
+        "경계값",
+        "계산",
+        "조합"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-07",
+      "group": "할인 계산",
+      "keyword": "원 단위 절사",
+      "text": "할인 금액은 원 단위 미만을 절사한다",
+      "flags": [
+        {
+          "level": "amber",
+          "label": "개발 문서에만 있음"
+        }
+      ],
+      "tcs": [
+        "TC-023"
+      ],
+      "techniques": [
+        "계산"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-08",
+      "group": "할인 계산",
+      "keyword": "최소결제 100원",
+      "text": "할인 후 결제 금액은 최소 100원이다(0원 결제 불가)",
+      "flags": [
+        {
+          "level": "amber",
+          "label": "개발 문서에만 있음 Q7"
+        }
+      ],
+      "tcs": [
+        "TC-025",
+        "TC-026",
+        "TC-027"
+      ],
+      "techniques": [
+        "경계값",
+        "조합"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-09",
+      "group": "쿠폰 선택",
+      "keyword": "최대할인 자동",
+      "text": "주문서 진입 시 할인 금액이 가장 큰 쿠폰을 자동 선택하고 \"최대 할인 적용됨\" 라벨을 보여 주며, 사용자가 변경할 수 있다",
+      "flags": [
+        {
+          "level": "amber",
+          "label": "동률·변경 후 라벨 미정 Q10"
+        }
+      ],
+      "tcs": [
+        "TC-028",
+        "TC-029",
+        "TC-030",
+        "TC-031",
+        "TC-032"
+      ],
+      "techniques": [
+        "기능",
+        "상태 전이",
+        "조합",
+        "화면"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-10",
+      "group": "쿠폰 선택",
+      "keyword": "할인액순 정렬",
+      "text": "쿠폰 목록은 할인액이 큰 순으로 정렬한다",
+      "flags": [],
+      "tcs": [
+        "TC-033"
+      ],
+      "techniques": [
+        "화면"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-11",
+      "group": "쿠폰 선택",
+      "keyword": "곧 만료 배지",
+      "text": "만료 3일 이내 쿠폰에 \"곧 만료\" 배지(D-3, D-2, D-1)를 단다",
+      "flags": [
+        {
+          "level": "amber",
+          "label": "D-day 기준 미정 Q11"
+        }
+      ],
+      "tcs": [
+        "TC-034",
+        "TC-035",
+        "TC-036"
+      ],
+      "techniques": [
+        "경계값",
+        "화면"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-12",
+      "group": "쿠폰 선택",
+      "keyword": "제외 안내문구",
+      "text": "사용 불가 상품이 있으면 \"상품권·e쿠폰 상품은 할인에서 제외돼요\" 문구를 보여 준다",
+      "flags": [],
+      "tcs": [
+        "TC-012",
+        "TC-013"
+      ],
+      "techniques": [
+        "화면"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-13",
+      "group": "결제 금액",
+      "keyword": "쿠폰→포인트",
+      "text": "결제 금액은 쿠폰 할인 → 포인트 사용 순서로 계산한다(화면 표시 순서와 다름)",
+      "flags": [
+        {
+          "level": "red",
+          "label": "충돌 C3"
+        }
+      ],
+      "tcs": [
+        "TC-006",
+        "TC-024",
+        "TC-037",
+        "TC-038",
+        "TC-039"
+      ],
+      "techniques": [
+        "경계값",
+        "계산",
+        "기능",
+        "조합",
+        "화면"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-14",
+      "group": "쿠폰 상태",
+      "keyword": "승인 후 USED",
+      "text": "쿠폰 상태는 결제 승인 완료 후 USED로 바꾼다",
+      "flags": [
+        {
+          "level": "red",
+          "label": "동시성 위험 Q6"
+        }
+      ],
+      "tcs": [
+        "TC-040",
+        "TC-041",
+        "TC-042",
+        "TC-043",
+        "TC-044"
+      ],
+      "techniques": [
+        "동시성",
+        "상태 전이",
+        "연동",
+        "예외"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-15",
+      "group": "쿠폰 상태",
+      "keyword": "전체취소 복구",
+      "text": "주문 전체 취소 시 쿠폰을 AVAILABLE로 복구한다",
+      "flags": [
+        {
+          "level": "red",
+          "label": "충돌 C4"
+        }
+      ],
+      "tcs": [
+        "TC-045",
+        "TC-046",
+        "TC-049"
+      ],
+      "techniques": [
+        "경계값",
+        "상태 전이"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-16",
+      "group": "쿠폰 상태",
+      "keyword": "부분취소 미복구",
+      "text": "부분 취소 시 쿠폰은 복구하지 않는다",
+      "flags": [
+        {
+          "level": "red",
+          "label": "충돌 C4"
+        },
+        {
+          "level": "amber",
+          "label": "기획서 미반영"
+        }
+      ],
+      "tcs": [
+        "TC-047",
+        "TC-048"
+      ],
+      "techniques": [
+        "계산",
+        "상태 전이",
+        "조합"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-17",
+      "group": "쿠폰 상태",
+      "keyword": "만료쿠폰 미복구",
+      "text": "취소 시점에 유효기간이 지난 쿠폰은 복구하지 않는다",
+      "flags": [
+        {
+          "level": "red",
+          "label": "충돌 C6"
+        },
+        {
+          "level": "amber",
+          "label": "문서 미반영(슬랙만)"
+        }
+      ],
+      "tcs": [
+        "TC-049",
+        "TC-050"
+      ],
+      "techniques": [
+        "경계값",
+        "상태 전이"
+      ],
+      "status": "ok"
+    },
+    {
+      "req_id": "REQ-18",
+      "group": "정산",
+      "keyword": "회사 부담",
+      "text": "쿠폰 할인 비용은 회사가 전액 부담하고 판매자 정산 금액에 영향을 주지 않는다",
+      "flags": [
+        {
+          "level": "amber",
+          "label": "구현 문서 없음"
+        }
+      ],
+      "tcs": [
+        "TC-063"
+      ],
+      "techniques": [
+        "계산"
+      ],
+      "status": "ok"
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "C1",
+      "topic": "최소 주문 금액에 배송비 포함 여부",
+      "req_ids": [
+        "REQ-01"
+      ],
+      "tcs": [
+        "TC-001",
+        "TC-002",
+        "TC-003",
+        "TC-004",
+        "TC-005",
+        "TC-006",
+        "TC-009",
+        "TC-010"
+      ],
+      "verdict": "충돌 → Q1"
+    },
+    {
+      "id": "C2",
+      "topic": "정률 쿠폰 할인 한도: 일괄 값 vs 쿠폰별 설정값",
+      "req_ids": [
+        "REQ-06"
+      ],
+      "tcs": [
+        "TC-019",
+        "TC-020",
+        "TC-021",
+        "TC-022",
+        "TC-024"
+      ],
+      "verdict": "충돌 → Q2"
+    },
+    {
+      "id": "C3",
+      "topic": "계산 순서(쿠폰→포인트) vs 화면 표시 순서(포인트→쿠폰)",
+      "req_ids": [
+        "REQ-13"
+      ],
+      "tcs": [
+        "TC-006",
+        "TC-024",
+        "TC-037",
+        "TC-038",
+        "TC-039"
+      ],
+      "verdict": "표시 순서 불일치 → Q3"
+    },
+    {
+      "id": "C4",
+      "topic": "주문 취소 시 쿠폰 복구 범위(전체·부분 취소)",
+      "req_ids": [
+        "REQ-15",
+        "REQ-16"
+      ],
+      "tcs": [
+        "TC-045",
+        "TC-046",
+        "TC-047",
+        "TC-048",
+        "TC-049"
+      ],
+      "verdict": "충돌·문서 미반영 → Q4"
+    },
+    {
+      "id": "C5",
+      "topic": "최소 주문 금액 계산에서 제외 카테고리 상품 금액 차감 여부",
+      "req_ids": [
+        "REQ-02",
+        "REQ-04"
+      ],
+      "tcs": [
+        "TC-007",
+        "TC-008",
+        "TC-009",
+        "TC-010",
+        "TC-011",
+        "TC-024",
+        "TC-030"
+      ],
+      "verdict": "충돌 → Q5"
+    },
+    {
+      "id": "C6",
+      "topic": "취소 시점에 만료된 쿠폰의 복구 여부",
+      "req_ids": [
+        "REQ-17"
+      ],
+      "tcs": [
+        "TC-049",
+        "TC-050"
+      ],
+      "verdict": "슬랙 결정 미반영 → Q4"
+    }
+  ],
+  "risks": [
+    {
+      "area": "최소 주문 금액 판정",
+      "level": "high",
+      "reason": "배송비·제외 상품 포함 여부가 문서마다 달라 경계값(29,999/30,000원) 판정이 바로 갈림(C1, C5)",
+      "refs": [
+        "C1",
+        "C5"
+      ],
+      "tcs": [
+        "TC-001",
+        "TC-002",
+        "TC-003",
+        "TC-004",
+        "TC-005",
+        "TC-006",
+        "TC-007",
+        "TC-008",
+        "TC-009",
+        "TC-010",
+        "TC-011",
+        "TC-024",
+        "TC-030"
+      ],
+      "matched_by": "refs"
+    },
+    {
+      "area": "할인 금액 계산(한도·절사·최소 100원)",
+      "level": "high",
+      "reason": "한도 기준이 충돌(C2)하고 절사·최소 결제액은 개발 문서에만 있어 금전 손실 위험",
+      "refs": [
+        "C2"
+      ],
+      "tcs": [
+        "TC-019",
+        "TC-020",
+        "TC-021",
+        "TC-022",
+        "TC-024"
+      ],
+      "matched_by": "refs"
+    },
+    {
+      "area": "쿠폰 동시 사용",
+      "level": "high",
+      "reason": "USED 전환이 결제 승인 후라 승인 전 틈에 같은 쿠폰을 다른 주문에 쓸 수 있고, 409 검증은 같은 주문만 막음",
+      "refs": [],
+      "tcs": [],
+      "matched_by": ""
+    },
+    {
+      "area": "취소 시 쿠폰 복구",
+      "level": "high",
+      "reason": "기획서·개발 문서·슬랙 결정이 모두 다르고(C4, C6) 만료 쿠폰 처리는 구현 문서에 없음",
+      "refs": [
+        "C4",
+        "C6"
+      ],
+      "tcs": [
+        "TC-045",
+        "TC-046",
+        "TC-047",
+        "TC-048",
+        "TC-049",
+        "TC-050"
+      ],
+      "matched_by": "refs"
+    },
+    {
+      "area": "부분 취소 환불 금액(쿠폰 할인 안분)",
+      "level": "high",
+      "reason": "부분 취소 시 쿠폰 할인액을 환불에 어떻게 나누는지 어느 문서에도 없음",
+      "refs": [],
+      "tcs": [
+        "TC-048",
+        "TC-059"
+      ],
+      "matched_by": "keyword"
+    },
+    {
+      "area": "쿠폰·포인트 차감 순서와 표시",
+      "level": "mid",
+      "reason": "계산 순서와 화면 표시 순서가 달라 사용자 혼동·표시 금액 오류 가능(C3)",
+      "refs": [
+        "C3"
+      ],
+      "tcs": [
+        "TC-006",
+        "TC-024",
+        "TC-037",
+        "TC-038",
+        "TC-039"
+      ],
+      "matched_by": "refs"
+    },
+    {
+      "area": "결제 승인 실패·PG 연동",
+      "level": "mid",
+      "reason": "승인 성공 후 USED 처리 실패나 승인 실패 시 쿠폰 상태 처리가 문서에 없음",
+      "refs": [],
+      "tcs": [
+        "TC-042"
+      ],
+      "matched_by": "keyword"
+    },
+    {
+      "area": "쿠폰 자동 선택·정렬",
+      "level": "mid",
+      "reason": "한도·제외 상품·최소 결제액이 반영된 실제 할인액 기준인지, 동률 기준이 미정",
+      "refs": [],
+      "tcs": [
+        "TC-028",
+        "TC-029",
+        "TC-030",
+        "TC-031",
+        "TC-032",
+        "TC-033"
+      ],
+      "matched_by": "keyword"
+    },
+    {
+      "area": "판매자 정산",
+      "level": "low",
+      "reason": "정책상 영향 없어야 하나 구현 근거 문서가 없어 확인만 필요",
+      "refs": [],
+      "tcs": [
+        "TC-063"
+      ],
+      "matched_by": "keyword"
+    },
+    {
+      "area": "곧 만료 배지·안내 문구",
+      "level": "low",
+      "reason": "D-day 기준 시각 미정, 표시 오류는 금전 영향 없음",
+      "refs": [],
+      "tcs": [],
+      "matched_by": ""
+    }
+  ],
+  "impacts": [
+    {
+      "group": "주문·결제",
+      "name": "결제 금액 계산",
+      "tcs": [
+        "TC-051"
+      ]
+    },
+    {
+      "group": "주문·결제",
+      "name": "포인트 사용(차감 순서·금액)",
+      "tcs": [
+        "TC-052",
+        "TC-053"
+      ]
+    },
+    {
+      "group": "주문·결제",
+      "name": "주문서 결제 금액 요약 화면",
+      "tcs": [
+        "TC-054"
+      ]
+    },
+    {
+      "group": "취소·환불",
+      "name": "주문 전체 취소",
+      "tcs": [
+        "TC-058"
+      ]
+    },
+    {
+      "group": "취소·환불",
+      "name": "주문 부분 취소",
+      "tcs": [
+        "TC-059"
+      ]
+    },
+    {
+      "group": "취소·환불",
+      "name": "환불 금액 계산",
+      "tcs": [
+        "TC-060"
+      ]
+    },
+    {
+      "group": "쿠폰·혜택",
+      "name": "쿠폰 상태 관리(AVAILABLE/USED)",
+      "tcs": [
+        "TC-061"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q1",
+      "question": "최소 주문 금액 30,000원에 배송비가 포함되나요? (기획서는 제외, 정책·API는 포함)",
+      "ask_to": "PM(박기획) · 프로모션운영",
+      "assumption": "정책 기준(배송비 포함). 근거: 금액 규칙은 정책이 기획서보다 우선이고 API도 같음",
+      "tcs_depending": [
+        "TC-004",
+        "TC-005",
+        "TC-009",
+        "TC-010"
+      ],
+      "hold_tcs": []
+    },
+    {
+      "id": "Q2",
+      "question": "정률 쿠폰 한도는 일괄 10,000원인가요, 쿠폰별 maxDiscount인가요? 쿠폰별이면 10,000원 초과 설정을 막나요?",
+      "ask_to": "프로모션운영(이운영) · 주문개발(김개발)",
+      "assumption": "할인액은 10,000원을 넘으면 안 됨(정책 우선). 쿠폰 설정값을 10,000원으로 두고 테스트하고, 10,000원 초과 설정 쿠폰은 결과를 판정 보류로 기록",
+      "tcs_depending": [
+        "TC-019",
+        "TC-020",
+        "TC-021",
+        "TC-022",
+        "TC-024"
+      ],
+      "hold_tcs": []
+    },
+    {
+      "id": "Q3",
+      "question": "결제 요약에서 쿠폰 할인을 포인트 사용보다 위에 표시하도록 디자인을 고칠까요?",
+      "ask_to": "프로덕트디자인 · PM(박기획)",
+      "assumption": "계산은 쿠폰→포인트(기획서·슬랙 일치). 표시 순서는 디자인 v1.1대로 보고 금액 값만 검증",
+      "tcs_depending": [
+        "TC-039"
+      ],
+      "hold_tcs": []
+    },
+    {
+      "id": "Q4",
+      "question": "취소 시 복구 규칙을 확정하고 기획서에 반영해 주세요: 전체 취소만 복구, 부분 취소 미복구, 취소 시점 만료 쿠폰 미복구가 맞나요? 만료 미복구는 API에도 구현되나요?",
+      "ask_to": "PM(박기획) · 주문개발(김개발)",
+      "assumption": "슬랙 11/05 PM 결정 기준(전체 취소만 복구, 부분·만료 미복구). 근거: 가장 최신 결정이고 API도 부분 취소 미복구로 일치",
+      "tcs_depending": [
+        "TC-045",
+        "TC-046",
+        "TC-047",
+        "TC-048",
+        "TC-049",
+        "TC-050"
+      ],
+      "hold_tcs": []
+    },
+    {
+      "id": "Q5",
+      "question": "혼합 장바구니에서 상품권·e쿠폰 금액을 최소 주문 금액 계산에서 빼나요? API는 totalPrice 전체로 검증합니다",
+      "ask_to": "주문개발(김개발) · 프로모션운영(이운영)",
+      "assumption": "정책 기준(제외 상품 금액을 뺀다). API가 다르면 결함 후보로 보고",
+      "tcs_depending": [
+        "TC-009",
+        "TC-010",
+        "TC-011"
+      ],
+      "hold_tcs": []
+    },
+    {
+      "id": "Q6",
+      "question": "결제 승인 전(USED 전) 같은 쿠폰을 다른 주문에 동시에 적용·결제할 수 있나요? 승인 시점에 쿠폰 상태를 재검증하나요?",
+      "ask_to": "주문개발(김개발)",
+      "assumption": "한 쿠폰은 한 주문에서만 결제 완료되어야 함. 두 번째 결제가 성공하면 결함으로 판정",
+      "tcs_depending": [
+        "TC-043",
+        "TC-044"
+      ],
+      "hold_tcs": []
+    },
+    {
+      "id": "Q7",
+      "question": "쿠폰·포인트 적용 후 결제 금액이 100원 미만이 되면 어떻게 처리하나요? (할인액 조정, 적용 거부, 포인트 사용 제한 중 무엇인지)",
+      "ask_to": "주문개발(김개발) · PM(박기획)",
+      "assumption": "최종 결제 금액이 100원 아래로 내려가지 않는 것만 검증하고 처리 방식은 판정 보류",
+      "tcs_depending": [
+        "TC-025",
+        "TC-026",
+        "TC-027"
+      ],
+      "hold_tcs": []
+    },
+    {
+      "id": "Q8",
+      "question": "부분 취소 시 쿠폰 할인액은 환불 금액에 어떻게 나누나요?",
+      "ask_to": "PM(박기획) · 주문개발(김개발)",
+      "assumption": "규칙 확정 전에는 환불 총액이 실제 결제 금액을 넘지 않는지만 검증",
+      "tcs_depending": [
+        "TC-048"
+      ],
+      "hold_tcs": []
+    },
+    {
+      "id": "Q9",
+      "question": "할인 대상 금액에 배송비가 포함되나요? 정액 쿠폰이 대상 금액보다 크면 어떻게 계산하나요?",
+      "ask_to": "주문개발(김개발)",
+      "assumption": "대상 금액 = 제외 카테고리를 뺀 상품 금액(배송비 제외)으로 보고 TC 작성, 답 후 수정",
+      "tcs_depending": [
+        "TC-007",
+        "TC-017",
+        "TC-019",
+        "TC-023",
+        "TC-032",
+        "TC-038",
+        "TC-055"
+      ],
+      "hold_tcs": []
+    },
+    {
+      "id": "Q10",
+      "question": "할인액이 같은 쿠폰이 여럿이면 무엇을 자동 선택하나요? 사용자가 바꾸면 \"최대 할인 적용됨\" 라벨은 사라지나요?",
+      "ask_to": "PM(박기획) · 프로덕트디자인",
+      "assumption": "동률일 때는 할인액만 최대인지 확인, 변경 후 라벨 동작은 판정 보류",
+      "tcs_depending": [
+        "TC-031",
+        "TC-032"
+      ],
+      "hold_tcs": []
+    },
+    {
+      "id": "Q11",
+      "question": "\"곧 만료\" D-3~D-1은 만료일 기준 며칠 전, 어느 시각 기준인가요? 당일 만료(D-0)는 어떻게 표시하나요?",
+      "ask_to": "프로덕트디자인 · 주문개발",
+      "assumption": "만료일까지 남은 날짜 수(날짜 단위) 3·2·1일에만 배지, D-0은 판정 보류",
+      "tcs_depending": [
+        "TC-034",
+        "TC-035",
+        "TC-036"
+      ],
+      "hold_tcs": []
+    }
+  ],
+  "tc_results": [],
+  "bugs": [],
+  "checks": [
+    {
+      "code": "REQ_NO_BOUNDARY",
+      "severity": "mid",
+      "targets": [
+        "REQ-03",
+        "TC-014",
+        "TC-015",
+        "TC-016"
+      ],
+      "detail": "수치 조건이 있는데 경계값 TC가 없음",
+      "owner": "tc-writer"
+    },
+    {
+      "code": "REQ_NO_BOUNDARY",
+      "severity": "mid",
+      "targets": [
+        "REQ-05",
+        "TC-007",
+        "TC-008",
+        "TC-017"
+      ],
+      "detail": "수치 조건이 있는데 경계값 TC가 없음",
+      "owner": "tc-writer"
+    },
+    {
+      "code": "RISK_NO_TC",
+      "severity": "high",
+      "targets": [
+        "쿠폰 동시 사용"
+      ],
+      "detail": "위험 '쿠폰 동시 사용'에 연결된 TC를 찾지 못함(번호·낱말 기준 — 실제로 덮는 TC가 있는지 확인)",
+      "owner": "tc-writer"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "mid",
+      "targets": [
+        "Q1"
+      ],
+      "detail": "임시 가정에 기댄 TC 4개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "mid",
+      "targets": [
+        "Q2"
+      ],
+      "detail": "임시 가정에 기댄 TC 5개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "low",
+      "targets": [
+        "Q3"
+      ],
+      "detail": "임시 가정에 기댄 TC 1개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "mid",
+      "targets": [
+        "Q4"
+      ],
+      "detail": "임시 가정에 기댄 TC 6개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "mid",
+      "targets": [
+        "Q5"
+      ],
+      "detail": "임시 가정에 기댄 TC 3개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "low",
+      "targets": [
+        "Q6"
+      ],
+      "detail": "임시 가정에 기댄 TC 2개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "mid",
+      "targets": [
+        "Q7"
+      ],
+      "detail": "임시 가정에 기댄 TC 3개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "low",
+      "targets": [
+        "Q8"
+      ],
+      "detail": "임시 가정에 기댄 TC 1개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "mid",
+      "targets": [
+        "Q9"
+      ],
+      "detail": "임시 가정에 기댄 TC 7개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "low",
+      "targets": [
+        "Q10"
+      ],
+      "detail": "임시 가정에 기댄 TC 2개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "QUESTION_OPEN",
+      "severity": "mid",
+      "targets": [
+        "Q11"
+      ],
+      "detail": "임시 가정에 기댄 TC 3개 — 답이 다르면 기대 결과가 바뀜",
+      "owner": "pm"
+    },
+    {
+      "code": "PRIORITY_INFLATED",
+      "severity": "low",
+      "targets": [
+        "P1"
+      ],
+      "detail": "P1 비율 57% — 우선순위 기준을 다시 볼 것(실행 순서 구분이 흐려짐)",
+      "owner": "tc-writer"
+    }
+  ]
+}

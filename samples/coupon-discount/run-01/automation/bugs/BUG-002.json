@@ -1,0 +1,62 @@
+{
+  "id": "BUG-002",
+  "summary": "상품권만 담은 주문에서 할인 0원인 쿠폰이 자동 선택돼 결제 후 USED로 소진된다",
+  "feature": "쿠폰 / 제외 상품",
+  "line": "신규기능",
+  "tc_id": "TC-011",
+  "req_ids": [
+    "REQ-02",
+    "REQ-04"
+  ],
+  "environment": {
+    "platform": "API",
+    "app_version": "샘플 쿠폰 QA 서버(개발문서 v0.3 기준)",
+    "server": "QA 샘플 서버 http://127.0.0.1:8765",
+    "account": "테스트마다 새로 생성(/test/members)",
+    "occurred_at": "2026-11-11 15:34"
+  },
+  "preconditions": [
+    "로그인 회원",
+    "정률 10% 쿠폰, 정액 5,000원 쿠폰 각 1장 보유(AVAILABLE)",
+    "상품권(GIFT_CARD) 상품 50,000원(배송비 0원)"
+  ],
+  "steps": [
+    "상품권 50,000원만 장바구니에 담는다",
+    "주문서에 들어간다",
+    "쿠폰 영역을 확인한다",
+    "결제를 완료한 뒤 보유 쿠폰 상태를 조회한다"
+  ],
+  "expected": [
+    "쿠폰이 자동 선택되지 않고 적용할 수 없다",
+    "최종 결제 금액 50,000원",
+    "보유 쿠폰 2장 모두 AVAILABLE 유지"
+  ],
+  "actual": [
+    "정률 10% 쿠폰 상태: 실제 USED (기대 AVAILABLE)"
+  ],
+  "severity": "Major",
+  "priority": "P2",
+  "reproducibility": "4/4 (2026-11-11 자동화 전체 실행 4회 모두 실패)",
+  "evidence": [
+    "자동화 테스트 test_excluded_items.py::test_TC_011_gift_card_only_cart",
+    "결과 reports/results.json · reports/run-20261111-153432.md"
+  ],
+  "attachments": [],
+  "follow_up": [
+    "[테스트] 가짜 QA 서버(samples/coupon-discount/automation/mock_server.py)에서 신규 기능 자동화로 발견한 샘플 결함",
+    "가정 Q5: Q5 답이 API 방식이면 totalPrice 50,000원으로 적용은 되고 할인 0원이 된다. 이때 할인 0원으로 쿠폰이 USED 되면 결함 후보로 보고"
+  ],
+  "source": {
+    "sheet": "test-cases_자동화결과.xlsx",
+    "row": 12,
+    "tc_title": "상품권 50,000원만 담은 장바구니면 쿠폰을 쓸 수 없다",
+    "issue": [
+      "정률 10% 쿠폰 상태: 실제 USED (기대 AVAILABLE)"
+    ]
+  },
+  "jira": {
+    "key": "QAO-10",
+    "url": "https://test12yk.atlassian.net/browse/QAO-10",
+    "created": "2026-11-11T15:35:41+09:00"
+  }
+}

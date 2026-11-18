@@ -1,0 +1,24 @@
+{
+  "bugs": [
+    {
+      "id": "BUG-002",
+      "key": "QAO-10",
+      "url": "https://test12yk.atlassian.net/browse/QAO-10",
+      "tc_id": "TC-011",
+      "line": "신규기능",
+      "severity": "Major",
+      "priority": "P2",
+      "summary": "상품권만 담은 주문에서 할인 0원인 쿠폰이 자동 선택돼 결제 후 USED로 소진된다"
+    },
+    {
+      "id": "BUG-003",
+      "key": "QAO-11",
+      "url": "https://test12yk.atlassian.net/browse/QAO-11",
+      "tc_id": "TC-050",
+      "line": "신규기능",
+      "severity": "Major",
+      "priority": "P2",
+      "summary": "유효기간이 지난 뒤 주문을 전체 취소하면 만료된 쿠폰이 AVAILABLE로 복구된다"
+    }
+  ]
+}

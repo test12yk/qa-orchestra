@@ -1,0 +1,60 @@
+{
+  "id": "BUG-003",
+  "summary": "유효기간이 지난 뒤 주문을 전체 취소하면 만료된 쿠폰이 AVAILABLE로 복구된다",
+  "feature": "취소·환불 / 취소 시 쿠폰 복구",
+  "line": "신규기능",
+  "tc_id": "TC-050",
+  "req_ids": [
+    "REQ-17"
+  ],
+  "environment": {
+    "platform": "API",
+    "app_version": "샘플 쿠폰 QA 서버(개발문서 v0.3 기준)",
+    "server": "QA 샘플 서버 http://127.0.0.1:8765",
+    "account": "테스트마다 새로 생성(/test/members)",
+    "occurred_at": "2026-11-11 15:34"
+  },
+  "preconditions": [
+    "로그인 회원",
+    "유효기간 2026-11-10 23:59:59인 정액 5,000원 쿠폰으로 일반 상품 40,000원(배송비 3,000원) 결제 완료, 쿠폰 USED",
+    "서버 시각 조정 가능"
+  ],
+  "steps": [
+    "서버 시각 2026-11-11 00:00:00에 주문 전체 취소를 요청한다",
+    "쿠폰 상태를 조회한다",
+    "새 주문서 쿠폰 목록을 확인한다"
+  ],
+  "expected": [
+    "쿠폰 상태가 AVAILABLE이 아니다",
+    "새 주문서 쿠폰 목록에 이 쿠폰이 사용 가능으로 보이지 않는다",
+    "주문 환불 38,000원은 정상 처리된다"
+  ],
+  "actual": [
+    "쿠폰 상태: 실제 AVAILABLE (기대 AVAILABLE 아님)"
+  ],
+  "severity": "Major",
+  "priority": "P2",
+  "reproducibility": "4/4 (2026-11-11 자동화 전체 실행 4회 모두 실패)",
+  "evidence": [
+    "자동화 테스트 test_cancel_restore.py::test_TC_050_cancel_after_expiry_not_restored",
+    "결과 reports/results.json · reports/run-20261111-153432.md"
+  ],
+  "attachments": [],
+  "follow_up": [
+    "[테스트] 가짜 QA 서버(samples/coupon-discount/automation/mock_server.py)에서 신규 기능 자동화로 발견한 샘플 결함",
+    "가정 Q4: Q4 답이 기획서대로 '즉시 복구(만료 예외 없음)'면 AVAILABLE로 바뀐다. API 문서에 만료 미복구가 없어 AVAILABLE로 복구되면 결함 후보로 보고"
+  ],
+  "source": {
+    "sheet": "test-cases_자동화결과.xlsx",
+    "row": 51,
+    "tc_title": "유효기간이 지난 뒤(00:00:00)에 전체 취소하면 쿠폰은 복구되지 않는다",
+    "issue": [
+      "쿠폰 상태: 실제 AVAILABLE (기대 AVAILABLE 아님)"
+    ]
+  },
+  "jira": {
+    "key": "QAO-11",
+    "url": "https://test12yk.atlassian.net/browse/QAO-11",
+    "created": "2026-11-11T15:35:41+09:00"
+  }
+}

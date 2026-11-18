@@ -1,0 +1,14 @@
+{
+  "bugs": [
+    {
+      "id": "BUG-001",
+      "key": "QAO-8",
+      "url": "https://test12yk.atlassian.net/browse/QAO-8",
+      "tc_id": "TC-009",
+      "line": "신규기능",
+      "severity": "Critical",
+      "priority": "P1",
+      "summary": "상품권이 섞인 장바구니에서 제외 상품 금액까지 최소 주문 금액에 포함돼 쿠폰이 적용된다"
+    }
+  ]
+}

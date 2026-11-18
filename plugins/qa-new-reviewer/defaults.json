@@ -1,0 +1,85 @@
+{
+  "team": {
+    "domain": "",
+    "language": "ko"
+  },
+  "tc": {
+    "_comment": "TC 시트 열 머리글(신규 TC 작성가와 같은 설정을 쓰면 그쪽 값이 쓰인다).",
+    "columns": [
+      {
+        "key": "id",
+        "label": "CaseID"
+      },
+      {
+        "key": "domain",
+        "label": "Domain"
+      },
+      {
+        "key": "section",
+        "label": "section"
+      },
+      {
+        "key": "type",
+        "label": "type"
+      },
+      {
+        "key": "title",
+        "label": "title"
+      },
+      {
+        "key": "preconditions",
+        "label": "precondition"
+      },
+      {
+        "key": "steps",
+        "label": "procedure"
+      },
+      {
+        "key": "expected",
+        "label": "expected result"
+      },
+      {
+        "key": "priority",
+        "label": "priority"
+      },
+      {
+        "key": "result",
+        "label": "결과"
+      },
+      {
+        "key": "issue",
+        "label": "이슈내용"
+      }
+    ],
+    "results": {
+      "pass": "Pass",
+      "fail": "Fail"
+    }
+  },
+  "review": {
+    "_comment": "신규 기능 검토자 설정. 팀 기준에 맞게 바꾼다.",
+    "vague_words": [
+      "정상",
+      "적절",
+      "올바르",
+      "문제없",
+      "잘 ",
+      "등등",
+      "확인한다"
+    ],
+    "_vague_words_comment": "기대 결과에 이 말만 있고 구체적인 값·상태가 없으면 '기대 결과 모호'로 본다.",
+    "boundary_technique": "경계값",
+    "top_priority": "P1",
+    "top_priority_share_warn": 0.5,
+    "_top_priority_comment": "최상위 우선순위 TC 비율이 이 값을 넘으면 우선순위 기준을 다시 보라고 알린다.",
+    "owners": {
+      "plan-analyst": "기획 분석가",
+      "tc-writer": "신규 TC 작성가",
+      "automation": "신규 기능 자동화",
+      "bug-reporter": "버그 리포터",
+      "tester": "수동 테스트 담당",
+      "pm": "기획·정책 담당(답변)",
+      "dev": "개발(수정)"
+    }
+  }
+}

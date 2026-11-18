@@ -1,0 +1,36 @@
+{
+  "_comment": "review.py collect가 만든 review-facts.json을 그대로 두고 summary·findings·dismissed만 채운다.",
+  "feature": "장바구니 쿠폰 할인",
+  "stage": "tc",
+  "generated_at": "2026-11-18T16:00:00+09:00",
+  "inputs": {"analysis": "analysis/plan-analysis.json", "tc": "tc/test-cases.json"},
+  "stats": {"requirements": 18, "tcs": 63, "top_priority_share": 0.57, "req_status": {"ok": 17, "weak": 1}, "results": {}},
+  "coverage": [],
+  "conflicts": [],
+  "risks": [],
+  "impacts": [],
+  "questions": [],
+  "tc_results": [],
+  "bugs": [],
+  "checks": [],
+  "summary": {
+    "status": "needs_work",
+    "headline": "고위험 '쿠폰 동시 사용'의 동시 적용 케이스가 없어 보완 후 실행을 권함",
+    "notes": ["Q1·Q2·Q9 답이 오면 가정 의존 TC 16개의 기대 결과를 다시 볼 것"]
+  },
+  "findings": [
+    {
+      "id": "F-01",
+      "severity": "high",
+      "category": "위험 미커버",
+      "targets": ["쿠폰 동시 사용", "TC-043"],
+      "detail": "동시 '결제'는 TC-043이 있지만, 같은 쿠폰을 두 주문에 동시에 '적용'하는 경우는 없음",
+      "action": "같은 쿠폰을 두 주문서에서 동시에 적용 요청하는 엣지케이스 TC 추가",
+      "owner": "tc-writer",
+      "from_checks": ["RISK_NO_TC"]
+    }
+  ],
+  "dismissed": [
+    {"code": "REQ_NO_BOUNDARY", "targets": ["REQ-05"], "reason": "숫자는 쿠폰 종류 예시(10%, 5,000원)일 뿐 경계 조건이 아님"}
+  ]
+}

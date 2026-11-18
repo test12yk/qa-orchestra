@@ -41,6 +41,12 @@
       "description": "신규 기능 자동화만 (API 테스트 → TC 시트 결과)",
       "source": "./plugins/qa-new-automation",
       "category": "testing"
+    },
+    {
+      "name": "qa-new-reviewer",
+      "description": "신규 기능 검토자만 (실행 전 TC 검토 · 실행 결과 검토)",
+      "source": "./plugins/qa-new-reviewer",
+      "category": "testing"
     }
   ]
 }
