@@ -1,0 +1,123 @@
+{
+  "_comment": "judge.py collect가 만든 judgment-facts.json은 그대로 두고 recommendation·conditions·alternatives와 요소 note만 채운다. decisions는 decide 명령이 쓴다.",
+  "feature": "장바구니 쿠폰 할인",
+  "generated_at": "2026-11-18T18:37:16+09:00",
+  "inputs": {
+    "review": "review/result/review.json",
+    "tc": "tc/test-cases.json"
+  },
+  "bug_status_checked": true,
+  "hint": "hold",
+  "elements": [
+    {
+      "id": "E2",
+      "name": "결함",
+      "status": "unmet",
+      "summary": "열린 버그 3건(Critical 1 · Major 2)",
+      "evidence": [
+        "QAO-8 Critical · 해야 할 일 · TC-009 상품권이 섞인 장바구니에서 제외 상품 금액까지 최소 주문 금액에 포함돼 쿠폰이 적용된다"
+      ],
+      "refs": [
+        "QAO-8",
+        "QAO-10",
+        "QAO-11"
+      ],
+      "note": "세 건 모두 지라 '해야 할 일'(2026-11-18 조회). QAO-8은 Critical이라 미충족 — 다만 E4대로 Q5 답에 따라 결함이 아닐 수 있음"
+    }
+  ],
+  "impacts": [],
+  "questions": [],
+  "recommendation": {
+    "verdict": "hold",
+    "headline": "편입을 막는 이유 3개(Critical 결함 QAO-8, P1 TC 미실행 1개·판정 보류 3개)가 남아 지금은 편입 보류 — 대부분은 기획 답(Q4·Q5 등)부터 받으면 풀린다",
+    "reasons": [
+      "E2 결함: Critical QAO-8(제외 상품이 최소 주문 금액에 포함) 미해결",
+      "E1·E3: P1 TC-059(부분 취소 회귀) 미실행, P1 TC-022·027·048 판정 보류 — 금액·환불 계산이 확인되지 않음"
+    ]
+  },
+  "conditions": [
+    {
+      "id": "K-01",
+      "what": "Q5(제외 상품을 최소 주문 금액에서 빼는지) 답 확정",
+      "owner": "pm",
+      "verify": "답에 맞춰 TC-009·010·011 기대 결과를 고정하고 다시 판정 — 결함이 아니면 QAO-8·10 닫기",
+      "refs": [
+        "Q5",
+        "QAO-8",
+        "QAO-10",
+        "TC-009",
+        "TC-011"
+      ],
+      "resolves": [
+        "B-01"
+      ]
+    },
+    {
+      "id": "K-03",
+      "what": "K-01 뒤에도 결함이면 QAO-8 수정",
+      "owner": "dev",
+      "verify": "수정 빌드에서 TC-009·010 Pass, QAO-8 완료",
+      "refs": [
+        "QAO-8",
+        "TC-009",
+        "TC-010"
+      ],
+      "resolves": [
+        "B-01"
+      ]
+    },
+    {
+      "id": "K-05",
+      "what": "P1 회귀 TC-059(쿠폰 없는 부분 취소) 실행",
+      "owner": "automation",
+      "verify": "변경 전 배송비 환불 기준값을 받아 실행해 Pass",
+      "refs": [
+        "TC-059"
+      ],
+      "resolves": [
+        "B-02"
+      ]
+    }
+  ],
+  "alternatives": [
+    {
+      "option": "질문 답부터 받고 다시 판정(권장)",
+      "pros": "Q4·Q5 답만으로 Fail 3건의 성격이 정해져, 결함이 아니면 남은 조건이 실행·판정 보류만 남음",
+      "cons": "기획 답변 일정에 묶임"
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "conditional",
+      "by": "QA 매니저",
+      "at": "2026-11-19T10:00:00+09:00",
+      "note": "Q4·Q5 답 확정 후 2.3.0 편입",
+      "conditions_accepted": [
+        "K-01",
+        "K-03"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "id": "B-01",
+      "level": "block",
+      "element": "E2·E6",
+      "title": "Critical 결함 QAO-8 미해결 — 제외 상품(상품권)까지 최소 주문 금액에 포함돼 쿠폰이 적용됨. 고위험 '최소 주문 금액'의 Fail이며, 결함인지는 Q5 답에 달림",
+      "refs": [
+        "QAO-8",
+        "TC-009",
+        "Q5"
+      ]
+    },
+    {
+      "id": "B-02",
+      "level": "block",
+      "element": "E1·E8",
+      "title": "P1 회귀 TC-059(쿠폰 없는 부분 취소) 미실행 — 기존 부분 취소 환불이 그대로인지 모름",
+      "refs": [
+        "TC-059"
+      ]
+    }
+  ]
+}

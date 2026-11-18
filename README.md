@@ -27,7 +27,8 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 - [x] 버그 리포터 `bug-reporter` — 리포트 작성·중복 확인 → 승인 후 지라 등록(커넥터/API 토큰/초안)
 - [x] 신규 기능 자동화 `new-automation` — TC·API 문서 → pytest API 테스트 → QA 서버 실행 → TC 시트 결과·이슈내용 기록(가짜 쿠폰 서버로 검증)
 - [x] 신규 기능 검토자 `new-reviewer` — 실행 전 TC 검토(요구사항·충돌·위험·영향 범위 커버, 경계값·조합, 기대 결과) · 실행 결과 검토(미실행·판정 보류·가정 위의 Pass·버그) → 담당별 보완 요청 HTML
-- [ ] 나머지 신규 기능 라인(판정관·QA 리포터) → 회귀 라인
+- [x] 신규 기능 판정관 `new-judge` — 실행 결과 검토 → 요소 8가지(실행·결함·보류·가정·요구사항·고위험·검토 지적·영향 범위) → 편입 가능/조건부/보류 추천 + 편입 조건, 사람의 결정 기록(릴리즈 기록 파일)
+- [ ] 신규 기능 QA 리포터 → 회귀 라인
 
 ## 폴더
 ```
@@ -40,6 +41,7 @@ plugins/
   qa-new-tc-writer/    신규 TC 작성가: agents/, tools/render_test_cases.py(점검 포함), tools/revise_test_cases.py(검토 지적 보완), tools/templates/, defaults.json
   qa-new-automation/   신규 기능 자동화: agents/, tools/run_automation.py(준비·점검·실행·결과 기록), tools/templates/, defaults.json
   qa-new-reviewer/     신규 기능 검토자: agents/, tools/review.py(자동 점검·보고서), tools/templates/, defaults.json
+  qa-new-judge/        신규 기능 판정관: agents/, tools/judge.py(요소 모으기·판정서·결정 기록), tools/templates/, defaults.json
 .claude/agents/        저장소를 받아 쓸 때를 위한 연결(plugins/*/agents 를 가리킴)
 qa-orchestra.config.json   팀 설정 견본
 samples/coupon-discount/   가상 "쿠폰 할인" 기능 (입력 5종, 기준 답안, 실행 결과)
@@ -60,6 +62,7 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 | 버그 리포터만 | `/plugin install qa-bug-reporter@qa-orchestra` | `bug-reporter` + 점검·지라 등록 스크립트 |
 | 신규 기능 자동화만 | `/plugin install qa-new-automation@qa-orchestra` | `new-automation` + 스위트 준비·실행·결과 기록 스크립트 (테스트 실행에 pytest 필요) |
 | 신규 기능 검토자만 | `/plugin install qa-new-reviewer@qa-orchestra` | `new-reviewer` + 자동 점검·보고서 스크립트 |
+| 신규 기능 판정관만 | `/plugin install qa-new-judge@qa-orchestra` | `new-judge` + 판정서·결정 기록 스크립트 |
 
 에이전트별 플러그인에는 그 에이전트가 쓰는 파일만 들어 있다(샘플·문서는 설치되지 않음). 나중에 전체를 설치하면 빠진 것만 추가된다. 비공개 저장소라면 접근 권한이 있는 GitHub 계정이 필요하다. 설치 뒤 Claude Code를 다시 시작한다.
 
@@ -96,6 +99,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 | `new-automation` 신규 기능 자동화 | TC(json·시트) + API 문서 + QA 서버 주소 | pytest 스위트, 실행 리포트, 결과·이슈내용이 채워진 TC 시트 | TC 시트만 줘도 된다(모든 행을 후보로 봄) |
 | `bug-reporter` 버그 리포터 | TC 실행 시트(Fail 행)·메모·로그 | 버그 리포트(MD) → 승인 시 지라 이슈 | 버그 메모만 줘도 된다 |
 | `new-tc-writer` 신규 TC 작성가 | 기획 분석서 (없으면 문서 폴더) | TC 스프레드시트(xlsx)·CSV·HTML·MD | 문서 폴더만 줘도 되지만, 분석서가 있어야 충돌·질문이 반영된다 |
+| `new-judge` 신규 기능 판정관 | 검토자의 실행 결과 검토(review.json) (+ TC json, 지라 상태) | 판정서(HTML·MD·JSON), 사람 결정 시 릴리즈 기록 | 실행 결과 검토 review.json만 있으면 된다 |
 | `new-reviewer` 신규 기능 검토자 | 실행 전: 분석서 + TC json / 실행 후: + 결과 시트·자동화 결과·버그 폴더 | 검토 보고서(HTML·MD·JSON), 담당별 보완 요청 | TC json만 있어도 TC 자체 점검(기대 결과·추적·중복)은 된다 |
 
 여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(예정)를 쓴다.
@@ -122,3 +126,9 @@ python3 plugins/qa-plan-analyst/tools/render_plan_analysis.py samples/coupon-dis
 - `tools/review.py collect`가 기계적으로 셀 수 있는 후보를 잡고, 에이전트가 TC·문서를 직접 읽어 확인한 것만 지적으로 남긴다(뺀 후보는 이유와 함께 보고서에 남음). 다른 에이전트의 결과물은 고치지 않고 담당별 보완 요청만 낸다. 출시 여부는 말하지 않는다(판정관 몫).
 - **보완 흐름**: 검토자(실행 전) → 신규 TC 작성가 보완 모드(`revise_test_cases.py` — 지적별 추가·수정·폐기·제외 사유·답 대기, 사람이 뺀 지적은 반영 안 함(결정한 사람 필수), 타당하지 않은 지적은 근거와 함께 이견, 번호 유지, 원본은 그대로 두고 새 버전) → 검토자 재검토(`collect --previous`, 이전 지적마다 해결·일부·답 대기·남음·반영 안 함·철회 — 이견은 받아들이거나 반박, 뺀 '상' 지적은 보고서 맨 위에 '감수한 위험'으로). 예: `run-01/tc-v2/`(TC 63→66, changes.md) · `run-01/review/tc-v2/`(해결 3 · 답 대기 1 · 남음 2, 새 지적 1).
 - 결과 예: `samples/coupon-discount/run-01/review/tc/`(실행 시작 가능, 지적 6건) · `review/result/`(보완 후 판정, 지적 7건 — Fail 3건이 모두 미확정 질문 Q4·Q5에 기댄 판정임을 짚음).
+
+## 신규 기능 판정관
+- 입력은 검토자의 **실행 결과 검토**. 요소 8가지를 설정 기준(`judge`: 막는 심각도 Blocker·Critical, 조건부 Major, 최상위 우선순위 P1)으로 매기고, 기준표 후보와 다르게 추천하면 이유를 남긴다.
+- 조건부·보류면 편입 조건(K-01…, 담당·확인 방법)을 낸다. 결정은 사람이 하고 `judge.py decide`로 기록한다(추천과 다른 결정은 이유 필수, `--ledger`로 릴리즈 기록 파일에 남김).
+- QA 매니저가 Claude를 쓰지 않아도 된다: 판정서를 claude.ai 링크로 공유하면 맨 아래 '결정 남기기' 칸에서 결정·조건·이유를 저장하고(참여자 이상 권한), 판정관이 그 제출을 `decide --source`로 판정서에 옮긴다.
+- 결과 예: `samples/coupon-discount/run-01/judgment/` — 편입 보류 추천(Critical QAO-8, P1 미실행·보류 4개), 단 Fail 3건이 모두 Q4·Q5 가정 기준이라 답에 따라 조건부로 바뀔 수 있음. 결정은 비워 둠.

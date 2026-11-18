@@ -1,0 +1,14 @@
+{
+  "name": "qa-new-judge",
+  "description": "QA 신규 기능 판정관: 검토자의 실행 결과 검토를 받아 실행 완료·결함·판정 보류·가정·요구사항·고위험 영역·검토 지적·영향 범위를 요소별로 따져 편입 가능/조건부 편입/편입 보류를 추천하고, 사람의 최종 결정을 기록한다",
+  "version": "0.1.0",
+  "author": {
+    "name": "test12yk"
+  },
+  "keywords": [
+    "qa",
+    "release",
+    "go-no-go",
+    "judgment"
+  ]
+}

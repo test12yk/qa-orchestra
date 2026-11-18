@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>장바구니 쿠폰 할인 신규 기능 판정</title><style>/* Layout: 문서형 단일 컬럼(최대 1080px), 추천·결정 두 칸 → 요소별 판정 표 → 조건·선택지 */
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --fg: #1b2130; --muted: #5b6477; --line: #dde2ea; --soft: #eef1f6;
+  --accent: #1f3a8a;
+  --plan: #3b6fe0; --policy: #7a4fd6; --dev: #0d8a80; --design: #c9437a; --slack: #b97e0c;
+  --red: #c4362c; --amber: #b0721a; --green: #2d8549;
+  --red-bg: #fbeceb; --amber-bg: #fbf2e4; --green-bg: #e8f4ec;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11141b; --surface: #191e28; --fg: #e5e8ee; --muted: #9aa3b4; --line: #2a3140; --soft: #1f2532;
+  --accent: #9db1ff;
+  --plan: #6f98ff; --policy: #a985ff; --dev: #38c2b5; --design: #f07aa8; --slack: #e6ad3c;
+  --red: #ff7b70; --amber: #f0b354; --green: #5ccb80;
+  --red-bg: #3a1f1d; --amber-bg: #392c18; --green-bg: #1b3324; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11141b; --surface: #191e28; --fg: #e5e8ee; --muted: #9aa3b4; --line: #2a3140; --soft: #1f2532;
+  --accent: #9db1ff;
+  --plan: #6f98ff; --policy: #a985ff; --dev: #38c2b5; --design: #f07aa8; --slack: #e6ad3c;
+  --red: #ff7b70; --amber: #f0b354; --green: #5ccb80;
+  --red-bg: #3a1f1d; --amber-bg: #392c18; --green-bg: #1b3324; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+h2 .no { font-family: var(--f-mono); font-size: .8rem; color: var(--muted); font-weight: 500; }
+h3 { font-size: .95rem; font-weight: 600; margin-bottom: 8px; }
+p { margin: 0; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.small { font-size: .8rem; font-weight: 400; }
+.eyebrow { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+header.top { display: grid; gap: 10px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); font-size: .85rem; }
+nav.toc { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .85rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 10px; }
+nav.toc a { color: var(--accent); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { text-decoration: underline; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.banner { display: grid; gap: 4px; padding: 14px 18px; border-radius: 10px; border: 1px solid var(--line); border-left-width: 5px; background: var(--surface); }
+.banner b { font-size: 1.05rem; }
+.banner.ok { border-left-color: var(--green); } .banner.ok b { color: var(--green); }
+.banner.warn { border-left-color: var(--amber); } .banner.warn b { color: var(--amber); }
+.banner ul { margin: 4px 0 0; padding-left: 18px; color: var(--muted); font-size: .88rem; }
+
+.kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 2px; }
+.kpi b { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.kpi span { font-size: .8rem; color: var(--muted); }
+.kpi.warn b { color: var(--red); }
+.kpi.caution b { color: var(--amber); }
+
+section { display: grid; gap: 14px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+ul.reqs { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: .88rem; }
+.fid { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); margin-inline: 2px 4px; }
+
+.flag { font-size: .75rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.flag.red { color: var(--red); background: var(--red-bg); }
+.flag.amber { color: var(--amber); background: var(--amber-bg); }
+.flag.green { color: var(--green); background: var(--green-bg); }
+.flag.muted { color: var(--muted); background: var(--soft); }
+.chip { display: inline-block; font-size: .75rem; padding: 0 7px; margin: 1px 3px 1px 0; border: 1px solid var(--line); border-radius: 4px; background: var(--soft); white-space: nowrap; }
+
+.tbl { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: .78rem; color: var(--muted); font-weight: 600; letter-spacing: .02em; white-space: nowrap; background: var(--soft); }
+td.c, th.c { text-align: center; }
+td.pre { white-space: pre-line; }
+
+.bar { display: flex; height: 8px; width: 120px; border-radius: 4px; overflow: hidden; background: var(--soft); margin-top: 4px; }
+.seg { display: block; height: 100%; }
+.seg.green { background: var(--green); } .seg.red { background: var(--red); } .seg.amber { background: var(--amber); } .seg.muted { background: var(--line); }
+
+@media (max-width: 760px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  h1 { font-size: 1.4rem; }
+}
+details summary { cursor: pointer; font-weight: 600; font-size: .9rem; }
+details[open] summary { margin-bottom: 10px; }
+
+.head2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 14px; align-items: start; }
+.verdict, .decision { display: grid; gap: 6px; padding: 16px 18px; border-radius: 10px; border: 1px solid var(--line); border-top-width: 5px; background: var(--surface); min-width: 0; }
+.verdict b, .decision b { font-size: 1.35rem; }
+.verdict ul { margin: 2px 0 0; padding-left: 18px; font-size: .9rem; display: grid; gap: 3px; }
+.verdict.ok, .decision.ok { border-top-color: var(--green); } .verdict.ok b, .decision.ok b { color: var(--green); }
+.verdict.warn, .decision.warn { border-top-color: var(--amber); } .verdict.warn b, .decision.warn b { color: var(--amber); }
+.verdict.bad, .decision.bad { border-top-color: var(--red); } .verdict.bad b, .decision.bad b { color: var(--red); }
+.decision.pending { border-style: dashed; border-top-style: solid; border-top-color: var(--line); }
+.decision.pending b { color: var(--muted); }
+.decision span:not(.eyebrow) { font-size: .88rem; color: var(--muted); }
+ul.ev { margin: 6px 0 0; padding-left: 18px; font-size: .85rem; color: var(--muted); display: grid; gap: 2px; }
+p.note { margin-top: 4px; font-size: .85rem; }
+b.good { color: var(--green); } b.bad { color: var(--red); }
+@media (max-width: 760px) { .head2 { grid-template-columns: minmax(0, 1fr); } }
+
+.form-card { display: grid; gap: 14px; }
+.form-card form { display: grid; gap: 14px; }
+fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px 12px; margin: 0; min-width: 0; }
+legend { font-size: .82rem; font-weight: 600; color: var(--muted); padding: 0 4px; }
+.opts { display: grid; gap: 8px; }
+label.opt { display: flex; gap: 8px; align-items: flex-start; font-size: .9rem; cursor: pointer; }
+label.opt input { margin-top: 4px; accent-color: var(--accent); }
+label.field { display: grid; gap: 4px; font-size: .85rem; font-weight: 600; }
+label.field em { font-style: normal; font-weight: 400; }
+input[type="text"], textarea { font: inherit; font-size: .92rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; }
+input[type="text"]:focus-visible, textarea:focus-visible, button:focus-visible, label.opt input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+button { font: inherit; font-weight: 600; color: var(--surface); background: var(--accent); border: 0; border-radius: 6px; padding: 9px 18px; cursor: pointer; }
+button:disabled { opacity: .6; cursor: default; }
+
+.bmaps { display: grid; gap: 10px; }
+.bmap { display: grid; grid-template-columns: minmax(0, 2fr) auto minmax(0, 3fr); gap: 12px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-left-width: 5px; border-radius: 10px; padding: 14px 16px; }
+.bmap.block { border-left-color: var(--red); }
+.bmap.cond { border-left-color: var(--amber); }
+.bmap .why { display: grid; gap: 4px; min-width: 0; }
+.bmap .why b { font-size: .95rem; line-height: 1.45; }
+.bmap .arrow { color: var(--muted); font-size: 1.2rem; padding-top: 18px; }
+ol.todo { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: .9rem; min-width: 0; }
+ol.todo li { display: grid; gap: 1px; }
+ol.todo .kid { font-size: .78rem; color: var(--muted); margin-right: 4px; }
+ol.todo .who { display: inline-block; font-size: .75rem; font-weight: 600; color: var(--accent); margin-left: 6px; }
+@media (max-width: 760px) { .bmap { grid-template-columns: minmax(0, 1fr); } .bmap .arrow { display: none; } }
+</style></head>
+<body><div class="wrap">
+<header class="top"><span class="eyebrow">QA 오케스트라 · 신규 기능 판정관</span><h1>장바구니 쿠폰 할인 신규 기능 판정</h1>
+<div class="meta"><span>2026-11-18 18:55</span><span>review: review.json · tc: test-cases.json</span></div></header>
+<div class="head2"><div class="verdict bad"><span class="eyebrow">판정관 추천</span><b>편입 보류</b><span>편입을 막는 이유 3개(Critical 결함 QAO-8, P1 TC 미실행 1개·판정 보류 3개)가 남아 지금은 편입 보류 — 대부분은 기획 답(Q4·Q5 등)부터 받으면 풀린다</span><ul><li>E2 결함: Critical QAO-8(제외 상품이 최소 주문 금액에 포함) 미해결</li><li>E1·E3: P1 TC-059(부분 취소 회귀) 미실행, P1 TC-022·027·048 판정 보류 — 금액·환불 계산이 확인되지 않음</li><li>E6 고위험 영역: &#x27;최소 주문 금액&#x27;과 &#x27;취소 시 쿠폰 복구&#x27;에 Fail</li><li>E4: 위 Fail 3건이 모두 Q4·Q5 임시 가정 기준이라, 답이 &#x27;API 동작이 맞다&#x27;면 버그가 닫히고 조건부 편입으로 바로 바뀔 수 있음</li><li>E8 기존 기능은 Fail 없음 — 편입이 기존 결제·취소를 깨뜨린 근거는 없음</li></ul></div><div class="decision pending"><span class="eyebrow">사람의 결정</span><b>아직 결정 전</b><span>QA 매니저가 추천안을 보고 정한다 — 판정관에게 "편입하자 / 조건부로 가자 / 보류하자"와 이유를 말하면 기록된다</span></div></div>
+<section id="map"><h2>왜 이 판정인가 → 무엇을 하면 풀리나 <span class="muted small">막음 3 · 조건부 4</span></h2><p class="muted">막는 이유 3개가 모두 풀려야 편입할 수 있어요. 조건부 4개는 풀거나, 남긴 채 편입할지 QA 매니저가 정해요.</p><div class="bmaps"><div class="bmap block"><div class="why"><span class="flag red">막음</span> <span class="mono muted small">B-01 · E2·E6</span><b>Critical 결함 QAO-8 미해결 — 제외 상품(상품권)까지 최소 주문 금액에 포함돼 쿠폰이 적용됨. 고위험 &#x27;최소 주문 금액&#x27;의 Fail이며, 결함인지는 Q5 답에 달림</b><div><span class=chip>QAO-8</span><span class=chip>TC-009</span><span class=chip>Q5</span></div></div><div class="arrow" aria-hidden="true">→</div><ol class="todo"><li><span class="mono kid">K-01</span> Q5(제외 상품을 최소 주문 금액에서 빼는지) 답 확정<span class="who">기획·정책 담당(답변)</span><span class="muted small">확인: 답에 맞춰 TC-009·010·011 기대 결과를 고정하고 다시 판정 — 결함이 아니면 QAO-8·10 닫기</span></li><li><span class="mono kid">K-03</span> K-01 뒤에도 결함이면 QAO-8 수정<span class="who">개발(수정)</span><span class="muted small">확인: 수정 빌드에서 TC-009·010 Pass, QAO-8 완료</span></li></ol></div><div class="bmap block"><div class="why"><span class="flag red">막음</span> <span class="mono muted small">B-02 · E1·E8</span><b>P1 회귀 TC-059(쿠폰 없는 부분 취소) 미실행 — 기존 부분 취소 환불이 그대로인지 모름</b><div><span class=chip>TC-059</span></div></div><div class="arrow" aria-hidden="true">→</div><ol class="todo"><li><span class="mono kid">K-05</span> P1 회귀 TC-059(쿠폰 없는 부분 취소) 실행<span class="who">신규 기능 자동화</span><span class="muted small">확인: 변경 전 배송비 환불 기준값을 받아 실행해 Pass</span></li></ol></div><div class="bmap block"><div class="why"><span class="flag red">막음</span> <span class="mono muted small">B-03 · E3</span><b>P1 TC 3개 판정 보류 — 정률 한도(TC-022)·100원 미만 결제(TC-027)·부분 취소 안분(TC-048) 금액이 확인되지 않음</b><div><span class=chip>TC-022</span><span class=chip>TC-027</span><span class=chip>TC-048</span><span class=chip>Q2</span><span class=chip>Q7</span><span class=chip>Q8</span></div></div><div class="arrow" aria-hidden="true">→</div><ol class="todo"><li><span class="mono kid">K-02</span> Q4(전체·부분 취소와 만료 쿠폰 복구 규칙) 답 확정<span class="who">기획·정책 담당(답변)</span><span class="muted small">확인: TC-045~050 다시 판정 — 결함이 아니면 QAO-11 닫기</span></li><li><span class="mono kid">K-06</span> Q2·Q7·Q8 답으로 P1 판정 보류 TC-022·027·048 판정<span class="who">기획·정책 담당(답변)</span><span class="muted small">확인: 답 받은 뒤 기대 결과 고정·재실행해 Pass</span></li></ol></div><div class="bmap cond"><div class="why"><span class="flag amber">조건부</span> <span class="mono muted small">B-04 · E2</span><b>Major 결함 QAO-10 미해결 — 상품권만 담은 주문에서 할인 0원 쿠폰이 소진됨. 결함인지는 Q5 답에 달림</b><div><span class=chip>QAO-10</span><span class=chip>TC-011</span><span class=chip>Q5</span></div></div><div class="arrow" aria-hidden="true">→</div><ol class="todo"><li><span class="mono kid">K-01</span> Q5(제외 상품을 최소 주문 금액에서 빼는지) 답 확정<span class="who">기획·정책 담당(답변)</span><span class="muted small">확인: 답에 맞춰 TC-009·010·011 기대 결과를 고정하고 다시 판정 — 결함이 아니면 QAO-8·10 닫기</span></li><li><span class="mono kid">K-04</span> K-01·02 뒤에도 결함인 Major(QAO-10·11)는 수정하거나, 다음 버전으로 미루는 것을 QA 매니저가 결정<span class="who">QA 매니저(결정)</span><span class="muted small">확인: 수정 시 TC-011·050 Pass / 미루면 판정서에 결정·이유 기록</span></li></ol></div><div class="bmap cond"><div class="why"><span class="flag amber">조건부</span> <span class="mono muted small">B-05 · E2·E6</span><b>Major 결함 QAO-11 미해결 — 만료 쿠폰이 전체 취소로 복구됨(고위험 &#x27;취소 시 쿠폰 복구&#x27;의 Fail). 결함인지는 Q4 답에 달림</b><div><span class=chip>QAO-11</span><span class=chip>TC-050</span><span class=chip>Q4</span></div></div><div class="arrow" aria-hidden="true">→</div><ol class="todo"><li><span class="mono kid">K-02</span> Q4(전체·부분 취소와 만료 쿠폰 복구 규칙) 답 확정<span class="who">기획·정책 담당(답변)</span><span class="muted small">확인: TC-045~050 다시 판정 — 결함이 아니면 QAO-11 닫기</span></li><li><span class="mono kid">K-04</span> K-01·02 뒤에도 결함인 Major(QAO-10·11)는 수정하거나, 다음 버전으로 미루는 것을 QA 매니저가 결정<span class="who">QA 매니저(결정)</span><span class="muted small">확인: 수정 시 TC-011·050 Pass / 미루면 판정서에 결정·이유 기록</span></li></ol></div><div class="bmap cond"><div class="why"><span class="flag amber">조건부</span> <span class="mono muted small">B-06 · E1</span><b>수동 TC 8개 미실행 — 제외 안내 문구·최대 할인 라벨·결제 요약 화면·상품권 발급·정산 금액</b><div><span class=chip>TC-012</span><span class=chip>TC-013</span><span class=chip>TC-028</span><span class=chip>TC-029</span><span class=chip>TC-039</span><span class=chip>TC-054</span><span class=chip>TC-057</span><span class=chip>TC-063</span></div></div><div class="arrow" aria-hidden="true">→</div><ol class="todo"><li><span class="mono kid">K-07</span> 수동 TC 8개 실행(제외 안내 문구·최대 할인 라벨·결제 요약 화면·상품권 발급·정산 금액)<span class="who">수동 테스트 담당</span><span class="muted small">확인: 결과 시트에 Pass/Fail 기록, Fail이면 버그 등록</span></li></ol></div><div class="bmap cond"><div class="why"><span class="flag amber">조건부</span> <span class="mono muted small">B-07 · E3</span><b>P2·P3 TC 2개 판정 보류 — 동률 쿠폰 자동 선택·라벨(TC-031·032)</b><div><span class=chip>TC-031</span><span class=chip>TC-032</span><span class=chip>Q10</span></div></div><div class="arrow" aria-hidden="true">→</div><ol class="todo"><li><span class="mono kid">K-08</span> Q10(동률 쿠폰 자동 선택 기준·라벨) 답으로 TC-031·032 판정<span class="who">기획·정책 담당(답변)</span><span class="muted small">확인: 답 받은 뒤 기대 결과 고정·재실행해 Pass</span></li></ol></div></div></section>
+<section id="conditions"><h2>할 일 전체 <span class="muted small">편입 조건</span></h2><div class="tbl"><table><thead><tr><th>번호</th><th>할 일</th><th>담당</th><th>확인 방법</th><th>푸는 이유</th></tr></thead><tbody><tr><td class="mono">K-01</td><td>Q5(제외 상품을 최소 주문 금액에서 빼는지) 답 확정</td><td>기획·정책 담당(답변)</td><td>답에 맞춰 TC-009·010·011 기대 결과를 고정하고 다시 판정 — 결함이 아니면 QAO-8·10 닫기</td><td><span class=chip>B-01</span><span class=chip>B-04</span></td></tr><tr><td class="mono">K-02</td><td>Q4(전체·부분 취소와 만료 쿠폰 복구 규칙) 답 확정</td><td>기획·정책 담당(답변)</td><td>TC-045~050 다시 판정 — 결함이 아니면 QAO-11 닫기</td><td><span class=chip>B-03</span><span class=chip>B-05</span></td></tr><tr><td class="mono">K-03</td><td>K-01 뒤에도 결함이면 QAO-8 수정</td><td>개발(수정)</td><td>수정 빌드에서 TC-009·010 Pass, QAO-8 완료</td><td><span class=chip>B-01</span></td></tr><tr><td class="mono">K-04</td><td>K-01·02 뒤에도 결함인 Major(QAO-10·11)는 수정하거나, 다음 버전으로 미루는 것을 QA 매니저가 결정</td><td>QA 매니저(결정)</td><td>수정 시 TC-011·050 Pass / 미루면 판정서에 결정·이유 기록</td><td><span class=chip>B-04</span><span class=chip>B-05</span></td></tr><tr><td class="mono">K-05</td><td>P1 회귀 TC-059(쿠폰 없는 부분 취소) 실행</td><td>신규 기능 자동화</td><td>변경 전 배송비 환불 기준값을 받아 실행해 Pass</td><td><span class=chip>B-02</span></td></tr><tr><td class="mono">K-06</td><td>Q2·Q7·Q8 답으로 P1 판정 보류 TC-022·027·048 판정</td><td>기획·정책 담당(답변)</td><td>답 받은 뒤 기대 결과 고정·재실행해 Pass</td><td><span class=chip>B-03</span></td></tr><tr><td class="mono">K-07</td><td>수동 TC 8개 실행(제외 안내 문구·최대 할인 라벨·결제 요약 화면·상품권 발급·정산 금액)</td><td>수동 테스트 담당</td><td>결과 시트에 Pass/Fail 기록, Fail이면 버그 등록</td><td><span class=chip>B-06</span></td></tr><tr><td class="mono">K-08</td><td>Q10(동률 쿠폰 자동 선택 기준·라벨) 답으로 TC-031·032 판정</td><td>기획·정책 담당(답변)</td><td>답 받은 뒤 기대 결과 고정·재실행해 Pass</td><td><span class=chip>B-07</span></td></tr></tbody></table></div></section>
+<section id="elements"><h2>요소별 근거 <span class="muted small">E1~E8</span></h2><div class="tbl"><table><thead><tr><th>요소</th><th>이름</th><th>상태</th><th>요약·근거</th></tr></thead><tbody><tr><td class="mono">E1</td><td><b>실행 완료</b></td><td><span class="flag red">미충족</span></td><td>63개 중 실행 49 · 판정 보류 5 · 미실행 9(P1 1개)<details><summary>근거 9건</summary><ul class="ev"><li>TC-012 P3 상품권이 섞인 장바구니면 쿠폰 영역에 제외 안내 문구가 보인다 — 수동</li><li>TC-013 P4 일반 상품만 담은 장바구니면 제외 안내 문구가 보이지 않는다 — 수동</li><li>TC-028 P2 정액 5,000원이 정률 10%(4,000원)보다 크면 정액 쿠폰이 자동 선택되고 &quot;최대 할인 적용됨&quot; 라벨이 보인다 — manual: &quot;최대 할인 적용됨&quot; 라벨은 화면에서만 보임 — API 응답에 라벨 없음</li><li>TC-029 P2 상품 80,000원이면 정률 10%(8,000원) 쿠폰이 정액 5,000원보다 커서 자동 선택된다 — manual: &quot;최대 할인 적용됨&quot; 라벨은 화면에서만 보임 — API 응답에 라벨 없음</li><li>TC-039 P3 결제 금액 요약은 디자인 v1.1 순서(상품 금액·배송비·포인트 사용·쿠폰 할인·최종 결제 금액)로 표시된다 — 수동</li><li>TC-054 P3 쿠폰 없는 회원이 포인트 2,000P를 쓰면 결제 금액 요약 값이 기존과 같다 — 수동</li><li>TC-057 P2 쿠폰 없는 회원의 상품권 50,000원 단독 주문이 기존처럼 결제된다 — manual: 상품권 발급 등 후속 처리를 확인할 API 없음(외부 시스템 확인)</li><li>TC-059 P1 쿠폰을 쓰지 않은 주문에서 상품 B 15,000원만 부분 취소하면 그 상품 금액이 환불된다 — blocked: &#x27;배송비 처리는 변경 전 기존 결과와 같다&#x27;의 기준값(기존 부분 취소 시 배송비 환불 결과)이 필요</li><li>TC-063 P2 정액 5,000원 쿠폰을 쓴 주문도 판매자 정산 기준 금액은 상품 금액 40,000원 그대로다 — 수동</li></ul></details></td></tr><tr><td class="mono">E2</td><td><b>결함</b></td><td><span class="flag red">미충족</span></td><td>열린 버그 3건(Critical 1 · Major 2)<p class="note">세 건 모두 지라 &#x27;해야 할 일&#x27;(2026-11-18 조회). QAO-8은 Critical이라 미충족 — 다만 E4대로 Q5 답에 따라 결함이 아닐 수 있음</p><details><summary>근거 3건</summary><ul class="ev"><li>QAO-8 Critical · 해야 할 일 · TC-009 상품권이 섞인 장바구니에서 제외 상품 금액까지 최소 주문 금액에 포함돼 쿠폰이 적용된다</li><li>QAO-10 Major · 해야 할 일 · TC-011 상품권만 담은 주문에서 할인 0원인 쿠폰이 자동 선택돼 결제 후 USED로 소진된다</li><li>QAO-11 Major · 해야 할 일 · TC-050 유효기간이 지난 뒤 주문을 전체 취소하면 만료된 쿠폰이 AVAILABLE로 복구된다</li></ul></details></td></tr><tr><td class="mono">E3</td><td><b>판정 보류</b></td><td><span class="flag red">미충족</span></td><td>5개(P1 3개) — 필요한 답 Q2, Q4, Q7, Q8, Q10<details><summary>근거 5건</summary><ul class="ev"><li>TC-022 P1 — 쿠폰 할인 -15,000원(최종 188,000원) — Q2 답(정책 일괄 한도 vs 쿠폰별 maxDiscount) 필요</li><li>TC-027 P1 — 처리 방식: 포인트 24,900P만 사용, 결제 금액 100원 — Q7 답(처리 방식·문구) 필요</li><li>TC-031 P2 — 할인 재계산은 정상(-4,000원, 39,000원). &quot;최대 할인 적용됨&quot; 라벨 표시 여부는 화면 확인 + Q10 답 필요</li><li>TC-032 P3 — 정률 10% 쿠폰이 자동 선택됨 — Q10 답(동률 기준) 필요</li><li>TC-048 P1 — 건별 환불 B 18,000원 · A 30,000원(합계 48,000원), 쿠폰 상태 USED — Q8 답(안분 규칙)·Q4 답(쿠폰 복구) 필요</li></ul></details></td></tr><tr><td class="mono">E4</td><td><b>가정에 기댄 판정</b></td><td><span class="flag amber">조건부</span></td><td>Fail 3개 · Pass 23개가 답이 안 온 질문의 임시 가정 기준<p class="note">Fail 3건이 전부 미확정 질문(Q4·Q5)에 기댐. 이 두 답이 판정 전체를 가장 크게 바꾼다</p><details><summary>근거 11건</summary><ul class="ev"><li>TC-009 Fail — 가정 Q1, Q5: 답이 가정과 다르면 결함이 아닐 수 있음</li><li>TC-011 Fail — 가정 Q5: 답이 가정과 다르면 결함이 아닐 수 있음</li><li>TC-050 Fail — 가정 Q4: 답이 가정과 다르면 결함이 아닐 수 있음</li><li>Q1: Pass 3개(TC-004, TC-005, TC-010)</li><li>Q2: Pass 4개(TC-019, TC-020, TC-021, TC-024)</li><li>Q4: Pass 4개(TC-045, TC-046, TC-047, TC-049)</li><li>Q5: Pass 1개(TC-010)</li><li>Q6: Pass 2개(TC-043, TC-044)</li><li>Q7: Pass 2개(TC-025, TC-026)</li><li>Q9: Pass 6개(TC-007, TC-017, TC-019, TC-023, TC-038, TC-055)</li><li>Q11: Pass 3개(TC-034, TC-035, TC-036)</li></ul></details></td></tr><tr><td class="mono">E5</td><td><b>요구사항 충족</b></td><td><span class="flag amber">조건부</span></td><td>18개 중 Fail 있음 4 · 충족 7 · 확인 덜 됨 7<details><summary>근거 11건</summary><ul class="ev"><li>REQ-01 최소 주문금액: Fail 있음 {&#x27;pass&#x27;: 7, &#x27;fail&#x27;: 1}</li><li>REQ-02 제외상품 금액: Fail 있음 {&#x27;fail&#x27;: 2, &#x27;pass&#x27;: 1}</li><li>REQ-04 제외 카테고리: Fail 있음 {&#x27;pass&#x27;: 4, &#x27;fail&#x27;: 1}</li><li>REQ-17 만료쿠폰 미복구: Fail 있음 {&#x27;pass&#x27;: 1, &#x27;fail&#x27;: 1}</li><li>REQ-06 정률 한도: 확인 덜 됨 {&#x27;pass&#x27;: 4, &#x27;hold&#x27;: 1}</li><li>REQ-08 최소결제 100원: 확인 덜 됨 {&#x27;pass&#x27;: 2, &#x27;hold&#x27;: 1}</li><li>REQ-09 최대할인 자동: 확인 덜 됨 {&#x27;blank&#x27;: 2, &#x27;pass&#x27;: 1, &#x27;hold&#x27;: 2}</li><li>REQ-12 제외 안내문구: 확인 덜 됨 {&#x27;blank&#x27;: 2}</li><li>REQ-13 쿠폰→포인트: 확인 덜 됨 {&#x27;pass&#x27;: 4, &#x27;blank&#x27;: 1}</li><li>REQ-16 부분취소 미복구: 확인 덜 됨 {&#x27;pass&#x27;: 1, &#x27;hold&#x27;: 1}</li><li>REQ-18 회사 부담: 확인 덜 됨 {&#x27;blank&#x27;: 1}</li></ul></details></td></tr><tr><td class="mono">E6</td><td><b>고위험 영역</b></td><td><span class="flag red">미충족</span></td><td>고위험 5곳<p class="note">&#x27;쿠폰 동시 사용&#x27;은 낱말이 달라 자동 연결만 안 됐을 뿐 TC-043·044(동시 결제, 다른 주문에서 먼저 USED)가 확인하고 둘 다 Pass — 검토자 판단과 같음. 미충족은 &#x27;최소 주문 금액&#x27;(TC-009·011 Fail)과 &#x27;취소 시 쿠폰 복구&#x27;(TC-050 Fail) 때문</p><details><summary>근거 5건</summary><ul class="ev"><li>최소 주문 금액 판정: TC 13개 — pass 11 · fail 2 → 미충족</li><li>할인 금액 계산(한도·절사·최소 100원): TC 5개 — pass 4 · hold 1 → 조건부</li><li>쿠폰 동시 사용: TC 0개 — 연결된 TC 없음 → 조건부</li><li>취소 시 쿠폰 복구: TC 6개 — pass 4 · hold 1 · fail 1 → 미충족</li><li>부분 취소 환불 금액(쿠폰 할인 안분): TC 2개 — hold 1 · blank 1 → 조건부</li></ul></details></td></tr><tr><td class="mono">E7</td><td><b>검토 지적</b></td><td><span class="flag amber">조건부</span></td><td>지적 7건(상 4)<details><summary>근거 5건</summary><ul class="ev"><li>검토 상태: 보완 후 판정 — 자동화 54개는 끝났지만 수동 8개와 blocked 1개(P1 회귀)가 아직 실행되지 않아 보완 후 판정을 권함</li><li>F-01 [high] 미실행: 변경 전 빌드(또는 운영 정책)의 부분 취소 배송비 환불 기준값을 받아 기대 결과에 적고 자동화하거나, 기준값을 받은 사람이 수동 실행</li><li>F-02 [high] 판정 근거 미확정: Q5(제외 상품을 최소 금액에서 빼는지)·Q4(만료 쿠폰 복구) 답을 확정해 주세요 — 답에 따라 버그 3건을 유지하거나 닫음</li><li>F-03 [high] 판정 보류: Q2·Q7·Q8·Q10 답을 받으면 이 5개 TC만 기대 결과를 고정해 다시 판정</li><li>F-04 [high] 열린 버그: 수정 여부·일정 확인 후, 수정되면 TC-009·010을 다시 돌려 닫기(F-02의 Q5 답이 먼저)</li></ul></details></td></tr><tr><td class="mono">E8</td><td><b>영향 범위(기존 기능)</b></td><td><span class="flag amber">조건부</span></td><td>직접 영향 기능 7개<p class="note">기존 기능 7개 중 5개 Pass, Fail 없음. 남은 것은 TC-054(화면, 수동)와 TC-059(P1 부분 취소, blocked)</p><details><summary>근거 7건</summary><ul class="ev"><li>결제 금액 계산: TC-051 pass → 충족</li><li>포인트 사용(차감 순서·금액): TC-052 pass · TC-053 pass → 충족</li><li>주문서 결제 금액 요약 화면: TC-054 blank → 조건부</li><li>주문 전체 취소: TC-058 pass → 충족</li><li>주문 부분 취소: TC-059 blank → 조건부</li><li>환불 금액 계산: TC-060 pass → 충족</li><li>쿠폰 상태 관리(AVAILABLE/USED): TC-061 pass → 충족</li></ul></details></td></tr></tbody></table></div></section>
+<section id="alternatives"><h2>다른 선택지</h2><div class="grid"><div class="card"><h3>질문 답부터 받고 다시 판정(권장)</h3><p><b class="good">장점</b> Q4·Q5 답만으로 Fail 3건의 성격이 정해져, 결함이 아니면 남은 조건이 실행·판정 보류만 남음</p><p><b class="bad">단점</b> 기획 답변 일정에 묶임</p></div><div class="card"><h3>이번 릴리즈에서 빼고 다음 버전에 편입</h3><p><b class="good">장점</b> 미확정 규칙(최소 금액·복구·안분)을 정리할 시간을 벌고 금액 오류 위험을 피함</p><p><b class="bad">단점</b> 기능 출시가 늦어짐 — 뺄 때는 릴리즈 판정관이 뺀 빌드의 재회귀 범위를 정해야 함</p></div></div></section>
+
+<section id="decide"><h2>결정 남기기</h2>
+<div class="card form-card">
+<p class="muted small" id="df-status">이 칸은 claude.ai 판정서 링크에서 열었을 때만 저장돼요. 파일로 열었다면 Claude에게 결정·조건·이유를 말로 전달해 주세요.</p>
+<form id="df" hidden>
+<fieldset><legend>결정</legend><div class="opts"><label class="opt"><input type="radio" name="decision" id="dec-include" value="include"><span>편입 가능</span></label><label class="opt"><input type="radio" name="decision" id="dec-conditional" value="conditional"><span>조건부 편입</span></label><label class="opt"><input type="radio" name="decision" id="dec-hold" value="hold" checked><span>편입 보류 (추천)</span></label></div></fieldset>
+<fieldset><legend>받아들이는 편입 조건</legend><div class="opts"><label class="opt"><input type="checkbox" name="cond" id="cond-K-01" value="K-01"><span><b class="mono">K-01</b> Q5(제외 상품을 최소 주문 금액에서 빼는지) 답 확정</span></label><label class="opt"><input type="checkbox" name="cond" id="cond-K-02" value="K-02"><span><b class="mono">K-02</b> Q4(전체·부분 취소와 만료 쿠폰 복구 규칙) 답 확정</span></label><label class="opt"><input type="checkbox" name="cond" id="cond-K-03" value="K-03"><span><b class="mono">K-03</b> K-01 뒤에도 결함이면 QAO-8 수정</span></label><label class="opt"><input type="checkbox" name="cond" id="cond-K-04" value="K-04"><span><b class="mono">K-04</b> K-01·02 뒤에도 결함인 Major(QAO-10·11)는 수정하거나, 다음 버전으로 미루는 것을 QA 매니저가 결정</span></label><label class="opt"><input type="checkbox" name="cond" id="cond-K-05" value="K-05"><span><b class="mono">K-05</b> P1 회귀 TC-059(쿠폰 없는 부분 취소) 실행</span></label><label class="opt"><input type="checkbox" name="cond" id="cond-K-06" value="K-06"><span><b class="mono">K-06</b> Q2·Q7·Q8 답으로 P1 판정 보류 TC-022·027·048 판정</span></label><label class="opt"><input type="checkbox" name="cond" id="cond-K-07" value="K-07"><span><b class="mono">K-07</b> 수동 TC 8개 실행(제외 안내 문구·최대 할인 라벨·결제 요약 화면·상품권 발급·정산 금액)</span></label><label class="opt"><input type="checkbox" name="cond" id="cond-K-08" value="K-08"><span><b class="mono">K-08</b> Q10(동률 쿠폰 자동 선택 기준·라벨) 답으로 TC-031·032 판정</span></label></div></fieldset>
+<label class="field" for="df-by"><span>결정한 사람 (이름·역할)</span><input id="df-by" type="text" maxlength="80" placeholder="예: QA 매니저 김OO" required></label>
+<label class="field" for="df-note"><span>이유 <em class="muted" id="df-note-hint">(추천과 다르게 결정하면 필수)</em></span><textarea id="df-note" rows="3" maxlength="1000"></textarea></label>
+<div class="actions"><button type="submit" id="df-submit">결정 저장</button><span class="muted small" id="df-msg" role="status"></span></div>
+</form>
+<div id="df-list" hidden><h3>이 화면에서 제출된 결정</h3><ul class="ev" id="df-items"></ul>
+<p class="muted small">판정관이 제출된 결정을 판정서에 옮기면 위 '사람의 결정'에 반영돼요.</p></div>
+</div>
+<script type="application/json" id="df-data">{"recommendation": "hold", "verdicts": {"include": "편입 가능", "conditional": "조건부 편입", "hold": "편입 보류"}, "generated_at": "2026-11-18T18:55:05+09:00", "conditions": [{"id": "K-01", "what": "Q5(제외 상품을 최소 주문 금액에서 빼는지) 답 확정"}, {"id": "K-02", "what": "Q4(전체·부분 취소와 만료 쿠폰 복구 규칙) 답 확정"}, {"id": "K-03", "what": "K-01 뒤에도 결함이면 QAO-8 수정"}, {"id": "K-04", "what": "K-01·02 뒤에도 결함인 Major(QAO-10·11)는 수정하거나, 다음 버전으로 미루는 것을 QA 매니저가 결정"}, {"id": "K-05", "what": "P1 회귀 TC-059(쿠폰 없는 부분 취소) 실행"}, {"id": "K-06", "what": "Q2·Q7·Q8 답으로 P1 판정 보류 TC-022·027·048 판정"}, {"id": "K-07", "what": "수동 TC 8개 실행(제외 안내 문구·최대 할인 라벨·결제 요약 화면·상품권 발급·정산 금액)"}, {"id": "K-08", "what": "Q10(동률 쿠폰 자동 선택 기준·라벨) 답으로 TC-031·032 판정"}], "recorded": []}</script>
+<script>// 판정서 링크에서 QA 매니저가 결정을 남기는 칸. 저장소(db)의 decisions 컬렉션에 한 건씩 쌓고,
+// 판정관(Claude)이 읽어 judge.py decide --source <문서 id>로 판정서에 옮긴다.
+(function () {
+  var D = JSON.parse(document.getElementById("df-data").textContent);
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $("df"), status = $("df-status"), msg = $("df-msg"), list = $("df-list"), items = $("df-items");
+  var recorded = {};
+  D.recorded.forEach(function (id) { recorded[id] = true; });
+
+  function say(text) { status.textContent = text; }
+
+  function chosen() {
+    var r = form.querySelector('input[name="decision"]:checked');
+    return r ? r.value : "";
+  }
+
+  function fmt(at) { return String(at || "").slice(0, 16).replace("T", " "); }
+
+  function render(docs, names) {
+    items.textContent = "";
+    docs.forEach(function (d) {
+      var v = d.data() || {};
+      var li = document.createElement("li");
+      var who = v.by || "";
+      var acct = v.by_id && names[v.by_id] && names[v.by_id].name ? " · 계정 " + names[v.by_id].name : "";
+      var conds = (v.conditions_accepted || []).length ? " · 조건 " + v.conditions_accepted.join(", ") : "";
+      li.textContent = fmt(v.at) + " · " + (D.verdicts[v.decision] || v.decision) + " · " + who + acct + conds
+        + (v.note ? " — " + v.note : "") + (recorded[d.id] ? " (판정서에 기록됨)" : " (판정서 기록 전)");
+      items.appendChild(li);
+    });
+    list.hidden = docs.length === 0;
+  }
+
+  async function start() {
+    if (!window.claude || !window.claude.use) return;
+    var db = await window.claude.use("db");
+    if (!db) {
+      say("이 화면에서는 결정을 저장할 수 없어요. 로그인했는지 확인하거나, Claude에게 결정을 말로 전달해 주세요.");
+      return;
+    }
+    var user = await window.claude.use("user");
+    var canWrite = user ? await user.can("data.write") : null;
+    var col = db.collection("decisions");
+
+    if (canWrite === false) {
+      say("이 판정서에는 보기 권한만 있어요. 결정을 남기려면 소유자에게 참여자 이상 권한을 받아 주세요.");
+    } else {
+      say("결정을 고르고 이름·역할과 이유를 적어 저장하세요. 저장한 결정은 판정관이 판정서에 옮겨요.");
+      form.hidden = false;
+    }
+
+    var loading = setTimeout(function () { list.hidden = true; }, 10000);
+    col.orderBy("at", "desc").limit(20).onSnapshot(async function (snap) {
+      clearTimeout(loading);
+      var ids = [];
+      snap.docs.forEach(function (d) { var v = d.data() || {}; if (v.by_id && ids.indexOf(v.by_id) < 0) ids.push(v.by_id); });
+      var names = {};
+      if (user && ids.length) { try { names = await user.profiles(ids); } catch (e) { names = {}; } }
+      render(snap.docs, names);
+    }, function () { clearTimeout(loading); });
+
+    form.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+      var decision = chosen();
+      var by = $("df-by").value.trim();
+      var note = $("df-note").value.trim();
+      var conds = Array.prototype.map.call(form.querySelectorAll('input[name="cond"]:checked'), function (c) { return c.value; });
+      if (!decision) { msg.textContent = "결정을 골라 주세요."; return; }
+      if (!by) { msg.textContent = "결정한 사람(이름·역할)을 적어 주세요."; $("df-by").focus(); return; }
+      if (decision !== D.recommendation && !note) {
+        msg.textContent = "추천(" + D.verdicts[D.recommendation] + ")과 다르게 결정하면 이유를 적어 주세요.";
+        $("df-note").focus();
+        return;
+      }
+      if (decision === "conditional" && D.conditions.length && !conds.length) {
+        msg.textContent = "조건부 편입이면 받아들이는 조건을 하나 이상 골라 주세요.";
+        return;
+      }
+      var btn = $("df-submit");
+      btn.disabled = true;
+      msg.textContent = "저장하는 중…";
+      try {
+        await col.add({
+          decision: decision, by: by, note: note, conditions_accepted: conds,
+          at: new Date().toISOString(), by_id: user ? await user.id() : null, judgment_at: D.generated_at
+        });
+        msg.textContent = "저장했어요. 판정관에게 '판정서에 옮겨 줘'라고 하면 기록돼요.";
+        $("df-note").value = "";
+      } catch (e) {
+        if (e && e.code === "invalid_argument") {
+          form.hidden = true;
+          say("이 판정서에 결정을 저장할 권한이 없어요. 소유자에게 참여자 이상 권한을 받아 주세요.");
+        } else if (e && e.code === "quota_exceeded") {
+          msg.textContent = "저장 공간이 가득 차서 저장하지 못했어요. 판정서 소유자에게 알려 주세요.";
+        } else {
+          msg.textContent = "저장하지 못했어요. 잠시 뒤 다시 눌러 주세요.";
+        }
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    form.addEventListener("change", function () {
+      $("df-note-hint").textContent = chosen() !== D.recommendation ? "(추천과 다르게 결정해서 필수)" : "(선택)";
+    });
+    $("df-note-hint").textContent = chosen() !== D.recommendation ? "(추천과 다르게 결정해서 필수)" : "(선택)";
+  }
+
+  start().catch(function () { say("결정 입력 칸을 불러오지 못했어요. Claude에게 결정을 말로 전달해 주세요."); });
+})();
+</script>
+</section>
+<p class="muted small">판정관은 근거와 추천안만 낸다. 편입 여부는 사람이 정한다.</p>
+</div></body></html>

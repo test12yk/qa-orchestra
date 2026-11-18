@@ -1,0 +1,1 @@
+../../plugins/qa-new-judge/agents/new-judge.md

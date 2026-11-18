@@ -47,6 +47,12 @@
       "description": "신규 기능 검토자만 (실행 전 TC 검토 · 실행 결과 검토)",
       "source": "./plugins/qa-new-reviewer",
       "category": "testing"
+    },
+    {
+      "name": "qa-new-judge",
+      "description": "신규 기능 판정관만 (편입 추천·사람 결정 기록)",
+      "source": "./plugins/qa-new-judge",
+      "category": "testing"
     }
   ]
 }

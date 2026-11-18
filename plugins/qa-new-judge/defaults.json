@@ -1,0 +1,31 @@
+{
+  "team": {
+    "domain": "",
+    "language": "ko"
+  },
+  "judge": {
+    "_comment": "신규 기능 판정관 기준. 판정관은 이 기준으로 요소를 매기되, 다르게 추천할 때는 이유를 쓴다. 최종 결정은 사람.",
+    "blocking_severities": ["Blocker", "Critical"],
+    "_blocking_comment": "이 심각도의 열린 버그가 있으면 '결함' 요소는 미충족.",
+    "conditional_severities": ["Major"],
+    "top_priority": "P1",
+    "_top_priority_comment": "이 우선순위 TC가 미실행·판정 보류면 미충족으로 본다.",
+    "closed_statuses": ["완료", "Done", "닫힘", "Closed", "Resolved", "해결됨"],
+    "_closed_comment": "지라 상태가 이 값이면 닫힌 버그로 본다.",
+    "verdicts": {
+      "include": "편입 가능",
+      "conditional": "조건부 편입",
+      "hold": "편입 보류"
+    },
+    "owners": {
+      "plan-analyst": "기획 분석가",
+      "tc-writer": "신규 TC 작성가",
+      "automation": "신규 기능 자동화",
+      "bug-reporter": "버그 리포터",
+      "tester": "수동 테스트 담당",
+      "pm": "기획·정책 담당(답변)",
+      "dev": "개발(수정)",
+      "qa-manager": "QA 매니저(결정)"
+    }
+  }
+}
