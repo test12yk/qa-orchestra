@@ -1,7 +1,7 @@
 {
   "name": "qa-orchestra",
   "description": "QA 오케스트라 전체 묶음: 설치하면 모든 QA 에이전트가 함께 설치된다",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "author": {
     "name": "test12yk"
   },
@@ -20,6 +20,7 @@
     "qa-new-judge",
     "qa-new-reporter",
     "qa-reg-tc-manager",
-    "qa-reg-automation"
+    "qa-reg-automation",
+    "qa-reg-reviewer"
   ]
 }

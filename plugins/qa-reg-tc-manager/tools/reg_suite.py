@@ -16,6 +16,8 @@
       → 승인한 것만 스위트에 넣고(새 RG 번호) 다시 그린다. 변경 이력에 남는다.
   python3 reg_suite.py set-automation --suite <suite.json> (--ids RG-0013,RG-0015 --reason "<이유>" | --list <to-manual.json>) --to manual|api --by "<누가>"
       → 케이스의 자동화 표시를 바꾼다. --list는 회귀 자동화 관리자가 넘긴 수동 후보 목록({"cases": [{"id", "reason"}]}). 변경 이력에 남는다.
+  python3 reg_suite.py apply-ops <ops-candidates.json> --suite <suite.json> --approve OPS-01,OPS-03 --by "<승인한 사람>" [--note "<이유>"]
+      → 회귀 검토자가 낸 운영 결함 회귀 후보 중 승인한 것만 넣는다(수정 완료·확인 필요 없는 것만). 변경 이력에 남는다.
   python3 reg_suite.py select --suite <suite.json> --features <judgment.json> ... [--ledger <features.json>]
                               [--analysis <plan-analysis.json> ...] --release "<릴리즈 이름>" --out <폴더>
       → <폴더>/selection-facts.json  (케이스마다 필수·직접 영향·간접 영향·제외와 이유)
@@ -487,6 +489,44 @@ def cmd_apply(args, cfg):
     cmd_render_candidates(args, cfg)
 
 
+def cmd_apply_ops(args, cfg):
+    d = read_json(args.candidates)
+    by = {c["id"]: c for c in d["candidates"]}
+    approve = [x.strip() for x in (args.approve or "").split(",") if x.strip()]
+    if not approve:
+        sys.exit("--approve 필요(승인한 번호)")
+    errs = [f"{x}: 없는 번호" for x in approve if x not in by]
+    errs += [f"{x}: 이미 스위트에 반영함" for x in approve if x in set(d.get("applied", []))]
+    errs += [f"{x}({by[x]['key']}): 운영 결함이 아직 수정 완료가 아님({by[x]['status']}) — 수정·확인 뒤 넣는다" for x in approve if x in by and not by[x]["closed"]]
+    errs += [f"{x}({by[x]['key']}): 케이스 초안에 '확인 필요'가 남음 — 회귀 검토자가 채운 뒤 넣는다" for x in approve if x in by and not by[x]["confirmed"]]
+    if errs:
+        sys.exit("apply-ops 실패:\n  - " + "\n  - ".join(errs))
+    st = read_json(args.suite)
+    pre = cfg["suite"]["id_prefix"]
+    nxt = max([int(m.group(1)) for c in st["cases"] for m in [re.match(rf"{pre}-(\d+)$", c["id"])] if m], default=0)
+    today = datetime.now().date().isoformat()
+    added = []
+    for x in approve:
+        c, k = by[x]["case"], by[x]
+        nxt += 1
+        case = {"id": f"{pre}-{nxt:04d}", **{f: c.get(f) for f in ("domain", "section", "type", "title", "preconditions", "steps", "expected", "priority", "automation")},
+                "source": f"운영 결함 {k['key']}", "added_at": today}
+        st["cases"].append({f: v for f, v in case.items() if v not in (None, "", [])})
+        added.append(case["id"])
+    st["version"] += 1
+    st["updated_at"] = now()
+    st["history"].append({"at": now(), "version": st["version"], "change": "add", "ids": added, "by": args.by,
+                          "from": "운영 결함 " + ", ".join(by[x]["key"] + (f"(+{', '.join(by[x]['also'])})" if by[x].get("also") else "") for x in approve),
+                          **({"note": args.note} if args.note else {})})
+    write_json(args.suite, st)
+    d["applied"] = sorted(set(d.get("applied", [])) | set(approve))
+    d.setdefault("approvals", []).append({"at": now(), "by": args.by, "approve": approve, "added": added, **({"note": args.note} if args.note else {})})
+    write_json(args.candidates, d)
+    print(f"스위트 v{st['version']}: 운영 결함 케이스 추가 {len(added)}({', '.join(added)})")
+    args.outdir = None
+    cmd_render(args, cfg)
+
+
 def cmd_set_automation(args, cfg):
     st = read_json(args.suite)
     by = {c["id"]: c for c in st["cases"]}
@@ -632,6 +672,8 @@ def main():
     p = sub.add_parser("apply"); p.add_argument("candidates"); p.add_argument("--suite", required=True)
     p.add_argument("--approve"); p.add_argument("--approve-updates", dest="approve_updates"); p.add_argument("--by", required=True)
     p.add_argument("--note"); p.add_argument("--before-decision", dest="before_decision", action="store_true")
+    p = sub.add_parser("apply-ops"); p.add_argument("candidates"); p.add_argument("--suite", required=True)
+    p.add_argument("--approve", required=True); p.add_argument("--by", required=True); p.add_argument("--note")
     p = sub.add_parser("set-automation"); p.add_argument("--suite", required=True); p.add_argument("--ids"); p.add_argument("--list")
     p.add_argument("--to", required=True); p.add_argument("--reason"); p.add_argument("--by", required=True)
     p = sub.add_parser("select"); p.add_argument("--suite", required=True); p.add_argument("--features", nargs="*", default=[])
@@ -642,7 +684,7 @@ def main():
     args = ap.parse_args()
     cfg = load_config(args.config)
     {"import": cmd_import, "render": cmd_render, "candidates": cmd_candidates, "render-candidates": cmd_render_candidates,
-     "apply": cmd_apply, "set-automation": cmd_set_automation, "select": cmd_select, "render-selection": cmd_render_selection}[args.cmd](args, cfg)
+     "apply": cmd_apply, "set-automation": cmd_set_automation, "apply-ops": cmd_apply_ops, "select": cmd_select, "render-selection": cmd_render_selection}[args.cmd](args, cfg)
 
 
 if __name__ == "__main__":

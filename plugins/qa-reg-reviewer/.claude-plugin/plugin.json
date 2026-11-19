@@ -1,0 +1,14 @@
+{
+  "name": "qa-reg-reviewer",
+  "description": "QA 회귀 검토자: 릴리즈 회귀 결과(자동화·수동)를 검토해 Fail마다 원인(이번 변경으로 깨짐·전부터 있던 결함·TC가 정책과 다름·환경 문제)과 다음 할 일·담당을 정하고, 지라의 운영 결함을 원인 분석해 회귀 편입 후보(심각도 또는 반복)를 낸다",
+  "version": "0.1.0",
+  "author": {
+    "name": "test12yk"
+  },
+  "keywords": [
+    "qa",
+    "regression",
+    "root-cause",
+    "release"
+  ]
+}

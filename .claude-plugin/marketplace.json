@@ -71,6 +71,12 @@
       "description": "회귀 자동화 관리자만 (회귀 API 테스트 → 회귀 실행 시트 결과)",
       "source": "./plugins/qa-reg-automation",
       "category": "testing"
+    },
+    {
+      "name": "qa-reg-reviewer",
+      "description": "회귀 검토자만 (회귀 Fail 원인·운영 결함 원인 분석)",
+      "source": "./plugins/qa-reg-reviewer",
+      "category": "testing"
     }
   ]
 }

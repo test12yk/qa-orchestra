@@ -31,7 +31,8 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 - [x] 신규 기능 QA 리포터 `new-reporter` — 판정서·실행 결과 검토(+ 분석서·TC·지라 상태) → 한 장 리포트(위 1분 요약 매니저·기획용 / 아래 상세 개발·QA용), 결정 전 중간 리포트 · 결정 후 완료 리포트, HTML·MD + 승인 후 컨플루언스 페이지
 - [x] 회귀 TC 관리자 `reg-tc-manager` — 회귀 스위트(영역별 탭 시트·변경 이력), 신규 TC 편입 후보(기준표·결과 확정·겹침·영역 대표) → 사람 승인분만 편입, 릴리즈 회귀 범위(필수·직접·간접·제외) → 실행 시트
 - [x] 회귀 자동화 관리자 `reg-automation` — 편입된 신규 기능 테스트를 RG 번호로 옮기기, TC가 바뀐 테스트는 고칠 때까지 실행 막기, 릴리즈 범위의 자동화 케이스 실행(Fail·자동화 오류는 한 번 더 → 불안정 구분) → 회귀 실행 시트 결과·이슈내용
-- [ ] 회귀 검토자 · 릴리즈 판정관 · 릴리즈 QA 리포터
+- [x] 회귀 검토자 `reg-reviewer` — 회귀 결과(자동화 + 수동 시트) → Fail마다 원인 4갈래(이번 변경·전부터 있던 결함·TC가 정책과 다름·환경) 추천 + 근거·담당별 할 일, 지라 운영 결함(읽기만) 원인·놓친 이유 → 심각도·반복이면 회귀 편입 후보(케이스 초안) → 회귀 TC 관리자 승인 편입
+- [ ] 릴리즈 판정관 · 릴리즈 QA 리포터
 
 ## 폴더
 ```
@@ -47,6 +48,7 @@ plugins/
   qa-new-judge/        신규 기능 판정관: agents/, tools/judge.py(요소 모으기·판정서·결정 기록), tools/templates/, defaults.json
   qa-new-reporter/     신규 기능 QA 리포터: agents/, tools/report.py(재료 모으기·리포트·올린 위치 기록), tools/templates/, defaults.json
   qa-reg-tc-manager/   회귀 TC 관리자: agents/, tools/reg_suite.py(스위트·편입 후보·승인·릴리즈 범위), tools/xlsx.py, tools/templates/, defaults.json
+  qa-reg-reviewer/     회귀 검토자: agents/, tools/reg_review.py(재료 모으기·검토 보고서·운영 편입 후보), tools/xlsx.py, tools/templates/, defaults.json
   qa-reg-automation/   회귀 자동화 관리자: agents/, tools/reg_auto.py(현황·옮기기·등록·실행·결과 기록), tools/xlsx.py, tools/templates/, defaults.json
 .claude/agents/        저장소를 받아 쓸 때를 위한 연결(plugins/*/agents 를 가리킴)
 qa-orchestra.config.json   팀 설정 견본
@@ -71,6 +73,7 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 | 신규 기능 판정관만 | `/plugin install qa-new-judge@qa-orchestra` | `new-judge` + 판정서·결정 기록 스크립트 |
 | 신규 기능 QA 리포터만 | `/plugin install qa-new-reporter@qa-orchestra` | `new-reporter` + 리포트 스크립트(HTML·MD·컨플루언스 본문) |
 | 회귀 TC 관리자만 | `/plugin install qa-reg-tc-manager@qa-orchestra` | `reg-tc-manager` + 스위트·편입·범위 스크립트(xlsx 읽기·쓰기 포함) |
+| 회귀 검토자만 | `/plugin install qa-reg-reviewer@qa-orchestra` | `reg-reviewer` + 재료 모으기·검토 보고서 스크립트 (운영 결함은 Atlassian 커넥터로 읽기) |
 | 회귀 자동화 관리자만 | `/plugin install qa-reg-automation@qa-orchestra` | `reg-automation` + 옮기기·등록·실행·결과 기록 스크립트 (테스트 실행에 pytest 필요) |
 
 에이전트별 플러그인에는 그 에이전트가 쓰는 파일만 들어 있다(샘플·문서는 설치되지 않음). 나중에 전체를 설치하면 빠진 것만 추가된다. 비공개 저장소라면 접근 권한이 있는 GitHub 계정이 필요하다. 설치 뒤 Claude Code를 다시 시작한다.
@@ -112,6 +115,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 | `new-reporter` 신규 기능 QA 리포터 | 판정서(judgment.json) + 실행 결과 검토(review.json) (+ 분석서·TC json·지라 상태) | QA 리포트(HTML·MD·컨플루언스 본문), 승인 시 컨플루언스 페이지 | 판정서와 실행 결과 검토만 있으면 된다 |
 | `reg-tc-manager` 회귀 TC 관리자 | 기존 회귀 시트(xlsx·csv) / 신규 TC json + 실행 결과 검토 + 판정서 / 릴리즈 기능(판정서·릴리즈 기록) | 회귀 스위트 시트(영역별 탭), 편입 후보 페이지, 릴리즈 회귀 범위·실행 시트 | 기존 회귀 시트만 있어도 가져오기·보기·범위 고르기가 된다 |
 | `reg-automation` 회귀 자동화 관리자 | 회귀 스위트 + 릴리즈 범위·실행 시트 (+ 신규 기능 자동화 폴더, API 문서, QA 서버 주소) | 회귀 pytest 폴더(registry.json), 실행 결과 페이지, 결과·이슈내용이 채워진 회귀 실행 시트 | 스위트만 있어도 현황(status)을 본다 |
+| `reg-reviewer` 회귀 검토자 | 회귀 자동화 results.json + 스위트 + 릴리즈 범위 (+ 수동 결과 시트, 지라 운영 결함) | 회귀 검토 보고서(HTML·MD), 운영 결함 회귀 편입 후보(ops-candidates.json) | 회귀 결과만 있어도 된다(운영 결함 분석은 빼고) |
 | `new-reviewer` 신규 기능 검토자 | 실행 전: 분석서 + TC json / 실행 후: + 결과 시트·자동화 결과·버그 폴더 | 검토 보고서(HTML·MD·JSON), 담당별 보완 요청 | TC json만 있어도 TC 자체 점검(기대 결과·추적·중복)은 된다 |
 
 여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(예정)를 쓴다.
@@ -166,3 +170,9 @@ python3 plugins/qa-plan-analyst/tools/render_plan_analysis.py samples/coupon-dis
 - **TC가 바뀌면**: 테스트를 만든 뒤 사전조건·절차·기대 결과가 바뀐 케이스는 실행하지 않고 '테스트 고치기 필요'로 둔다. 고친 내용(`--note`)과 함께 다시 등록해야 풀린다(코드가 그대로면 거부).
 - **실행**: 릴리즈 범위에 든 실행 가능 케이스만 돌린다. Fail·자동화 오류는 한 번 더 돌리고, 그때 통과하면 Pass가 아니라 **불안정**. 결과는 회귀 실행 시트의 결과·이슈내용에 적고, 구글 시트로 올리면 `link`로 결과 페이지에 링크를 건다(불안정·고치기 필요·자동화 아직 안 됨·수동으로 확인은 결과 칸을 비우고 사람이 확인).
 - 결과 예: `samples/coupon-discount/regression/automation/` — 기존 API 표시 19개 중 테스트 8개(직접 작성), 11개는 API로 확인할 수 없어 수동으로 바꿈(샘플 API에 없는 로그인·정산 등, 화면 안내가 기대 결과인 RG-0015 → 스위트 v2). 2026.12 범위 17개 = 자동화 8 · 수동 9, 가짜 서버 실행 Pass 5 · Fail 3(RG-0011 보유 초과 포인트 입력 거부, RG-0018 취소 시 포인트 미복구, RG-0020 배송비 미차감 환불). 편입 승인 전이라 쿠폰 TC 옮기기는 하지 않음.
+
+## 회귀 검토자
+- **Fail 원인**: Fail마다 4갈래 중 하나를 근거와 함께 추천한다 — 이번 변경으로 깨짐 · 전부터 있던 결함 · TC가 정책·명세와 다름 · 환경·데이터 문제. 도구가 지난 회귀 결과·변경 영향으로 후보를 주고, 검토자가 문서를 읽어 정한다. 근거가 모자라면 '확인 필요' + 질문(누구에게 무엇을). 확정은 담당자.
+- **담당별 할 일**: 결함 → 버그 리포터 등록 → 개발, TC 문제 → 회귀 TC 관리자(기존 케이스 고치기), 환경 → 회귀 자동화 관리자, 결과 없는 수동 케이스 → 테스터. 결과 없는 케이스가 있으면 '남은 확인 뒤 판정'.
+- **운영 결함**: 지라에서 설정 `ops.jql`로 읽기만 한다. 티켓마다 원인·놓친 이유(TC 없음·범위 제외·TC가 조건 안 봄·자동화 빈틈·QA 환경 재현 불가)를 쓰고, 심각도 Blocker·Critical·Major이거나 같은 영역 90일 안 2번 이상이면 회귀 편입 후보 + 케이스 초안(기대 결과는 티켓에서만). 회귀 TC 관리자가 `apply-ops`로 승인분만 넣는다(수정 완료·확인 필요 없음만).
+- 결과 예: `samples/coupon-discount/regression/review-2026.12/` — Fail 3개: RG-0018 이번 변경으로 깨짐(근거 일부), RG-0011 TC가 명세와 다름(기획 확인 필요), RG-0020 환경(QA 서버 배송비 미계산, 개발 확인 필요). 수동 9개 결과 없음 → 남은 확인 뒤 판정. 가상 운영 결함 5건 → 회귀 편입 후보 3(SHOP-201 Critical · SHOP-212 Major(수정 중) · SHOP-210+198 반복), 종료 1. 승인·편입은 하지 않음.

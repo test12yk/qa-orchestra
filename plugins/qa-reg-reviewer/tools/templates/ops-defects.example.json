@@ -1,0 +1,21 @@
+{
+  "_comment": "회귀 검토자가 지라에서 읽어 만든 운영 결함 목록(읽기만). expected·actual은 티켓에 적힌 그대로 옮기고, 없으면 비운다(지어내지 않음).",
+  "source": {"site": "https://<회사>.atlassian.net", "jql": "project = SHOP AND labels = 운영결함 AND created >= -90d", "fetched_at": "2026-11-19T10:00:00+09:00"},
+  "issues": [
+    {
+      "key": "SHOP-201",
+      "url": "https://<회사>.atlassian.net/browse/SHOP-201",
+      "summary": "포인트 쓴 주문을 부분 취소한 뒤 나머지를 취소하면 포인트가 두 번 복구됨",
+      "severity": "Critical",
+      "status": "완료",
+      "created": "2026-10-21",
+      "resolved": "2026-10-24",
+      "area": "주문 부분 취소",
+      "labels": ["운영결함"],
+      "description": "티켓 설명 요약",
+      "expected": "티켓에 적힌 기대 동작",
+      "actual": "티켓에 적힌 실제 동작",
+      "fix": "티켓·댓글에 적힌 원인·수정 내용(있으면)"
+    }
+  ]
+}

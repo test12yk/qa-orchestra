@@ -54,6 +54,15 @@ python3 "TOOLS/reg_suite.py" set-automation --suite <suite.json> --ids RG-0013 -
 - 이유에 "준비 API가 있으면 자동화 가능"이 있으면 그 내용도 `--reason`에 남긴다. 준비 API가 생기면 `--to api`로 되돌리고 회귀 자동화 관리자에게 테스트를 맡긴다.
 - 바꾼 케이스는 보고에 번호와 이유를 쓴다(QA 매니저가 볼 수 있게).
 
+## 운영 결함 회귀 편입
+회귀 검토자가 원인 분석 뒤 낸 `ops-candidates.json`(심각도·반복 기준 후보와 케이스 초안)을 QA 매니저에게 보여 주고, 승인한 번호만 넣는다.
+```
+python3 "TOOLS/reg_suite.py" apply-ops <ops-candidates.json> --suite <suite.json> --approve OPS-01,OPS-03 --by "<승인한 사람>" [--note "<이유>"]
+```
+- 운영 결함이 아직 수정 완료가 아니거나 초안에 '확인 필요'가 남으면 거부된다 — 수정·확인 뒤, 또는 회귀 검토자가 채운 뒤 넣는다.
+- 새 케이스의 출처는 `운영 결함 <티켓>`이다. 자동화(API) 케이스면 회귀 자동화 관리자에게 테스트 작성을 맡긴다.
+- **스스로 승인하지 않는다.**
+
 ## 하는 일 3 — 릴리즈 회귀 범위
 1. ```
    python3 "TOOLS/reg_suite.py" select --suite <suite.json> --features <judgment.json> ... [--ledger <릴리즈 기록 features.json>] --analysis <plan-analysis.json> ... --release "<릴리즈 이름>" --out <폴더>

@@ -1,0 +1,68 @@
+{
+  "team": {
+    "domain": "",
+    "language": "ko"
+  },
+  "suite": {
+    "_comment": "회귀 실행 시트 양식(회귀 TC 관리자와 같은 설정을 쓰면 그쪽 값이 쓰인다). 머리글 label로 열을 찾는다.",
+    "columns": [
+      {"key": "id", "label": "CaseID"},
+      {"key": "domain", "label": "Domain"},
+      {"key": "section", "label": "section"},
+      {"key": "title", "label": "title"},
+      {"key": "priority", "label": "priority"},
+      {"key": "automation", "label": "자동화"},
+      {"key": "result", "label": "결과"},
+      {"key": "issue", "label": "이슈내용"}
+    ],
+    "results": {"pass": "Pass", "fail": "Fail"},
+    "automation": {"api": "API", "manual": "수동"}
+  },
+  "review": {
+    "_comment": "회귀 검토 기준. 원인은 검토자가 근거와 함께 추천하고, 확정은 사람.",
+    "causes": {
+      "change": "이번 변경으로 깨짐",
+      "existing": "전부터 있던 결함",
+      "tc_outdated": "TC가 정책·명세와 다름",
+      "env": "환경·데이터 문제"
+    },
+    "owners": {
+      "change": "개발",
+      "existing": "개발",
+      "tc_outdated": "회귀 TC 관리자",
+      "env": "회귀 자동화 관리자"
+    },
+    "_owners_comment": "원인별 기본 담당. 결함(change·existing)은 버그 리포터로 지라에 올린 뒤 개발이 고친다."
+  },
+  "ops": {
+    "_comment": "운영 결함 원인 분석. 지라는 읽기만 한다(검색·조회). jql의 {project}는 jira.project_key로 바뀐다.",
+    "jql": "project = {project} AND labels = 운영결함 AND created >= -90d ORDER BY created DESC",
+    "severity_from": "priority",
+    "_severity_comment": "심각도를 어디서 읽나: priority = 지라 Priority 이름(Blocker·Critical·Major·Minor·Trivial을 쓰는 회사) / label = 'severity-critical' 같은 라벨 / customfield_xxxxx = 심각도 필드",
+    "include_severities": ["Blocker", "Critical", "Major"],
+    "repeat_window_days": 90,
+    "repeat_count": 2,
+    "_include_comment": "심각도가 include_severities이거나, 같은 영역에서 repeat_window_days 안에 repeat_count번 이상 나오면 회귀 편입 후보. 아니면 수정 확인 후 종료.",
+    "closed_statuses": ["완료", "Done", "Closed", "Resolved"],
+    "root_causes": {
+      "code": "코드 결함",
+      "requirement": "요구사항·정책 누락",
+      "data": "데이터·설정",
+      "integration": "외부 연동",
+      "other": "기타"
+    },
+    "why_missed": {
+      "no_tc": "확인하는 TC 없음",
+      "out_of_scope": "TC는 있지만 이번 회귀 범위에서 제외",
+      "tc_weak": "TC가 그 조건을 확인하지 않음",
+      "automation_gap": "자동화가 그 줄을 확인하지 않음",
+      "env_gap": "QA 환경에서 재현 안 되는 조건(데이터·연동)",
+      "other": "기타"
+    }
+  },
+  "jira": {
+    "_comment": "운영 결함을 읽을 지라(버그 리포터와 같은 설정을 쓰면 그쪽 값이 쓰인다).",
+    "site": "",
+    "project_key": ""
+  }
+}

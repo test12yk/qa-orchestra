@@ -1,0 +1,653 @@
+{
+  "release": "2026.12 정기 릴리즈(샘플)",
+  "generated_at": "2026-11-19T18:38:56+09:00",
+  "inputs": {
+    "results": "regression/automation/reports/results.json",
+    "suite": "regression/suite/suite.json",
+    "selection": "regression/release-2026.12/selection.json",
+    "sheet": "regression/automation/reports/regression-run_자동화결과.xlsx",
+    "ops": "regression/review-2026.12/ops-defects.json"
+  },
+  "suite": {
+    "name": "커머스 회귀 스위트(샘플)",
+    "version": 2
+  },
+  "run_at": "2026-11-19T17:56:28+09:00",
+  "base_url": "http://127.0.0.1:8765",
+  "sheet_url": "https://docs.google.com/spreadsheets/d/1nLVafe4MxvcZLaBUhhl5ioILqBeugdXw7H3rTFp1UAQ/edit",
+  "features": [
+    {
+      "feature": "장바구니 쿠폰 할인",
+      "judgment": "run-01/judgment/judgment.json",
+      "decision": null
+    }
+  ],
+  "impacts": [
+    {
+      "name": "결제 금액 계산",
+      "level": "direct"
+    },
+    {
+      "name": "포인트 사용(차감 순서·금액)",
+      "level": "direct"
+    },
+    {
+      "name": "주문서 결제 금액 요약 화면",
+      "level": "direct"
+    },
+    {
+      "name": "주문 전체 취소",
+      "level": "direct"
+    },
+    {
+      "name": "주문 부분 취소",
+      "level": "direct"
+    },
+    {
+      "name": "환불 금액 계산",
+      "level": "direct"
+    },
+    {
+      "name": "쿠폰 상태 관리(AVAILABLE/USED)",
+      "level": "direct"
+    },
+    {
+      "name": "배송비 계산",
+      "level": "indirect"
+    },
+    {
+      "name": "PG 결제 승인",
+      "level": "indirect"
+    },
+    {
+      "name": "쿠폰 유효기간·만료 처리",
+      "level": "indirect"
+    },
+    {
+      "name": "상품권·e쿠폰 카테고리 상품 주문",
+      "level": "indirect"
+    },
+    {
+      "name": "판매자 정산 금액",
+      "level": "indirect"
+    }
+  ],
+  "scope": 17,
+  "counts": {
+    "pass": 5,
+    "fail": 3,
+    "not_run": 9,
+    "attention": 0
+  },
+  "cases": [
+    {
+      "id": "RG-0001",
+      "title": "가입한 이메일·비밀번호로 로그인하면 메인 화면으로 이동한다",
+      "domain": "회원",
+      "section": "로그인",
+      "priority": "P1",
+      "automation": "manual",
+      "result": "not_run",
+      "by": "",
+      "message": "수동 케이스",
+      "category": "must",
+      "select_reason": "P1은 매 릴리즈 실행"
+    },
+    {
+      "id": "RG-0008",
+      "title": "결제 금액은 상품 금액 합계에 배송비를 더한 값이다",
+      "domain": "주문·결제",
+      "section": "결제 금액 계산",
+      "priority": "P1",
+      "automation": "api",
+      "result": "pass",
+      "by": "자동화",
+      "message": "",
+      "category": "must",
+      "select_reason": "P1은 매 릴리즈 실행 · 영향: 결제 금액 계산"
+    },
+    {
+      "id": "RG-0009",
+      "title": "여러 판매자 상품을 함께 주문하면 판매자별 배송비가 각각 더해진다",
+      "domain": "주문·결제",
+      "section": "결제 금액 계산",
+      "priority": "P2",
+      "automation": "manual",
+      "result": "not_run",
+      "by": "",
+      "message": "수동 케이스",
+      "category": "direct",
+      "select_reason": "직접 영향: 결제 금액 계산"
+    },
+    {
+      "id": "RG-0010",
+      "title": "포인트 3,000P를 쓰면 결제 금액이 3,000원 줄고 잔액도 줄어든다",
+      "domain": "주문·결제",
+      "section": "포인트 사용",
+      "priority": "P1",
+      "automation": "api",
+      "result": "pass",
+      "by": "자동화",
+      "message": "",
+      "category": "must",
+      "select_reason": "P1은 매 릴리즈 실행 · 영향: 포인트 사용(차감 순서·금액)"
+    },
+    {
+      "id": "RG-0011",
+      "title": "보유 포인트보다 많이 입력하면 보유 포인트까지만 쓰인다",
+      "domain": "주문·결제",
+      "section": "포인트 사용",
+      "priority": "P2",
+      "automation": "api",
+      "result": "fail",
+      "by": "자동화",
+      "message": "포인트 사용 응답: 실제 400 INSUFFICIENT_POINTS (기대 200 성공)\n사용 포인트: 실제 없음 (기대 1,200P)",
+      "category": "direct",
+      "select_reason": "직접 영향: 포인트 사용(차감 순서·금액)"
+    },
+    {
+      "id": "RG-0012",
+      "title": "주문서 결제 금액 요약에 상품 금액·배송비·포인트·최종 금액이 순서대로 보인다",
+      "domain": "주문·결제",
+      "section": "주문서 결제 금액 요약",
+      "priority": "P3",
+      "automation": "manual",
+      "result": "not_run",
+      "by": "",
+      "message": "수동 케이스",
+      "category": "direct",
+      "select_reason": "직접 영향: 주문서 결제 금액 요약 화면"
+    },
+    {
+      "id": "RG-0013",
+      "title": "30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다",
+      "domain": "주문·결제",
+      "section": "배송비 계산",
+      "priority": "P2",
+      "automation": "manual",
+      "result": "not_run",
+      "by": "",
+      "message": "수동 케이스",
+      "category": "indirect",
+      "select_reason": "간접 영향: 배송비 계산"
+    },
+    {
+      "id": "RG-0014",
+      "title": "카드 결제 승인 금액은 주문서 최종 결제 금액과 같다",
+      "domain": "주문·결제",
+      "section": "PG 결제 승인",
+      "priority": "P1",
+      "automation": "api",
+      "result": "pass",
+      "by": "자동화",
+      "message": "",
+      "category": "must",
+      "select_reason": "P1은 매 릴리즈 실행 · 영향: PG 결제 승인"
+    },
+    {
+      "id": "RG-0015",
+      "title": "PG 승인이 실패하면 주문이 만들어지지 않고 포인트도 차감되지 않는다",
+      "domain": "주문·결제",
+      "section": "PG 결제 승인",
+      "priority": "P1",
+      "automation": "manual",
+      "result": "not_run",
+      "by": "",
+      "message": "수동 케이스",
+      "category": "must",
+      "select_reason": "P1은 매 릴리즈 실행 · 영향: PG 결제 승인"
+    },
+    {
+      "id": "RG-0016",
+      "title": "상품권 50,000원을 단독 주문하면 결제 후 상품권 번호가 발급된다",
+      "domain": "주문·결제",
+      "section": "상품권 주문",
+      "priority": "P2",
+      "automation": "manual",
+      "result": "not_run",
+      "by": "",
+      "message": "수동 케이스",
+      "category": "indirect",
+      "select_reason": "간접 영향: 상품권·e쿠폰 카테고리 상품 주문"
+    },
+    {
+      "id": "RG-0017",
+      "title": "결제 완료 주문을 전체 취소하면 결제 금액 전액이 환불된다",
+      "domain": "취소·환불",
+      "section": "주문 전체 취소",
+      "priority": "P1",
+      "automation": "api",
+      "result": "pass",
+      "by": "자동화",
+      "message": "",
+      "category": "must",
+      "select_reason": "P1은 매 릴리즈 실행 · 영향: 주문 전체 취소"
+    },
+    {
+      "id": "RG-0018",
+      "title": "포인트를 쓴 주문을 전체 취소하면 쓴 포인트가 되돌아온다",
+      "domain": "취소·환불",
+      "section": "주문 전체 취소",
+      "priority": "P1",
+      "automation": "api",
+      "result": "fail",
+      "by": "자동화",
+      "message": "포인트 잔액: 실제 0P (기대 3,000P)",
+      "category": "must",
+      "select_reason": "P1은 매 릴리즈 실행 · 영향: 주문 전체 취소"
+    },
+    {
+      "id": "RG-0019",
+      "title": "상품 2개 중 1개를 부분 취소하면 그 상품 금액만 환불된다",
+      "domain": "취소·환불",
+      "section": "주문 부분 취소",
+      "priority": "P1",
+      "automation": "api",
+      "result": "pass",
+      "by": "자동화",
+      "message": "",
+      "category": "must",
+      "select_reason": "P1은 매 릴리즈 실행 · 영향: 주문 부분 취소"
+    },
+    {
+      "id": "RG-0020",
+      "title": "부분 취소로 무료배송 기준 아래가 되면 배송비 3,000원을 빼고 환불한다",
+      "domain": "취소·환불",
+      "section": "환불 금액 계산",
+      "priority": "P2",
+      "automation": "api",
+      "result": "fail",
+      "by": "자동화",
+      "message": "환불 금액: 실제 15,000원 (기대 12,000원)",
+      "category": "direct",
+      "select_reason": "직접 영향: 환불 금액 계산"
+    },
+    {
+      "id": "RG-0021",
+      "title": "이벤트 페이지에서 쿠폰을 받으면 쿠폰함에 AVAILABLE로 들어온다",
+      "domain": "쿠폰",
+      "section": "쿠폰 발급",
+      "priority": "P2",
+      "automation": "manual",
+      "result": "not_run",
+      "by": "",
+      "message": "수동 케이스",
+      "category": "indirect",
+      "select_reason": "쿠폰 할인은 발급받은 쿠폰을 쓰므로 발급 → 쿠폰함 흐름을 한 번 확인(발급 코드는 안 바뀜)"
+    },
+    {
+      "id": "RG-0022",
+      "title": "같은 쿠폰은 한 번만 받을 수 있다",
+      "domain": "쿠폰",
+      "section": "쿠폰 상태 관리",
+      "priority": "P2",
+      "automation": "manual",
+      "result": "not_run",
+      "by": "",
+      "message": "수동 케이스",
+      "category": "direct",
+      "select_reason": "직접 영향: 쿠폰 상태 관리(AVAILABLE/USED)"
+    },
+    {
+      "id": "RG-0025",
+      "title": "판매자 정산 기준 금액은 상품 판매 금액에서 수수료를 뺀 값이다",
+      "domain": "정산",
+      "section": "판매자 정산",
+      "priority": "P2",
+      "automation": "manual",
+      "result": "not_run",
+      "by": "",
+      "message": "수동 케이스",
+      "category": "indirect",
+      "select_reason": "간접 영향: 판매자 정산 금액"
+    }
+  ],
+  "fails": [
+    {
+      "id": "RG-0011",
+      "title": "보유 포인트보다 많이 입력하면 보유 포인트까지만 쓰인다",
+      "domain": "주문·결제",
+      "section": "포인트 사용",
+      "priority": "P2",
+      "automation": "api",
+      "result": "fail",
+      "by": "자동화",
+      "message": "포인트 사용 응답: 실제 400 INSUFFICIENT_POINTS (기대 200 성공)\n사용 포인트: 실제 없음 (기대 1,200P)",
+      "category": "direct",
+      "select_reason": "직접 영향: 포인트 사용(차감 순서·금액)",
+      "last_result": "pass",
+      "source": "기존 회귀 스위트",
+      "expected": [
+        "사용 포인트 1,200P로 바뀜"
+      ],
+      "preconditions": [
+        "포인트 1,200P 보유"
+      ],
+      "steps": [
+        "포인트 5,000P 입력"
+      ],
+      "impacts": [
+        {
+          "name": "포인트 사용(차감 순서·금액)",
+          "level": "direct"
+        }
+      ],
+      "hint": "change",
+      "hint_why": "이번 변경 영향 영역: 포인트 사용(차감 순서·금액)(직접) · 지난 회귀 Pass"
+    },
+    {
+      "id": "RG-0018",
+      "title": "포인트를 쓴 주문을 전체 취소하면 쓴 포인트가 되돌아온다",
+      "domain": "취소·환불",
+      "section": "주문 전체 취소",
+      "priority": "P1",
+      "automation": "api",
+      "result": "fail",
+      "by": "자동화",
+      "message": "포인트 잔액: 실제 0P (기대 3,000P)",
+      "category": "must",
+      "select_reason": "P1은 매 릴리즈 실행 · 영향: 주문 전체 취소",
+      "last_result": "pass",
+      "source": "기존 회귀 스위트",
+      "expected": [
+        "포인트 3,000P 복구",
+        "카드 환불은 실제 결제 금액만"
+      ],
+      "preconditions": [
+        "포인트 3,000P 사용한 결제 완료 주문"
+      ],
+      "steps": [
+        "전체 취소"
+      ],
+      "impacts": [
+        {
+          "name": "주문 전체 취소",
+          "level": "direct"
+        }
+      ],
+      "hint": "change",
+      "hint_why": "이번 변경 영향 영역: 주문 전체 취소(직접) · 지난 회귀 Pass"
+    },
+    {
+      "id": "RG-0020",
+      "title": "부분 취소로 무료배송 기준 아래가 되면 배송비 3,000원을 빼고 환불한다",
+      "domain": "취소·환불",
+      "section": "환불 금액 계산",
+      "priority": "P2",
+      "automation": "api",
+      "result": "fail",
+      "by": "자동화",
+      "message": "환불 금액: 실제 15,000원 (기대 12,000원)",
+      "category": "direct",
+      "select_reason": "직접 영향: 환불 금액 계산",
+      "last_result": "pass",
+      "source": "기존 회귀 스위트",
+      "expected": [
+        "환불 금액 12,000원(15,000 − 배송비 3,000)"
+      ],
+      "preconditions": [
+        "상품 A 20,000원 + 상품 B 15,000원 주문(무료배송)"
+      ],
+      "steps": [
+        "상품 B 부분 취소"
+      ],
+      "impacts": [
+        {
+          "name": "환불 금액 계산",
+          "level": "direct"
+        }
+      ],
+      "hint": "change",
+      "hint_why": "이번 변경 영향 영역: 환불 금액 계산(직접) · 지난 회귀 Pass"
+    }
+  ],
+  "attention": [],
+  "not_run": [
+    {
+      "id": "RG-0001",
+      "title": "가입한 이메일·비밀번호로 로그인하면 메인 화면으로 이동한다",
+      "priority": "P1",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0009",
+      "title": "여러 판매자 상품을 함께 주문하면 판매자별 배송비가 각각 더해진다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0012",
+      "title": "주문서 결제 금액 요약에 상품 금액·배송비·포인트·최종 금액이 순서대로 보인다",
+      "priority": "P3",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0013",
+      "title": "30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0015",
+      "title": "PG 승인이 실패하면 주문이 만들어지지 않고 포인트도 차감되지 않는다",
+      "priority": "P1",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0016",
+      "title": "상품권 50,000원을 단독 주문하면 결제 후 상품권 번호가 발급된다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0021",
+      "title": "이벤트 페이지에서 쿠폰을 받으면 쿠폰함에 AVAILABLE로 들어온다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0022",
+      "title": "같은 쿠폰은 한 번만 받을 수 있다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0025",
+      "title": "판매자 정산 기준 금액은 상품 판매 금액에서 수수료를 뺀 값이다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    }
+  ],
+  "ops_source": {
+    "site": "(샘플 — 가상 지라)",
+    "jql": "project = SHOP AND labels = 운영결함 AND created >= -90d ORDER BY created DESC",
+    "fetched_at": "2026-11-19T18:30:00+09:00"
+  },
+  "ops": [
+    {
+      "key": "SHOP-212",
+      "url": "",
+      "summary": "상품권 결제 완료 후 상품권 번호가 발급되지 않음(발급사 응답 지연 시)",
+      "severity": "Major",
+      "status": "진행 중",
+      "created": "2026-11-10",
+      "resolved": "",
+      "area": "상품권 주문",
+      "labels": [
+        "운영결함"
+      ],
+      "description": "상품권 발급사 API 응답이 5초를 넘으면 주문은 결제 완료인데 상품권 번호가 비어 있음. 재시도 없음.",
+      "expected": "결제 완료 주문에는 상품권 번호가 발급된다(발급사 응답이 늦으면 재시도해 발급)",
+      "actual": "주문 상세에 상품권 번호가 비어 있음",
+      "fix": "발급 재시도 추가 작업 중",
+      "closed": false,
+      "hint": "include",
+      "hint_why": "심각도 Major",
+      "repeat_with": [],
+      "related": [
+        {
+          "id": "RG-0016",
+          "title": "상품권 50,000원을 단독 주문하면 결제 후 상품권 번호가 발급된다",
+          "priority": "P2",
+          "automation": "manual",
+          "why": "같은 영역",
+          "this_release": "indirect",
+          "this_release_reason": "간접 영향: 상품권·e쿠폰 카테고리 상품 주문"
+        }
+      ]
+    },
+    {
+      "key": "SHOP-210",
+      "url": "",
+      "summary": "도서산간 추가 배송비가 판매자별로 두 번 붙음",
+      "severity": "Minor",
+      "status": "완료",
+      "created": "2026-11-03",
+      "resolved": "2026-11-05",
+      "area": "배송비 계산",
+      "labels": [
+        "운영결함"
+      ],
+      "description": "판매자 2곳 상품을 제주로 주문하면 판매자마다 추가 배송비 3,000원이 두 번씩 붙어 추가 배송비 합계 12,000원",
+      "expected": "도서산간 추가 배송비는 판매자마다 한 번씩만 붙는다(판매자 2곳이면 3,000원 × 2 = 6,000원)",
+      "actual": "추가 배송비 합계 12,000원",
+      "fix": "추가 배송비 합산 로직 수정",
+      "closed": true,
+      "hint": "include",
+      "hint_why": "반복: '배송비 계산' 90일 안 2건(SHOP-210, SHOP-198)",
+      "repeat_with": [
+        "SHOP-198"
+      ],
+      "related": [
+        {
+          "id": "RG-0013",
+          "title": "30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다",
+          "priority": "P2",
+          "automation": "manual",
+          "why": "같은 영역",
+          "this_release": "indirect",
+          "this_release_reason": "간접 영향: 배송비 계산"
+        }
+      ]
+    },
+    {
+      "key": "SHOP-205",
+      "url": "",
+      "summary": "쿠폰함 유효기간 날짜가 하루 빠르게 보임",
+      "severity": "Minor",
+      "status": "완료",
+      "created": "2026-10-28",
+      "resolved": "2026-10-29",
+      "area": "쿠폰 유효기간",
+      "labels": [
+        "운영결함"
+      ],
+      "description": "유효기간 11/30 23:59 쿠폰이 쿠폰함에 11/29로 보임(UTC 기준 날짜로 표시)",
+      "expected": "유효기간 날짜를 KST 기준으로 표시",
+      "actual": "UTC 날짜로 표시되어 하루 빠름",
+      "fix": "표시 시간대 KST로 수정",
+      "closed": true,
+      "hint": "close",
+      "hint_why": "Minor · 단발",
+      "repeat_with": [],
+      "related": [
+        {
+          "id": "RG-0023",
+          "title": "쿠폰함에 쿠폰 유효기간이 날짜로 보인다",
+          "priority": "P3",
+          "automation": "manual",
+          "why": "같은 영역",
+          "this_release": "skip",
+          "this_release_reason": "간접 영향(쿠폰 유효기간·만료 처리)이지만 P3 — 간접 영향은 P1·P2만 실행"
+        }
+      ]
+    },
+    {
+      "key": "SHOP-201",
+      "url": "",
+      "summary": "포인트 쓴 주문을 부분 취소한 뒤 나머지를 취소하면 포인트가 두 번 복구됨",
+      "severity": "Critical",
+      "status": "완료",
+      "created": "2026-10-21",
+      "resolved": "2026-10-24",
+      "area": "주문 부분 취소",
+      "labels": [
+        "운영결함"
+      ],
+      "description": "포인트 3,000P를 쓴 상품 2개 주문에서 1개 부분 취소 후 남은 상품을 취소하면 포인트가 3,000P씩 두 번 복구(6,000P)",
+      "expected": "부분 취소·남은 상품 취소를 합쳐 복구되는 포인트는 쓴 포인트(3,000P)와 같다",
+      "actual": "6,000P 복구",
+      "fix": "취소마다 전액 복구하던 로직을 남은 사용 포인트 기준으로 수정",
+      "closed": true,
+      "hint": "include",
+      "hint_why": "심각도 Critical",
+      "repeat_with": [],
+      "related": [
+        {
+          "id": "RG-0018",
+          "title": "포인트를 쓴 주문을 전체 취소하면 쓴 포인트가 되돌아온다",
+          "priority": "P1",
+          "automation": "api",
+          "why": "제목 비슷함 0.56",
+          "this_release": "must",
+          "this_release_reason": "P1은 매 릴리즈 실행 · 영향: 주문 전체 취소"
+        },
+        {
+          "id": "RG-0019",
+          "title": "상품 2개 중 1개를 부분 취소하면 그 상품 금액만 환불된다",
+          "priority": "P1",
+          "automation": "api",
+          "why": "같은 영역",
+          "this_release": "must",
+          "this_release_reason": "P1은 매 릴리즈 실행 · 영향: 주문 부분 취소"
+        }
+      ]
+    },
+    {
+      "key": "SHOP-198",
+      "url": "",
+      "summary": "제주 주문에 도서산간 추가 배송비 3,000원이 빠짐",
+      "severity": "Minor",
+      "status": "완료",
+      "created": "2026-09-12",
+      "resolved": "2026-09-15",
+      "area": "배송비 계산",
+      "labels": [
+        "운영결함"
+      ],
+      "description": "제주 우편번호 일부(63xxx 중 신규 구간)가 도서산간 목록에 없어 추가 배송비 미적용",
+      "expected": "제주 주소 주문에는 도서산간 추가 배송비 3,000원이 붙는다",
+      "actual": "추가 배송비 0원",
+      "fix": "도서산간 우편번호 목록 갱신",
+      "closed": true,
+      "hint": "include",
+      "hint_why": "반복: '배송비 계산' 90일 안 2건(SHOP-210, SHOP-198)",
+      "repeat_with": [
+        "SHOP-210"
+      ],
+      "related": [
+        {
+          "id": "RG-0013",
+          "title": "30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다",
+          "priority": "P2",
+          "automation": "manual",
+          "why": "같은 영역",
+          "this_release": "indirect",
+          "this_release_reason": "간접 영향: 배송비 계산"
+        }
+      ]
+    }
+  ],
+  "summary": null,
+  "fail_reviews": [],
+  "ops_reviews": []
+}

@@ -143,7 +143,7 @@ def states(folder, reg, cases):
             rows[cid] = ("to_manual", manual_text(b))
         elif cid in tests:
             rows[cid] = ("unregistered", "테스트는 있음 — 확인 뒤 register")
-        elif src and src.group(1) != "기존 회귀 스위트":
+        elif src and src.group(1) not in ("기존 회귀 스위트", "운영 결함"):
             rows[cid] = ("todo", f"{c['source']}에서 옮기기(promote)")
         else:
             rows[cid] = ("todo", "테스트 작성 필요")

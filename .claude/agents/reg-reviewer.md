@@ -1,0 +1,1 @@
+../../plugins/qa-reg-reviewer/agents/reg-reviewer.md
