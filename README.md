@@ -28,7 +28,8 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 - [x] 신규 기능 자동화 `new-automation` — TC·API 문서 → pytest API 테스트 → QA 서버 실행 → TC 시트 결과·이슈내용 기록(가짜 쿠폰 서버로 검증)
 - [x] 신규 기능 검토자 `new-reviewer` — 실행 전 TC 검토(요구사항·충돌·위험·영향 범위 커버, 경계값·조합, 기대 결과) · 실행 결과 검토(미실행·판정 보류·가정 위의 Pass·버그) → 담당별 보완 요청 HTML
 - [x] 신규 기능 판정관 `new-judge` — 실행 결과 검토 → 요소 8가지(실행·결함·보류·가정·요구사항·고위험·검토 지적·영향 범위) → 편입 가능/조건부/보류 추천 + 편입 조건, 사람의 결정 기록(릴리즈 기록 파일)
-- [ ] 신규 기능 QA 리포터 → 회귀 라인
+- [x] 신규 기능 QA 리포터 `new-reporter` — 판정서·실행 결과 검토(+ 분석서·TC·지라 상태) → 한 장 리포트(위 1분 요약 매니저·기획용 / 아래 상세 개발·QA용), 결정 전 중간 리포트 · 결정 후 완료 리포트, HTML·MD + 승인 후 컨플루언스 페이지
+- [ ] 회귀 라인
 
 ## 폴더
 ```
@@ -42,6 +43,7 @@ plugins/
   qa-new-automation/   신규 기능 자동화: agents/, tools/run_automation.py(준비·점검·실행·결과 기록), tools/templates/, defaults.json
   qa-new-reviewer/     신규 기능 검토자: agents/, tools/review.py(자동 점검·보고서), tools/templates/, defaults.json
   qa-new-judge/        신규 기능 판정관: agents/, tools/judge.py(요소 모으기·판정서·결정 기록), tools/templates/, defaults.json
+  qa-new-reporter/     신규 기능 QA 리포터: agents/, tools/report.py(재료 모으기·리포트·올린 위치 기록), tools/templates/, defaults.json
 .claude/agents/        저장소를 받아 쓸 때를 위한 연결(plugins/*/agents 를 가리킴)
 qa-orchestra.config.json   팀 설정 견본
 samples/coupon-discount/   가상 "쿠폰 할인" 기능 (입력 5종, 기준 답안, 실행 결과)
@@ -63,6 +65,7 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 | 신규 기능 자동화만 | `/plugin install qa-new-automation@qa-orchestra` | `new-automation` + 스위트 준비·실행·결과 기록 스크립트 (테스트 실행에 pytest 필요) |
 | 신규 기능 검토자만 | `/plugin install qa-new-reviewer@qa-orchestra` | `new-reviewer` + 자동 점검·보고서 스크립트 |
 | 신규 기능 판정관만 | `/plugin install qa-new-judge@qa-orchestra` | `new-judge` + 판정서·결정 기록 스크립트 |
+| 신규 기능 QA 리포터만 | `/plugin install qa-new-reporter@qa-orchestra` | `new-reporter` + 리포트 스크립트(HTML·MD·컨플루언스 본문) |
 
 에이전트별 플러그인에는 그 에이전트가 쓰는 파일만 들어 있다(샘플·문서는 설치되지 않음). 나중에 전체를 설치하면 빠진 것만 추가된다. 비공개 저장소라면 접근 권한이 있는 GitHub 계정이 필요하다. 설치 뒤 Claude Code를 다시 시작한다.
 
@@ -100,6 +103,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 | `bug-reporter` 버그 리포터 | TC 실행 시트(Fail 행)·메모·로그 | 버그 리포트(MD) → 승인 시 지라 이슈 | 버그 메모만 줘도 된다 |
 | `new-tc-writer` 신규 TC 작성가 | 기획 분석서 (없으면 문서 폴더) | TC 스프레드시트(xlsx)·CSV·HTML·MD | 문서 폴더만 줘도 되지만, 분석서가 있어야 충돌·질문이 반영된다 |
 | `new-judge` 신규 기능 판정관 | 검토자의 실행 결과 검토(review.json) (+ TC json, 지라 상태) | 판정서(HTML·MD·JSON), 사람 결정 시 릴리즈 기록 | 실행 결과 검토 review.json만 있으면 된다 |
+| `new-reporter` 신규 기능 QA 리포터 | 판정서(judgment.json) + 실행 결과 검토(review.json) (+ 분석서·TC json·지라 상태) | QA 리포트(HTML·MD·컨플루언스 본문), 승인 시 컨플루언스 페이지 | 판정서와 실행 결과 검토만 있으면 된다 |
 | `new-reviewer` 신규 기능 검토자 | 실행 전: 분석서 + TC json / 실행 후: + 결과 시트·자동화 결과·버그 폴더 | 검토 보고서(HTML·MD·JSON), 담당별 보완 요청 | TC json만 있어도 TC 자체 점검(기대 결과·추적·중복)은 된다 |
 
 여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(예정)를 쓴다.
@@ -128,7 +132,14 @@ python3 plugins/qa-plan-analyst/tools/render_plan_analysis.py samples/coupon-dis
 - 결과 예: `samples/coupon-discount/run-01/review/tc/`(실행 시작 가능, 지적 6건) · `review/result/`(보완 후 판정, 지적 7건 — Fail 3건이 모두 미확정 질문 Q4·Q5에 기댄 판정임을 짚음).
 
 ## 신규 기능 판정관
-- 입력은 검토자의 **실행 결과 검토**. 요소 8가지를 설정 기준(`judge`: 막는 심각도 Blocker·Critical, 조건부 Major, 최상위 우선순위 P1)으로 매기고, 기준표 후보와 다르게 추천하면 이유를 남긴다.
+- 입력은 검토자의 **실행 결과 검토**. 요소 8가지를 설정 기준(`judge`: 릴리즈 불가 심각도 Blocker·Critical, 조건부 릴리즈 Major, 최상위 우선순위 P1)으로 매기고, 기준표 후보와 다르게 추천하면 이유를 남긴다.
 - 조건부·보류면 편입 조건(K-01…, 담당·확인 방법)을 낸다. 결정은 사람이 하고 `judge.py decide`로 기록한다(추천과 다른 결정은 이유 필수, `--ledger`로 릴리즈 기록 파일에 남김).
 - QA 매니저가 Claude를 쓰지 않아도 된다: 판정서를 claude.ai 링크로 공유하면 맨 아래 '결정 남기기' 칸에서 결정·조건·이유를 저장하고(참여자 이상 권한), 판정관이 그 제출을 `decide --source`로 판정서에 옮긴다.
 - 결과 예: `samples/coupon-discount/run-01/judgment/` — 편입 보류 추천(Critical QAO-8, P1 미실행·보류 4개), 단 Fail 3건이 모두 Q4·Q5 가정 기준이라 답에 따라 조건부로 바뀔 수 있음. 결정은 비워 둠.
+
+## 신규 기능 QA 리포터
+- 앞 단계 결과를 바꾸지 않고 모아 **한 장**으로 전한다. 위 '요약'(한 줄 요약·요점, 결정/추천, 숫자, 남은 일·담당, 답이 필요한 질문, 범위)은 QA 매니저·기획용, 아래 '상세'(결함, 우선순위·유형별 실행 결과, 통과 못 한 TC, 요구사항, 영향 받는 기존 기능, 검토 지적, 근거 자료)는 개발·QA용.
+- 판정서에 사람의 결정이 없으면 **중간 리포트(결정 대기)**, 결정이 기록되면 **QA 완료 리포트**(받아들인 조건 표시). 리포트 이후 판정서에 새 결정이 생기면 그릴 때 경고한다.
+- 요약 요점에는 근거 번호(TC·버그·질문·조건)가 있어야 그려진다.
+- **컨플루언스**: `report.confluence.html`(Atlassian 형식 본문)을 만들어 두고, 사용자가 원하면 위치·제목을 보여 주고 승인받은 뒤 Atlassian 커넥터로 올린다. 설정 `confluence`(site·space_key·parent_page_id)만 바꾸면 회사 컨플루언스로 간다. 올린 페이지는 `report.py record`로 남겨 다음엔 같은 페이지를 고친다.
+- 결과 예: `samples/coupon-discount/run-01/report/` — 중간 리포트(결정 대기, 추천 편입 보류).

@@ -167,7 +167,7 @@ def collect(args, cfg):
     worst = max((e["status"] for e in els), key=RANK.get)
     hint = {"unmet": "hold", "conditional": "conditional", "met": "include"}[worst]
 
-    # 막는 이유 후보: 요소 근거를 '하나씩 풀 수 있는 단위'로 쪼갠다. block = 남아 있으면 편입 보류, cond = 조건부
+    # 릴리즈 이슈 후보: 요소 근거를 '하나씩 해결할 수 있는 단위'로 쪼갠다. block = 릴리즈 불가(남아 있으면 편입 보류), cond = 조건부 릴리즈
     blockers = []
     add = lambda level, title, el, refs: blockers.append({"id": f"B-{len(blockers) + 1:02d}", "level": level, "title": title,
                                                           "element": el, "refs": list(refs)})
@@ -204,7 +204,7 @@ def collect(args, cfg):
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "judgment-facts.json").write_text(json.dumps(facts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"막는 이유 후보: 막음 {sum(b['level'] == 'block' for b in blockers)} · 조건부 {sum(b['level'] == 'cond' for b in blockers)}")
+    print(f"릴리즈 이슈 후보: 릴리즈 불가 {sum(b['level'] == 'block' for b in blockers)} · 조건부 릴리즈 {sum(b['level'] == 'cond' for b in blockers)}")
     print(f"judgment-facts.json: 추천 후보 {jc['verdicts'][hint]} — " + " · ".join(f"{e['id']} {e['name']} {STATUS[e['status']][0]}" for e in els))
 
 
@@ -229,7 +229,7 @@ def validate(j, cfg):
             errs.append(f"{el.get('id')}.status는 {'/'.join(STATUS)}")
     conds = j.get("conditions", [])
     if rec.get("verdict") in ("conditional", "hold") and not conds:
-        errs.append("조건부·보류면 conditions(편입하려면 풀어야 할 조건)가 필요")
+        errs.append("조건부·보류면 conditions(편입하려면 해결할 일)가 필요")
     ids = set()
     for i, c in enumerate(conds):
         for k in ("id", "what", "owner", "verify"):
@@ -248,15 +248,15 @@ def validate(j, cfg):
     for i, c in enumerate(conds):
         bad = [x for x in c.get("resolves", []) if x not in bids]
         if not c.get("resolves"):
-            errs.append(f"conditions[{i}] {c.get('id')}: resolves(이 할 일이 푸는 막는 이유 B-번호)가 없음")
+            errs.append(f"conditions[{i}] {c.get('id')}: resolves(이 할 일이 해결하는 릴리즈 이슈 B-번호)가 없음")
         elif bad:
-            errs.append(f"conditions[{i}] {c.get('id')}: 없는 막는 이유 {', '.join(bad)}")
+            errs.append(f"conditions[{i}] {c.get('id')}: 없는 릴리즈 이슈 {', '.join(bad)}")
     solved = {x for c in conds for x in c.get("resolves", [])}
-    errs += [f"막는 이유 {b['id']}를 푸는 할 일(conditions)이 없음" for b in blockers if b.get("id") not in solved]
+    errs += [f"릴리즈 이슈 {b['id']}를 해결할 일(conditions)이 없음" for b in blockers if b.get("id") not in solved]
     if rec.get("verdict") == "hold" and not any(b.get("level") == "block" for b in blockers):
-        errs.append("편입 보류인데 '막음'(block) 이유가 없음 — 무엇이 막는지 blockers에 적는다")
+        errs.append("편입 보류인데 '릴리즈 불가'(block) 이슈가 없음 — 무엇 때문에 릴리즈할 수 없는지 blockers에 적는다")
     if rec.get("verdict") == "include" and blockers:
-        errs.append("편입 가능인데 막는 이유가 남아 있음 — 풀렸으면 blockers에서 뺀다")
+        errs.append("편입 가능인데 릴리즈 이슈가 남아 있음 — 해결됐으면 blockers에서 뺀다")
     for i, d in enumerate(j.get("decisions", [])):
         if d.get("decision") not in VERDICTS or not d.get("by"):
             errs.append(f"decisions[{i}]: decision·by가 필요")
@@ -321,20 +321,20 @@ def render(path, outdir, cfg):
         steps = "".join(f'<li><span class="mono kid">{e(c["id"])}</span> {e(c["what"])}<span class="who">{e(owners[c["owner"]])}</span>'
                         f'<span class="muted small">확인: {e(c["verify"])}</span></li>' for c in todo)
         refs = "".join(f"<span class=chip>{e(x)}</span>" for x in b.get("refs", []) if x)
-        lvl = ("막음", "red") if b["level"] == "block" else ("조건부", "amber")
+        lvl = ("릴리즈 불가", "red") if b["level"] == "block" else ("조건부 릴리즈", "amber")
         cards.append(f'<div class="bmap {b["level"]}"><div class="why"><span class="flag {lvl[1]}">{lvl[0]}</span> <span class="mono muted small">{e(b["id"])} · {e(b.get("element", ""))}</span>'
                      f'<b>{e(b["title"])}</b><div>{refs}</div></div><div class="arrow" aria-hidden="true">→</div>'
                      f'<ol class="todo">{steps}</ol></div>')
     n_block = sum(1 for b in bl if b["level"] == "block")
     n_cond = len(bl) - n_block
-    lead = (f'막는 이유 {n_block}개가 모두 풀려야 편입할 수 있어요. 조건부 {n_cond}개는 풀거나, 남긴 채 편입할지 QA 매니저가 정해요.' if n_block
-            else f'막는 이유는 없어요. 조건부 {n_cond}개를 풀거나, 남긴 채 편입할지 QA 매니저가 정해요.' if n_cond else "")
-    map_html = (f'<section id="map"><h2>왜 이 판정인가 → 무엇을 하면 풀리나 <span class="muted small">막음 {n_block} · 조건부 {n_cond}</span></h2>'
+    lead = (f'릴리즈 불가 이슈 {n_block}개를 모두 해결해야 편입할 수 있어요. 조건부 릴리즈 이슈 {n_cond}개는 해결하거나, 남긴 채 편입할지 QA 매니저가 정해요.' if n_block
+            else f'릴리즈 불가 이슈는 없어요. 조건부 릴리즈 이슈 {n_cond}개를 해결하거나, 남긴 채 편입할지 QA 매니저가 정해요.' if n_cond else "")
+    map_html = (f'<section id="map"><h2>릴리즈 이슈 → 해결할 일 <span class="muted small">릴리즈 불가 {n_block} · 조건부 릴리즈 {n_cond}</span></h2>'
                 f'<p class="muted">{e(lead)}</p><div class="bmaps">{"".join(cards)}</div></section>') if bl else ""
     cond_rows = "".join(
         f'<tr><td class="mono">{e(c["id"])}</td><td>{e(c["what"])}</td><td>{e(owners[c["owner"]])}</td><td>{e(c["verify"])}</td>'
         f'<td>{"".join(f"<span class=chip>{e(x)}</span>" for x in c.get("resolves", []))}</td></tr>' for c in j.get("conditions", []))
-    cond_html = (f'<section id="conditions"><h2>할 일 전체 <span class="muted small">편입 조건</span></h2><div class="tbl"><table><thead><tr><th>번호</th><th>할 일</th><th>담당</th><th>확인 방법</th><th>푸는 이유</th></tr></thead>'
+    cond_html = (f'<section id="conditions"><h2>할 일 전체 <span class="muted small">편입 조건</span></h2><div class="tbl"><table><thead><tr><th>번호</th><th>할 일</th><th>담당</th><th>확인 방법</th><th>해결하는 이슈</th></tr></thead>'
                  f'<tbody>{cond_rows}</tbody></table></div></section>') if cond_rows else ""
 
     alt = j.get("alternatives", [])
@@ -377,10 +377,10 @@ def render(path, outdir, cfg):
         md += ["", f"_기준표 후보는 {vlabel[j['hint']]} — 다르게 추천한 이유: {rec['deviation_reason']}_"]
     md += ["", "**사람의 결정:** " + (f"{vlabel[last['decision']]} ({last['by']}, {last['at'][:16].replace('T', ' ')})" + (f" — {last['note']}" if last.get("note") else "") if last else "아직 결정 전")]
     if j.get("blockers"):
-        md += ["", "## 왜 이 판정인가 → 무엇을 하면 풀리나"]
+        md += ["", "## 릴리즈 이슈 → 해결할 일"]
         for b in sorted(j["blockers"], key=lambda b: (b["level"] != "block", b["id"])):
             todo = [c for c in j.get("conditions", []) if b["id"] in c.get("resolves", [])]
-            md += ["", f"- **[{'막음' if b['level'] == 'block' else '조건부'}] {b['id']} {b['title']}**"]
+            md += ["", f"- **[{'릴리즈 불가' if b['level'] == 'block' else '조건부 릴리즈'}] {b['id']} {b['title']}**"]
             md += [f"  - {c['id']} {c['what']} ({owners[c['owner']]}) — 확인: {c['verify']}" for c in todo]
     md += ["", "## 요소별 근거", "", "| 요소 | 이름 | 상태 | 요약 |", "|---|---|---|---|"]
     md += [f"| {el['id']} | {el['name']} | {STATUS[el['status']][0]} | {el['summary']} |" for el in j["elements"]]

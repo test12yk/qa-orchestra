@@ -29,7 +29,7 @@
   "questions": [],
   "recommendation": {
     "verdict": "hold",
-    "headline": "편입을 막는 이유 3개(Critical 결함 QAO-8, P1 TC 미실행 1개·판정 보류 3개)가 남아 지금은 편입 보류 — 대부분은 기획 답(Q4·Q5 등)부터 받으면 풀린다",
+    "headline": "릴리즈 불가 이슈 3개(Critical 결함 QAO-8, P1 TC 미실행 1개·판정 보류 3개)가 남아 지금은 편입 보류 — 대부분은 기획 답(Q4·Q5 등)을 받으면 해결된다",
     "reasons": [
       "E2 결함: Critical QAO-8(제외 상품이 최소 주문 금액에 포함) 미해결",
       "E1·E3: P1 TC-059(부분 취소 회귀) 미실행, P1 TC-022·027·048 판정 보류 — 금액·환불 계산이 확인되지 않음"

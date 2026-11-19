@@ -1,0 +1,45 @@
+{
+  "team": {
+    "domain": "",
+    "language": "ko"
+  },
+  "report": {
+    "_comment": "신규 기능 QA 리포터 기준. 판정관과 같은 이름을 쓴다(팀 설정 파일에 judge 블록이 있으면 그 값과 맞춘다).",
+    "top_priority": "P1",
+    "highlight_severities": ["Blocker", "Critical", "Major"],
+    "_highlight_comment": "이 심각도의 열린 버그는 한 줄 요약 바로 아래에 지라 키·내용으로 보인다(앞에 둔 심각도부터).",
+    "release_blocking_severities": ["Blocker", "Critical"],
+    "_release_blocking_comment": "빨강(릴리즈 불가 수준)으로 표시할 심각도. 판정관 judge.blocking_severities와 맞춘다.",
+    "closed_statuses": ["완료", "Done", "닫힘", "Closed", "Resolved", "해결됨"],
+    "verdicts": {
+      "include": "편입 가능",
+      "conditional": "조건부 편입",
+      "hold": "편입 보류"
+    },
+    "results": {
+      "pass": "Pass",
+      "fail": "Fail",
+      "hold": "판정 보류",
+      "blank": "미실행",
+      "error": "자동화 오류"
+    },
+    "owners": {
+      "plan-analyst": "기획 분석가",
+      "tc-writer": "신규 TC 작성가",
+      "automation": "신규 기능 자동화",
+      "bug-reporter": "버그 리포터",
+      "tester": "수동 테스트 담당",
+      "pm": "기획·정책 담당(답변)",
+      "dev": "개발(수정)",
+      "qa-manager": "QA 매니저(결정)"
+    }
+  },
+  "confluence": {
+    "_comment": "컨플루언스에도 올릴 때 쓴다. site는 xxx.atlassian.net, 올릴 위치는 space_key(+ parent_page_id). 비어 있으면 올리기 전에 묻는다. 회사 컨플루언스로 바꿀 때는 이 블록만 바꾼다.",
+    "site": "",
+    "space_key": "",
+    "parent_page_id": "",
+    "content_type": "page",
+    "title": "[QA] {feature} 신규 기능 QA 리포트"
+  }
+}

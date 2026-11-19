@@ -1,0 +1,21 @@
+{
+  "_comment": "리포터가 report-facts.json에 더해 쓰는 칸만 보인 예시. 나머지 칸은 collect가 채운 그대로 둔다.",
+  "summary": {
+    "headline": "63개 중 49개를 실행했고, Critical QAO-8(제외 상품까지 최소 주문 금액에 포함돼 쿠폰 적용)과 Major QAO-10·QAO-11이 열려 있어 판정관은 편입 보류를 권한다 — 대부분 기획 답(Q4·Q5)을 받으면 해결된다.",
+    "points": [
+      "릴리즈 불가: Critical QAO-8(TC-009) 미해결 — 결함인지는 Q5 답에 달림(K-01→K-03).",
+      "Fail 3건(TC-009·011·050)은 답이 안 온 Q4·Q5의 임시 가정 기준 — 답이 가장 먼저 필요하다(K-01·K-02).",
+      "기존 기능 리그레이션은 실행한 것 모두 Pass, 수동 8개는 실행 전(K-07)."
+    ]
+  },
+  "links": [
+    {
+      "label": "판정서",
+      "url": "https://claude.ai/artifact/..."
+    },
+    {
+      "label": "TC 실행 시트(구글 시트)",
+      "url": "https://docs.google.com/spreadsheets/d/..."
+    }
+  ]
+}

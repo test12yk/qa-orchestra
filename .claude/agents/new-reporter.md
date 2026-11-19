@@ -1,0 +1,1 @@
+../../plugins/qa-new-reporter/agents/new-reporter.md

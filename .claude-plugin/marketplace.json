@@ -53,6 +53,12 @@
       "description": "신규 기능 판정관만 (편입 추천·사람 결정 기록)",
       "source": "./plugins/qa-new-judge",
       "category": "testing"
+    },
+    {
+      "name": "qa-new-reporter",
+      "description": "신규 기능 QA 리포터만",
+      "source": "./plugins/qa-new-reporter",
+      "category": "testing"
     }
   ]
 }
