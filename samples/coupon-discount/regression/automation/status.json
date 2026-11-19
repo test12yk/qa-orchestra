@@ -1,0 +1,51 @@
+{
+  "at": "2026-11-19T17:56:28+09:00",
+  "suite": {
+    "name": "커머스 회귀 스위트(샘플)",
+    "version": 2
+  },
+  "scope": "regression/release-2026.12/selection.json",
+  "counts": {
+    "ready": 8,
+    "stale": 0,
+    "todo": 0,
+    "unregistered": 0,
+    "no_code": 0,
+    "to_manual": 0
+  },
+  "cases": {
+    "RG-0008": {
+      "state": "ready",
+      "detail": "직접 작성"
+    },
+    "RG-0010": {
+      "state": "ready",
+      "detail": "직접 작성"
+    },
+    "RG-0011": {
+      "state": "ready",
+      "detail": "직접 작성"
+    },
+    "RG-0014": {
+      "state": "ready",
+      "detail": "직접 작성"
+    },
+    "RG-0017": {
+      "state": "ready",
+      "detail": "직접 작성"
+    },
+    "RG-0018": {
+      "state": "ready",
+      "detail": "직접 작성"
+    },
+    "RG-0019": {
+      "state": "ready",
+      "detail": "직접 작성"
+    },
+    "RG-0020": {
+      "state": "ready",
+      "detail": "직접 작성"
+    }
+  },
+  "loose": []
+}

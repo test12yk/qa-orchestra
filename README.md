@@ -30,7 +30,8 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 - [x] 신규 기능 판정관 `new-judge` — 실행 결과 검토 → 요소 8가지(실행·결함·보류·가정·요구사항·고위험·검토 지적·영향 범위) → 편입 가능/조건부/보류 추천 + 편입 조건, 사람의 결정 기록(릴리즈 기록 파일)
 - [x] 신규 기능 QA 리포터 `new-reporter` — 판정서·실행 결과 검토(+ 분석서·TC·지라 상태) → 한 장 리포트(위 1분 요약 매니저·기획용 / 아래 상세 개발·QA용), 결정 전 중간 리포트 · 결정 후 완료 리포트, HTML·MD + 승인 후 컨플루언스 페이지
 - [x] 회귀 TC 관리자 `reg-tc-manager` — 회귀 스위트(영역별 탭 시트·변경 이력), 신규 TC 편입 후보(기준표·결과 확정·겹침·영역 대표) → 사람 승인분만 편입, 릴리즈 회귀 범위(필수·직접·간접·제외) → 실행 시트
-- [ ] 회귀 자동화 관리자 · 회귀 검토자 · 릴리즈 판정관 · 릴리즈 QA 리포터
+- [x] 회귀 자동화 관리자 `reg-automation` — 편입된 신규 기능 테스트를 RG 번호로 옮기기, TC가 바뀐 테스트는 고칠 때까지 실행 막기, 릴리즈 범위의 자동화 케이스 실행(Fail·자동화 오류는 한 번 더 → 불안정 구분) → 회귀 실행 시트 결과·이슈내용
+- [ ] 회귀 검토자 · 릴리즈 판정관 · 릴리즈 QA 리포터
 
 ## 폴더
 ```
@@ -46,6 +47,7 @@ plugins/
   qa-new-judge/        신규 기능 판정관: agents/, tools/judge.py(요소 모으기·판정서·결정 기록), tools/templates/, defaults.json
   qa-new-reporter/     신규 기능 QA 리포터: agents/, tools/report.py(재료 모으기·리포트·올린 위치 기록), tools/templates/, defaults.json
   qa-reg-tc-manager/   회귀 TC 관리자: agents/, tools/reg_suite.py(스위트·편입 후보·승인·릴리즈 범위), tools/xlsx.py, tools/templates/, defaults.json
+  qa-reg-automation/   회귀 자동화 관리자: agents/, tools/reg_auto.py(현황·옮기기·등록·실행·결과 기록), tools/xlsx.py, tools/templates/, defaults.json
 .claude/agents/        저장소를 받아 쓸 때를 위한 연결(plugins/*/agents 를 가리킴)
 qa-orchestra.config.json   팀 설정 견본
 samples/coupon-discount/   가상 "쿠폰 할인" 기능 (입력 5종, 기준 답안, 실행 결과)
@@ -69,6 +71,7 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 | 신규 기능 판정관만 | `/plugin install qa-new-judge@qa-orchestra` | `new-judge` + 판정서·결정 기록 스크립트 |
 | 신규 기능 QA 리포터만 | `/plugin install qa-new-reporter@qa-orchestra` | `new-reporter` + 리포트 스크립트(HTML·MD·컨플루언스 본문) |
 | 회귀 TC 관리자만 | `/plugin install qa-reg-tc-manager@qa-orchestra` | `reg-tc-manager` + 스위트·편입·범위 스크립트(xlsx 읽기·쓰기 포함) |
+| 회귀 자동화 관리자만 | `/plugin install qa-reg-automation@qa-orchestra` | `reg-automation` + 옮기기·등록·실행·결과 기록 스크립트 (테스트 실행에 pytest 필요) |
 
 에이전트별 플러그인에는 그 에이전트가 쓰는 파일만 들어 있다(샘플·문서는 설치되지 않음). 나중에 전체를 설치하면 빠진 것만 추가된다. 비공개 저장소라면 접근 권한이 있는 GitHub 계정이 필요하다. 설치 뒤 Claude Code를 다시 시작한다.
 
@@ -108,6 +111,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 | `new-judge` 신규 기능 판정관 | 검토자의 실행 결과 검토(review.json) (+ TC json, 지라 상태) | 판정서(HTML·MD·JSON), 사람 결정 시 릴리즈 기록 | 실행 결과 검토 review.json만 있으면 된다 |
 | `new-reporter` 신규 기능 QA 리포터 | 판정서(judgment.json) + 실행 결과 검토(review.json) (+ 분석서·TC json·지라 상태) | QA 리포트(HTML·MD·컨플루언스 본문), 승인 시 컨플루언스 페이지 | 판정서와 실행 결과 검토만 있으면 된다 |
 | `reg-tc-manager` 회귀 TC 관리자 | 기존 회귀 시트(xlsx·csv) / 신규 TC json + 실행 결과 검토 + 판정서 / 릴리즈 기능(판정서·릴리즈 기록) | 회귀 스위트 시트(영역별 탭), 편입 후보 페이지, 릴리즈 회귀 범위·실행 시트 | 기존 회귀 시트만 있어도 가져오기·보기·범위 고르기가 된다 |
+| `reg-automation` 회귀 자동화 관리자 | 회귀 스위트 + 릴리즈 범위·실행 시트 (+ 신규 기능 자동화 폴더, API 문서, QA 서버 주소) | 회귀 pytest 폴더(registry.json), 실행 결과 페이지, 결과·이슈내용이 채워진 회귀 실행 시트 | 스위트만 있어도 현황(status)을 본다 |
 | `new-reviewer` 신규 기능 검토자 | 실행 전: 분석서 + TC json / 실행 후: + 결과 시트·자동화 결과·버그 폴더 | 검토 보고서(HTML·MD·JSON), 담당별 보완 요청 | TC json만 있어도 TC 자체 점검(기대 결과·추적·중복)은 된다 |
 
 여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(예정)를 쓴다.
@@ -154,3 +158,11 @@ python3 plugins/qa-plan-analyst/tools/render_plan_analysis.py samples/coupon-dis
 - **승인**: QA 매니저가 고른 번호만 `apply`로 넣는다(새 RG 번호, 변경 이력). 기능 편입 결정 전이면 거부, 이미 넣은 번호·가정 기준 결과도 거부.
 - **릴리즈 범위**: P1·지난 회귀 Fail = 필수, 이번 기능에서 편입된 케이스·직접 영향 영역 = 전부, 간접 영향 = P1·P2, 나머지 = 이번엔 제외(이유). 관리자가 놓친 연결만 조정(`overrides`). `regression-run.xlsx`에 이번에 돌릴 케이스만.
 - 결과 예: `samples/coupon-discount/regression/` — 기존 스위트 26개(가상 쇼핑몰), 쿠폰 TC 63개 → 넣기 5(기능당 최대 5·영역당 1) · 나중에 41 · 빼기 17, 2026.12 릴리즈 범위 17/26(필수 8 · 직접 5 · 간접 4 · 제외 9). 승인·편입은 하지 않음.
+
+## 회귀 자동화 관리자
+- **현황**: 스위트에서 자동화(API)인 케이스마다 실행 가능 · 테스트 고치기 필요 · 자동화 아직 안 됨(옮기기/작성) · 수동으로 바꿀 후보(API로 끝까지 확인할 수 없음, 이유와 "자동화하려면" 필요한 API). `registry.json`에 케이스별 테스트, 기준 TC 지문, 코드 지문, 출처가 남는다.
+- **옮기기**: 회귀 TC 관리자가 편입한 케이스(출처 `<기능> TC-xxx`)의 신규 기능 테스트를 `test_RG_xxxx_…`로 이름만 바꿔 회귀 폴더로 복사한다(도우미·준비 코드 포함, 신규 기능 폴더는 그대로). 신규 기능 자동화에서 Pass가 아닌 TC는 옮기지 않는다.
+- **수동으로 바꾸기**: API로 끝까지 확인할 수 없는 케이스는 수동 케이스다. 회귀 자동화 관리자는 `to-manual.json`으로 넘기기만 하고, 회귀 TC 관리자가 `set-automation --list`로 스위트 표시를 수동으로 바꾼다(변경 이력). 바뀌기 전 실행에서는 `[수동으로 확인]`으로 테스터에게 넘긴다.
+- **TC가 바뀌면**: 테스트를 만든 뒤 사전조건·절차·기대 결과가 바뀐 케이스는 실행하지 않고 '테스트 고치기 필요'로 둔다. 고친 내용(`--note`)과 함께 다시 등록해야 풀린다(코드가 그대로면 거부).
+- **실행**: 릴리즈 범위에 든 실행 가능 케이스만 돌린다. Fail·자동화 오류는 한 번 더 돌리고, 그때 통과하면 Pass가 아니라 **불안정**. 결과는 회귀 실행 시트의 결과·이슈내용에 적고, 구글 시트로 올리면 `link`로 결과 페이지에 링크를 건다(불안정·고치기 필요·자동화 아직 안 됨·수동으로 확인은 결과 칸을 비우고 사람이 확인).
+- 결과 예: `samples/coupon-discount/regression/automation/` — 기존 API 표시 19개 중 테스트 8개(직접 작성), 11개는 API로 확인할 수 없어 수동으로 바꿈(샘플 API에 없는 로그인·정산 등, 화면 안내가 기대 결과인 RG-0015 → 스위트 v2). 2026.12 범위 17개 = 자동화 8 · 수동 9, 가짜 서버 실행 Pass 5 · Fail 3(RG-0011 보유 초과 포인트 입력 거부, RG-0018 취소 시 포인트 미복구, RG-0020 배송비 미차감 환불). 편입 승인 전이라 쿠폰 TC 옮기기는 하지 않음.

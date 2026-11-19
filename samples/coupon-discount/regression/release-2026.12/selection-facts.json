@@ -1,10 +1,10 @@
 {
   "release": "2026.12 정기 릴리즈(샘플)",
-  "generated_at": "2026-11-19T15:50:10+09:00",
+  "generated_at": "2026-11-19T17:56:28+09:00",
   "suite": {
     "path": "regression/suite/suite.json",
     "name": "커머스 회귀 스위트(샘플)",
-    "version": 1,
+    "version": 2,
     "cases": 26
   },
   "features": [
@@ -71,7 +71,7 @@
       "section": "로그인",
       "title": "가입한 이메일·비밀번호로 로그인하면 메인 화면으로 이동한다",
       "priority": "P1",
-      "automation": "api",
+      "automation": "manual",
       "category": "must",
       "reason": "P1은 매 릴리즈 실행"
     },
@@ -81,7 +81,7 @@
       "section": "로그인",
       "title": "비밀번호를 5번 틀리면 계정이 10분간 잠긴다",
       "priority": "P2",
-      "automation": "api",
+      "automation": "manual",
       "category": "skip",
       "reason": "이번 릴리즈 변경과 관련 없음"
     },
@@ -101,7 +101,7 @@
       "section": "상품 검색",
       "title": "상품명으로 검색하면 이름이 맞는 상품이 결과에 나온다",
       "priority": "P2",
-      "automation": "api",
+      "automation": "manual",
       "category": "skip",
       "reason": "이번 릴리즈 변경과 관련 없음"
     },
@@ -121,7 +121,7 @@
       "section": "장바구니 담기",
       "title": "상품을 담으면 장바구니 수량과 금액이 바로 바뀐다",
       "priority": "P2",
-      "automation": "api",
+      "automation": "manual",
       "category": "skip",
       "reason": "이번 릴리즈 변경과 관련 없음"
     },
@@ -131,7 +131,7 @@
       "section": "장바구니 담기",
       "title": "재고보다 많이 담으면 재고 수량까지만 담긴다",
       "priority": "P3",
-      "automation": "api",
+      "automation": "manual",
       "category": "skip",
       "reason": "이번 릴리즈 변경과 관련 없음"
     },
@@ -151,7 +151,7 @@
       "section": "결제 금액 계산",
       "title": "여러 판매자 상품을 함께 주문하면 판매자별 배송비가 각각 더해진다",
       "priority": "P2",
-      "automation": "api",
+      "automation": "manual",
       "category": "direct",
       "reason": "직접 영향: 결제 금액 계산"
     },
@@ -191,7 +191,7 @@
       "section": "배송비 계산",
       "title": "30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다",
       "priority": "P2",
-      "automation": "api",
+      "automation": "manual",
       "category": "indirect",
       "reason": "간접 영향: 배송비 계산"
     },
@@ -211,7 +211,7 @@
       "section": "PG 결제 승인",
       "title": "PG 승인이 실패하면 주문이 만들어지지 않고 포인트도 차감되지 않는다",
       "priority": "P1",
-      "automation": "api",
+      "automation": "manual",
       "category": "must",
       "reason": "P1은 매 릴리즈 실행 · 영향: PG 결제 승인"
     },
@@ -271,7 +271,7 @@
       "section": "쿠폰 발급",
       "title": "이벤트 페이지에서 쿠폰을 받으면 쿠폰함에 AVAILABLE로 들어온다",
       "priority": "P2",
-      "automation": "api",
+      "automation": "manual",
       "category": "skip",
       "reason": "이번 릴리즈 변경과 관련 없음"
     },
@@ -281,7 +281,7 @@
       "section": "쿠폰 상태 관리",
       "title": "같은 쿠폰은 한 번만 받을 수 있다",
       "priority": "P2",
-      "automation": "api",
+      "automation": "manual",
       "category": "direct",
       "reason": "직접 영향: 쿠폰 상태 관리(AVAILABLE/USED)"
     },
@@ -311,7 +311,7 @@
       "section": "판매자 정산",
       "title": "판매자 정산 기준 금액은 상품 판매 금액에서 수수료를 뺀 값이다",
       "priority": "P2",
-      "automation": "api",
+      "automation": "manual",
       "category": "indirect",
       "reason": "간접 영향: 판매자 정산 금액"
     },

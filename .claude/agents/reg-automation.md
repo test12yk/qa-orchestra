@@ -1,0 +1,1 @@
+../../plugins/qa-reg-automation/agents/reg-automation.md

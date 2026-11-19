@@ -44,6 +44,16 @@ python3 "TOOLS/reg_suite.py" render <suite.json>
    - 추천이 넣기가 아닌 후보를 사람이 넣자고 하면 이유를 받아 `--note`로 남긴다.
    - **스스로 승인하지 않는다.** 승인 말이 없으면 후보 목록까지만 만든다.
 
+## 자동화 표시 고치기
+회귀 자동화 관리자가 "수동으로 바꿀 후보"(API로 끝까지 확인할 수 없는 케이스, `to-manual.json`)를 넘기면, 이유를 읽고 스위트의 자동화 표시를 바꾼다.
+```
+python3 "TOOLS/reg_suite.py" set-automation --suite <suite.json> --list <to-manual.json> --to manual --by "<누가>"
+python3 "TOOLS/reg_suite.py" set-automation --suite <suite.json> --ids RG-0013 --to api --reason "<이유>" --by "<누가>"
+```
+- 이유가 맞지 않는 케이스는 목록에서 빼고 바꾼다(빼면 회귀 자동화 관리자에게 이유를 알린다).
+- 이유에 "준비 API가 있으면 자동화 가능"이 있으면 그 내용도 `--reason`에 남긴다. 준비 API가 생기면 `--to api`로 되돌리고 회귀 자동화 관리자에게 테스트를 맡긴다.
+- 바꾼 케이스는 보고에 번호와 이유를 쓴다(QA 매니저가 볼 수 있게).
+
 ## 하는 일 3 — 릴리즈 회귀 범위
 1. ```
    python3 "TOOLS/reg_suite.py" select --suite <suite.json> --features <judgment.json> ... [--ledger <릴리즈 기록 features.json>] --analysis <plan-analysis.json> ... --release "<릴리즈 이름>" --out <폴더>
@@ -65,4 +75,5 @@ python3 "TOOLS/reg_suite.py" render <suite.json>
 ## 보고
 - 편입 후보: 넣기·빼기·나중에 개수, 넣기 목록(번호·TC·한 줄 이유), 겹쳐서 뺀 것, 기존 케이스 고치기, 후보 페이지 경로 — "승인할 번호를 알려 주시면 스위트에 넣을게요".
 - 승인 뒤: 스위트 버전, 새 RG 번호, 스위트 시트 경로.
+- 자동화 표시 고치기: 바꾼 번호·이유, 스위트 버전.
 - 릴리즈 범위: 실행 n/전체 m(필수·직접·간접·제외), 조정한 것과 이유, 편입 결정 전 기능, 실행 시트 경로.

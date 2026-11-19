@@ -1,0 +1,162 @@
+{
+  "release": "2026.12 정기 릴리즈(샘플)",
+  "run_at": "2026-11-19T17:56:28+09:00",
+  "base_url": "http://127.0.0.1:8765",
+  "suite": {
+    "name": "커머스 회귀 스위트(샘플)",
+    "version": 2
+  },
+  "selection": "regression/release-2026.12/selection.json",
+  "scope": 17,
+  "summary": {
+    "fail": 3,
+    "error": 0,
+    "flaky": 0,
+    "stale": 0,
+    "hold": 0,
+    "todo": 0,
+    "to_manual": 0,
+    "pass": 5,
+    "manual": 9
+  },
+  "missing_from_suite": [],
+  "results": {
+    "RG-0001": {
+      "result": "manual",
+      "message": "",
+      "title": "가입한 이메일·비밀번호로 로그인하면 메인 화면으로 이동한다",
+      "domain": "회원",
+      "priority": "P1"
+    },
+    "RG-0008": {
+      "result": "pass",
+      "message": "",
+      "test": "test_payment.py::test_RG_0008_pay_amount_goods_plus_shipping",
+      "attempts": 1,
+      "title": "결제 금액은 상품 금액 합계에 배송비를 더한 값이다",
+      "domain": "주문·결제",
+      "priority": "P1"
+    },
+    "RG-0009": {
+      "result": "manual",
+      "message": "",
+      "title": "여러 판매자 상품을 함께 주문하면 판매자별 배송비가 각각 더해진다",
+      "domain": "주문·결제",
+      "priority": "P2"
+    },
+    "RG-0010": {
+      "result": "pass",
+      "message": "",
+      "test": "test_payment.py::test_RG_0010_points_3000_reduce_pay_and_balance",
+      "attempts": 1,
+      "title": "포인트 3,000P를 쓰면 결제 금액이 3,000원 줄고 잔액도 줄어든다",
+      "domain": "주문·결제",
+      "priority": "P1"
+    },
+    "RG-0011": {
+      "result": "fail",
+      "message": "포인트 사용 응답: 실제 400 INSUFFICIENT_POINTS (기대 200 성공)\n사용 포인트: 실제 없음 (기대 1,200P)",
+      "test": "test_payment.py::test_RG_0011_points_over_balance_capped",
+      "attempts": 2,
+      "title": "보유 포인트보다 많이 입력하면 보유 포인트까지만 쓰인다",
+      "domain": "주문·결제",
+      "priority": "P2"
+    },
+    "RG-0012": {
+      "result": "manual",
+      "message": "",
+      "title": "주문서 결제 금액 요약에 상품 금액·배송비·포인트·최종 금액이 순서대로 보인다",
+      "domain": "주문·결제",
+      "priority": "P3"
+    },
+    "RG-0013": {
+      "result": "manual",
+      "message": "",
+      "title": "30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다",
+      "domain": "주문·결제",
+      "priority": "P2"
+    },
+    "RG-0014": {
+      "result": "pass",
+      "message": "",
+      "test": "test_payment.py::test_RG_0014_pg_approved_amount_equals_pay_amount",
+      "attempts": 1,
+      "title": "카드 결제 승인 금액은 주문서 최종 결제 금액과 같다",
+      "domain": "주문·결제",
+      "priority": "P1"
+    },
+    "RG-0015": {
+      "result": "manual",
+      "message": "",
+      "title": "PG 승인이 실패하면 주문이 만들어지지 않고 포인트도 차감되지 않는다",
+      "domain": "주문·결제",
+      "priority": "P1"
+    },
+    "RG-0016": {
+      "result": "manual",
+      "message": "",
+      "title": "상품권 50,000원을 단독 주문하면 결제 후 상품권 번호가 발급된다",
+      "domain": "주문·결제",
+      "priority": "P2"
+    },
+    "RG-0017": {
+      "result": "pass",
+      "message": "",
+      "test": "test_refund.py::test_RG_0017_full_cancel_refunds_all",
+      "attempts": 1,
+      "title": "결제 완료 주문을 전체 취소하면 결제 금액 전액이 환불된다",
+      "domain": "취소·환불",
+      "priority": "P1"
+    },
+    "RG-0018": {
+      "result": "fail",
+      "message": "포인트 잔액: 실제 0P (기대 3,000P)",
+      "test": "test_refund.py::test_RG_0018_full_cancel_restores_points",
+      "attempts": 2,
+      "title": "포인트를 쓴 주문을 전체 취소하면 쓴 포인트가 되돌아온다",
+      "domain": "취소·환불",
+      "priority": "P1"
+    },
+    "RG-0019": {
+      "result": "pass",
+      "message": "",
+      "test": "test_refund.py::test_RG_0019_partial_cancel_refunds_item_only",
+      "attempts": 1,
+      "title": "상품 2개 중 1개를 부분 취소하면 그 상품 금액만 환불된다",
+      "domain": "취소·환불",
+      "priority": "P1"
+    },
+    "RG-0020": {
+      "result": "fail",
+      "message": "환불 금액: 실제 15,000원 (기대 12,000원)",
+      "test": "test_refund.py::test_RG_0020_partial_cancel_below_free_shipping_deducts_fee",
+      "attempts": 2,
+      "title": "부분 취소로 무료배송 기준 아래가 되면 배송비 3,000원을 빼고 환불한다",
+      "domain": "취소·환불",
+      "priority": "P2"
+    },
+    "RG-0021": {
+      "result": "manual",
+      "message": "",
+      "title": "이벤트 페이지에서 쿠폰을 받으면 쿠폰함에 AVAILABLE로 들어온다",
+      "domain": "쿠폰",
+      "priority": "P2"
+    },
+    "RG-0022": {
+      "result": "manual",
+      "message": "",
+      "title": "같은 쿠폰은 한 번만 받을 수 있다",
+      "domain": "쿠폰",
+      "priority": "P2"
+    },
+    "RG-0025": {
+      "result": "manual",
+      "message": "",
+      "title": "판매자 정산 기준 금액은 상품 판매 금액에서 수수료를 뺀 값이다",
+      "domain": "정산",
+      "priority": "P2"
+    }
+  },
+  "sheet_url": "https://docs.google.com/spreadsheets/d/1nLVafe4MxvcZLaBUhhl5ioILqBeugdXw7H3rTFp1UAQ/edit",
+  "report_md": "run-20261119-175628.md"
+}

@@ -1,0 +1,43 @@
+{
+  "team": {
+    "domain": "",
+    "language": "ko"
+  },
+  "suite": {
+    "_comment": "회귀 스위트·실행 시트 양식(회귀 TC 관리자와 같은 설정을 쓰면 그쪽 값이 쓰인다). key는 바꾸지 말고 label·폭만 바꾼다.",
+    "columns": [
+      {"key": "id", "label": "CaseID", "width": 10},
+      {"key": "domain", "label": "Domain", "width": 12},
+      {"key": "section", "label": "section", "width": 18},
+      {"key": "type", "label": "type", "width": 11},
+      {"key": "title", "label": "title", "width": 44},
+      {"key": "preconditions", "label": "precondition", "width": 32},
+      {"key": "steps", "label": "procedure", "width": 44},
+      {"key": "expected", "label": "expected result", "width": 48},
+      {"key": "priority", "label": "priority", "width": 9},
+      {"key": "automation", "label": "자동화", "width": 9},
+      {"key": "source", "label": "출처", "width": 22},
+      {"key": "added_at", "label": "편입일", "width": 11},
+      {"key": "result", "label": "결과", "width": 9},
+      {"key": "issue", "label": "이슈내용", "width": 36}
+    ],
+    "results": {"pass": "Pass", "fail": "Fail"},
+    "automation": {"api": "API", "manual": "수동"}
+  },
+  "automation": {
+    "_comment": "회귀 자동화 설정. 회사에서는 base_url·auth·allowed_hosts를 바꾼다.",
+    "base_url": "",
+    "allowed_hosts": [],
+    "_allowed_hosts_comment": "테스트를 돌려도 되는 서버 호스트(QA·스테이지만). 여기 없는 서버에는 실행하지 않는다(운영 서버 보호).",
+    "auth": {
+      "header": "Authorization",
+      "prefix": "Bearer ",
+      "env": "QA_API_TOKEN"
+    },
+    "_auth_comment": "토큰은 환경변수(env)에서만 읽는다. 파일에 쓰지 않는다.",
+    "timeout": 10,
+    "retry_failed": 1,
+    "_retry_comment": "Fail·자동화 오류 테스트를 다시 돌리는 횟수. 다시 돌려 통과하면 Pass가 아니라 '불안정'으로 남긴다.",
+    "workspace_dir": "work/regression/automation"
+  }
+}

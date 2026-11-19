@@ -65,6 +65,12 @@
       "description": "회귀 TC 관리자만",
       "source": "./plugins/qa-reg-tc-manager",
       "category": "testing"
+    },
+    {
+      "name": "qa-reg-automation",
+      "description": "회귀 자동화 관리자만 (회귀 API 테스트 → 회귀 실행 시트 결과)",
+      "source": "./plugins/qa-reg-automation",
+      "category": "testing"
     }
   ]
 }

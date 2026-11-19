@@ -14,6 +14,8 @@
   python3 reg_suite.py apply <candidates.json> --suite <suite.json> --approve RC-01,RC-02 [--approve-updates U-01]
                              --by "<승인한 사람>" [--note "<이유>"] [--before-decision]
       → 승인한 것만 스위트에 넣고(새 RG 번호) 다시 그린다. 변경 이력에 남는다.
+  python3 reg_suite.py set-automation --suite <suite.json> (--ids RG-0013,RG-0015 --reason "<이유>" | --list <to-manual.json>) --to manual|api --by "<누가>"
+      → 케이스의 자동화 표시를 바꾼다. --list는 회귀 자동화 관리자가 넘긴 수동 후보 목록({"cases": [{"id", "reason"}]}). 변경 이력에 남는다.
   python3 reg_suite.py select --suite <suite.json> --features <judgment.json> ... [--ledger <features.json>]
                               [--analysis <plan-analysis.json> ...] --release "<릴리즈 이름>" --out <폴더>
       → <폴더>/selection-facts.json  (케이스마다 필수·직접 영향·간접 영향·제외와 이유)
@@ -485,6 +487,40 @@ def cmd_apply(args, cfg):
     cmd_render_candidates(args, cfg)
 
 
+def cmd_set_automation(args, cfg):
+    st = read_json(args.suite)
+    by = {c["id"]: c for c in st["cases"]}
+    if args.list:
+        why = {c["id"]: c["reason"] for c in read_json(args.list)["cases"]}
+    elif args.ids and args.reason:
+        why = {x.strip(): args.reason for x in args.ids.split(",") if x.strip()}
+    else:
+        sys.exit("--ids와 --reason, 또는 --list가 필요")
+    ids = list(why)
+    labels = cfg["suite"]["automation"]
+    if args.to not in labels:
+        sys.exit(f"--to는 {'/'.join(labels)} 중 하나")
+    bad = [x for x in ids if x not in by]
+    if bad:
+        sys.exit(f"없는 번호: {', '.join(bad)}")
+    same = [x for x in ids if by[x].get("automation") == args.to]
+    if same:
+        sys.exit(f"이미 {labels[args.to]}인 케이스: {', '.join(same)}")
+    today = datetime.now().date().isoformat()
+    for x in ids:
+        by[x]["automation"] = args.to
+        by[x]["updated_at"] = today
+    st["version"] += 1
+    st["updated_at"] = now()
+    st["history"].append({"at": now(), "version": st["version"], "change": "automation", "ids": ids, "by": args.by,
+                          "from": f"자동화 표시 → {labels[args.to]}",
+                          "note": args.reason if not args.list else "; ".join(f"{x}: {why[x]}" for x in ids)})
+    write_json(args.suite, st)
+    print(f"스위트 v{st['version']}: 자동화 표시 → {labels[args.to]} {len(ids)}개({', '.join(ids)})")
+    args.outdir = None
+    cmd_render(args, cfg)
+
+
 # ── 릴리즈 범위 ──
 def cmd_select(args, cfg):
     sel = cfg["regression"]["select"]
@@ -596,6 +632,8 @@ def main():
     p = sub.add_parser("apply"); p.add_argument("candidates"); p.add_argument("--suite", required=True)
     p.add_argument("--approve"); p.add_argument("--approve-updates", dest="approve_updates"); p.add_argument("--by", required=True)
     p.add_argument("--note"); p.add_argument("--before-decision", dest="before_decision", action="store_true")
+    p = sub.add_parser("set-automation"); p.add_argument("--suite", required=True); p.add_argument("--ids"); p.add_argument("--list")
+    p.add_argument("--to", required=True); p.add_argument("--reason"); p.add_argument("--by", required=True)
     p = sub.add_parser("select"); p.add_argument("--suite", required=True); p.add_argument("--features", nargs="*", default=[])
     p.add_argument("--ledger"); p.add_argument("--analysis", nargs="*", default=[]); p.add_argument("--release", required=True); p.add_argument("--out", required=True)
     p = sub.add_parser("render-selection"); p.add_argument("selection"); p.add_argument("outdir", nargs="?")
@@ -604,7 +642,7 @@ def main():
     args = ap.parse_args()
     cfg = load_config(args.config)
     {"import": cmd_import, "render": cmd_render, "candidates": cmd_candidates, "render-candidates": cmd_render_candidates,
-     "apply": cmd_apply, "select": cmd_select, "render-selection": cmd_render_selection}[args.cmd](args, cfg)
+     "apply": cmd_apply, "set-automation": cmd_set_automation, "select": cmd_select, "render-selection": cmd_render_selection}[args.cmd](args, cfg)
 
 
 if __name__ == "__main__":
