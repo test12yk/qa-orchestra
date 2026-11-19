@@ -1,0 +1,14 @@
+{
+  "_comment": "관리자가 candidates-facts.json에 더해 쓰는 칸만 보인 예시. items는 facts의 같은 항목에 recommendation·reason(+ merge_note)을 더한다.",
+  "items": [
+    {"id": "RC-01", "recommendation": "include", "reason": "핵심 흐름 · 사업 영향 · 자동화 가능 — '최소 주문 금액' 대표 케이스"},
+    {"id": "RC-51", "recommendation": "exclude", "reason": "기존 RG-0008(결제 금액 = 상품 금액 + 배송비)과 같은 확인"},
+    {"id": "RC-53", "recommendation": "include", "reason": "쿠폰과 포인트를 함께 쓸 때 포인트 잔액 — 새 조합", "merge_note": "RG-0010은 쿠폰 없이 포인트만 쓸 때라 따로 둔다"},
+    {"id": "RC-04", "recommendation": "defer", "reason": "Q1 답 전 임시 가정 기준 Pass — 답과 맞는지 확인한 뒤 다시 본다"}
+  ],
+  "updates": [
+    {"id": "U-01", "target": "RG-0012", "why": "결제 금액 요약에 쿠폰 할인 줄이 생김(Q3 답: 상품 금액 → 쿠폰 할인 → 배송비 → 포인트)",
+     "changes": {"expected": ["상품 금액 → 쿠폰 할인 → 배송비 → 포인트 사용 → 최종 결제 금액 순서"]}}
+  ],
+  "affected_notes": {"RG-0020": "부분 취소 환불 — 쿠폰 할인 안분은 Q8 답 뒤 정한다"}
+}

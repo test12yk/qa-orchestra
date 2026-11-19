@@ -1,0 +1,1792 @@
+{
+  "feature": "장바구니 쿠폰 할인",
+  "generated_at": "2026-11-19T16:00:36+09:00",
+  "inputs": {
+    "suite": "regression/suite/suite.json",
+    "tc": "run-01/tc/test-cases.json",
+    "review": "run-01/review/result/review.json",
+    "judgment": "run-01/judgment/judgment.json"
+  },
+  "suite": {
+    "name": "커머스 회귀 스위트(샘플)",
+    "version": 1,
+    "cases": 26
+  },
+  "feature_decision": null,
+  "criteria_note": {
+    "core": "핵심 흐름",
+    "business": "사업 영향",
+    "change": "변경 영향(기존 기능)",
+    "automatable": "자동화 가능"
+  },
+  "items": [
+    {
+      "id": "RC-01",
+      "tc": {
+        "id": "TC-001",
+        "domain": "쿠폰",
+        "section": "최소 주문 금액",
+        "type": "기본기능",
+        "title": "무료배송 상품 30,000원이면 쿠폰을 쓸 수 있다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "include",
+      "duplicates": []
+    },
+    {
+      "id": "RC-02",
+      "tc": {
+        "id": "TC-002",
+        "domain": "쿠폰",
+        "section": "최소 주문 금액",
+        "type": "엣지케이스",
+        "title": "무료배송 상품 29,999원이면 쿠폰을 쓸 수 없다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "review",
+      "duplicates": [],
+      "note": "'최소 주문 금액'에 넣기 후보가 4개 — 대표 1개(TC-001) 밖이라 검토"
+    },
+    {
+      "id": "RC-03",
+      "tc": {
+        "id": "TC-003",
+        "domain": "쿠폰",
+        "section": "최소 주문 금액",
+        "type": "엣지케이스",
+        "title": "상품 26,999원 + 배송비 3,000원(합계 29,999원)이면 쿠폰을 쓸 수 없다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "review",
+      "duplicates": [],
+      "note": "'최소 주문 금액'에 넣기 후보가 4개 — 대표 1개(TC-001) 밖이라 검토"
+    },
+    {
+      "id": "RC-04",
+      "tc": {
+        "id": "TC-004",
+        "domain": "쿠폰",
+        "section": "최소 주문 금액",
+        "type": "엣지케이스",
+        "title": "상품 27,000원 + 배송비 3,000원(합계 30,000원)이면 쿠폰을 쓸 수 있다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q1"
+      ],
+      "note": "Q1 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-05",
+      "tc": {
+        "id": "TC-005",
+        "domain": "쿠폰",
+        "section": "최소 주문 금액",
+        "type": "엣지케이스",
+        "title": "상품 27,001원 + 배송비 3,000원(합계 30,001원)이면 쿠폰을 쓸 수 있다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q1"
+      ],
+      "note": "Q1 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-06",
+      "tc": {
+        "id": "TC-006",
+        "domain": "쿠폰",
+        "section": "최소 주문 금액",
+        "type": "엣지케이스",
+        "title": "무료배송 30,000원 주문에 포인트 5,000P를 함께 쓰면 최소 주문 금액은 포인트 차감 전 금액으로 판정해 쿠폰이 적용된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "review",
+      "duplicates": [],
+      "note": "'최소 주문 금액'에 넣기 후보가 4개 — 대표 1개(TC-001) 밖이라 검토"
+    },
+    {
+      "id": "RC-07",
+      "tc": {
+        "id": "TC-007",
+        "domain": "쿠폰",
+        "section": "제외 상품",
+        "type": "기본기능",
+        "title": "일반 상품 40,000원 + 상품권 20,000원 장바구니에 정률 10% 쿠폰을 쓰면 일반 상품에만 할인된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q9"
+      ],
+      "note": "Q9 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-08",
+      "tc": {
+        "id": "TC-008",
+        "domain": "쿠폰",
+        "section": "제외 상품",
+        "type": "기본기능",
+        "title": "일반 상품 35,000원 + e쿠폰 10,000원 장바구니에 정액 5,000원 쿠폰을 쓰면 5,000원 할인된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "include",
+      "duplicates": []
+    },
+    {
+      "id": "RC-09",
+      "tc": {
+        "id": "TC-009",
+        "domain": "쿠폰",
+        "section": "제외 상품",
+        "type": "엣지케이스",
+        "title": "일반 상품 26,999원 + 배송비 3,000원 + 상품권 10,000원이면 제외 상품을 뺀 29,999원 기준으로 쿠폰을 쓸 수 없다",
+        "priority": "P1"
+      },
+      "result": "fail",
+      "mode": "api",
+      "bugs": [
+        "QAO-8",
+        "BUG-001"
+      ],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q1",
+        "Q5"
+      ],
+      "note": "Q1, Q5 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-10",
+      "tc": {
+        "id": "TC-010",
+        "domain": "쿠폰",
+        "section": "제외 상품",
+        "type": "엣지케이스",
+        "title": "일반 상품 27,000원 + 배송비 3,000원 + 상품권 10,000원이면 제외 상품을 뺀 30,000원 기준으로 쿠폰을 쓸 수 있다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q1",
+        "Q5"
+      ],
+      "note": "Q1, Q5 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-11",
+      "tc": {
+        "id": "TC-011",
+        "domain": "쿠폰",
+        "section": "제외 상품",
+        "type": "엣지케이스",
+        "title": "상품권 50,000원만 담은 장바구니면 쿠폰을 쓸 수 없다",
+        "priority": "P2"
+      },
+      "result": "fail",
+      "mode": "api",
+      "bugs": [
+        "QAO-10"
+      ],
+      "criteria": {
+        "core": false,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 2,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q5"
+      ],
+      "note": "Q5 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-12",
+      "tc": {
+        "id": "TC-012",
+        "domain": "쿠폰",
+        "section": "제외 상품",
+        "type": "기본기능",
+        "title": "상품권이 섞인 장바구니면 쿠폰 영역에 제외 안내 문구가 보인다",
+        "priority": "P3"
+      },
+      "result": "blank",
+      "mode": "수동",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": false,
+        "change": false,
+        "automatable": false
+      },
+      "score": 0,
+      "hint": "defer",
+      "duplicates": []
+    },
+    {
+      "id": "RC-13",
+      "tc": {
+        "id": "TC-013",
+        "domain": "쿠폰",
+        "section": "제외 상품",
+        "type": "엣지케이스",
+        "title": "일반 상품만 담은 장바구니면 제외 안내 문구가 보이지 않는다",
+        "priority": "P4"
+      },
+      "result": "blank",
+      "mode": "수동",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": false,
+        "change": false,
+        "automatable": false
+      },
+      "score": 0,
+      "hint": "defer",
+      "duplicates": []
+    },
+    {
+      "id": "RC-14",
+      "tc": {
+        "id": "TC-014",
+        "domain": "쿠폰",
+        "section": "1주문 1쿠폰",
+        "type": "기본기능",
+        "title": "쿠폰 2장을 보유해도 주문서에서는 1장만 적용된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "review",
+      "duplicates": [],
+      "note": "기능당 넣기 최대 5개 — 순위 6위라 한도 밖"
+    },
+    {
+      "id": "RC-15",
+      "tc": {
+        "id": "TC-015",
+        "domain": "쿠폰",
+        "section": "1주문 1쿠폰",
+        "type": "엣지케이스",
+        "title": "쿠폰이 적용된 주문에 다른 쿠폰을 API로 적용하면 409 COUPON_ALREADY_APPLIED가 온다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "review",
+      "duplicates": [],
+      "note": "'1주문 1쿠폰'에 넣기 후보가 2개 — 대표 1개(TC-014) 밖이라 검토"
+    },
+    {
+      "id": "RC-16",
+      "tc": {
+        "id": "TC-016",
+        "domain": "쿠폰",
+        "section": "1주문 1쿠폰",
+        "type": "엣지케이스",
+        "title": "같은 쿠폰을 같은 주문에 두 번 적용 요청하면 두 번째는 409로 거부되고 할인은 한 번만 된다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 2,
+      "hint": "review",
+      "duplicates": []
+    },
+    {
+      "id": "RC-17",
+      "tc": {
+        "id": "TC-017",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "기본기능",
+        "title": "상품 50,000원에 정률 10% 쿠폰을 쓰면 5,000원 할인된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q9"
+      ],
+      "note": "Q9 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-18",
+      "tc": {
+        "id": "TC-018",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "기본기능",
+        "title": "상품 40,000원에 정액 5,000원 쿠폰을 쓰면 5,000원 할인된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "review",
+      "duplicates": [],
+      "note": "기능당 넣기 최대 5개 — 순위 7위라 한도 밖"
+    },
+    {
+      "id": "RC-19",
+      "tc": {
+        "id": "TC-019",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "엣지케이스",
+        "title": "상품 99,990원에 정률 10% 쿠폰을 쓰면 한도 아래인 9,999원 할인된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q2",
+        "Q9"
+      ],
+      "note": "Q2, Q9 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-20",
+      "tc": {
+        "id": "TC-020",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "엣지케이스",
+        "title": "상품 100,000원에 정률 10% 쿠폰을 쓰면 한도와 같은 10,000원 할인된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q2"
+      ],
+      "note": "Q2 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-21",
+      "tc": {
+        "id": "TC-021",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "엣지케이스",
+        "title": "상품 100,010원에 정률 10% 쿠폰을 쓰면 할인이 한도 10,000원에서 멈춘다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q2"
+      ],
+      "note": "Q2 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-22",
+      "tc": {
+        "id": "TC-022",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "엣지케이스",
+        "title": "maxDiscount 15,000원으로 설정된 정률 10% 쿠폰을 상품 200,000원에 쓰면 할인은 정책 한도 10,000원을 넘지 않는다",
+        "priority": "P1"
+      },
+      "result": "hold",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q2"
+      ],
+      "note": "Q2 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-23",
+      "tc": {
+        "id": "TC-023",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "엣지케이스",
+        "title": "정률 15% 쿠폰 할인액 4,500.75원은 원 단위 미만을 절사해 4,500원이 된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q9"
+      ],
+      "note": "Q9 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-24",
+      "tc": {
+        "id": "TC-024",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "엣지케이스",
+        "title": "정률 10% 쿠폰 + 상품권 혼합 + 포인트 5,000P를 함께 쓰면 일반 상품 기준 한도 10,000원 할인 후 포인트를 뺀다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q2"
+      ],
+      "note": "Q2 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-25",
+      "tc": {
+        "id": "TC-025",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "엣지케이스",
+        "title": "쿠폰 적용 후 25,000원에 포인트 24,899P를 쓰면 결제 금액 101원으로 결제된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q7"
+      ],
+      "note": "Q7 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-26",
+      "tc": {
+        "id": "TC-026",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "엣지케이스",
+        "title": "쿠폰 적용 후 25,000원에 포인트 24,900P를 쓰면 결제 금액 100원으로 결제된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q7"
+      ],
+      "note": "Q7 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-27",
+      "tc": {
+        "id": "TC-027",
+        "domain": "쿠폰",
+        "section": "할인 계산",
+        "type": "엣지케이스",
+        "title": "쿠폰 적용 후 25,000원에 포인트 24,901P를 넣어도 결제 금액이 100원 아래로 내려가지 않는다",
+        "priority": "P1"
+      },
+      "result": "hold",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q7"
+      ],
+      "note": "Q7 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-28",
+      "tc": {
+        "id": "TC-028",
+        "domain": "쿠폰",
+        "section": "쿠폰 자동 선택·정렬",
+        "type": "기본기능",
+        "title": "정액 5,000원이 정률 10%(4,000원)보다 크면 정액 쿠폰이 자동 선택되고 \"최대 할인 적용됨\" 라벨이 보인다",
+        "priority": "P2"
+      },
+      "result": "blank",
+      "mode": "manual",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": true,
+        "change": false,
+        "automatable": false
+      },
+      "score": 1,
+      "hint": "defer",
+      "duplicates": []
+    },
+    {
+      "id": "RC-29",
+      "tc": {
+        "id": "TC-029",
+        "domain": "쿠폰",
+        "section": "쿠폰 자동 선택·정렬",
+        "type": "기본기능",
+        "title": "상품 80,000원이면 정률 10%(8,000원) 쿠폰이 정액 5,000원보다 커서 자동 선택된다",
+        "priority": "P2"
+      },
+      "result": "blank",
+      "mode": "manual",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": true,
+        "change": false,
+        "automatable": false
+      },
+      "score": 1,
+      "hint": "defer",
+      "duplicates": []
+    },
+    {
+      "id": "RC-30",
+      "tc": {
+        "id": "TC-030",
+        "domain": "쿠폰",
+        "section": "쿠폰 자동 선택·정렬",
+        "type": "엣지케이스",
+        "title": "상품권이 섞여 정률 10% 실제 할인액(4,500원)이 정액 5,000원보다 작으면 정액 쿠폰이 자동 선택된다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 2,
+      "hint": "review",
+      "duplicates": []
+    },
+    {
+      "id": "RC-31",
+      "tc": {
+        "id": "TC-031",
+        "domain": "쿠폰",
+        "section": "쿠폰 자동 선택·정렬",
+        "type": "기본기능",
+        "title": "자동 선택된 정액 쿠폰을 정률 10% 쿠폰으로 바꾸면 할인이 4,000원으로 다시 계산된다",
+        "priority": "P2"
+      },
+      "result": "hold",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 2,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q10"
+      ],
+      "note": "Q10 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-32",
+      "tc": {
+        "id": "TC-032",
+        "domain": "쿠폰",
+        "section": "쿠폰 자동 선택·정렬",
+        "type": "엣지케이스",
+        "title": "정률 10%와 정액 5,000원의 할인액이 5,000원으로 같으면 둘 중 하나가 자동 선택되고 할인은 5,000원이다",
+        "priority": "P3"
+      },
+      "result": "hold",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": false,
+        "change": false,
+        "automatable": true
+      },
+      "score": 1,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q9",
+        "Q10"
+      ],
+      "note": "Q9, Q10 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-33",
+      "tc": {
+        "id": "TC-033",
+        "domain": "쿠폰",
+        "section": "쿠폰 자동 선택·정렬",
+        "type": "기본기능",
+        "title": "쿠폰 목록은 할인액이 큰 순(7,000원 → 5,000원 → 3,000원)으로 정렬된다",
+        "priority": "P3"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": false,
+        "change": false,
+        "automatable": true
+      },
+      "score": 1,
+      "hint": "exclude",
+      "duplicates": []
+    },
+    {
+      "id": "RC-34",
+      "tc": {
+        "id": "TC-034",
+        "domain": "쿠폰",
+        "section": "곧 만료 배지",
+        "type": "엣지케이스",
+        "title": "만료까지 4일 남은 쿠폰(D-4)에는 \"곧 만료\" 배지가 없다",
+        "priority": "P3"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": false,
+        "change": false,
+        "automatable": true
+      },
+      "score": 1,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q11"
+      ],
+      "note": "Q11 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-35",
+      "tc": {
+        "id": "TC-035",
+        "domain": "쿠폰",
+        "section": "곧 만료 배지",
+        "type": "엣지케이스",
+        "title": "만료까지 3일 남은 쿠폰(D-3)에는 \"곧 만료\" D-3 배지가 붙는다",
+        "priority": "P3"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": false,
+        "change": false,
+        "automatable": true
+      },
+      "score": 1,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q11"
+      ],
+      "note": "Q11 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-36",
+      "tc": {
+        "id": "TC-036",
+        "domain": "쿠폰",
+        "section": "곧 만료 배지",
+        "type": "엣지케이스",
+        "title": "만료까지 1일 남은 쿠폰(D-1)에는 \"곧 만료\" D-1 배지가 붙는다",
+        "priority": "P3"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": false,
+        "change": false,
+        "automatable": true
+      },
+      "score": 1,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q11"
+      ],
+      "note": "Q11 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-37",
+      "tc": {
+        "id": "TC-037",
+        "domain": "주문·결제",
+        "section": "결제 금액 계산",
+        "type": "기본기능",
+        "title": "상품 52,000원 + 배송비 3,000원에 정액 5,000원 쿠폰과 포인트 2,000P를 쓰면 최종 결제 금액은 48,000원이다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "include",
+      "duplicates": []
+    },
+    {
+      "id": "RC-38",
+      "tc": {
+        "id": "TC-038",
+        "domain": "주문·결제",
+        "section": "결제 금액 계산",
+        "type": "엣지케이스",
+        "title": "정률 10% 쿠폰과 포인트 10,000P를 함께 쓰면 쿠폰을 먼저 계산해 할인 6,000원, 최종 47,000원이 된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q9"
+      ],
+      "note": "Q9 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-39",
+      "tc": {
+        "id": "TC-039",
+        "domain": "주문·결제",
+        "section": "결제 금액 계산",
+        "type": "기본기능",
+        "title": "결제 금액 요약은 디자인 v1.1 순서(상품 금액·배송비·포인트 사용·쿠폰 할인·최종 결제 금액)로 표시된다",
+        "priority": "P3"
+      },
+      "result": "blank",
+      "mode": "수동",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": false,
+        "change": true,
+        "automatable": false
+      },
+      "score": 3,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q3"
+      ],
+      "note": "Q3 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-40",
+      "tc": {
+        "id": "TC-040",
+        "domain": "쿠폰",
+        "section": "쿠폰 상태",
+        "type": "기본기능",
+        "title": "쿠폰을 적용한 주문의 결제 승인이 완료되면 쿠폰이 USED로 바뀐다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "include",
+      "duplicates": []
+    },
+    {
+      "id": "RC-41",
+      "tc": {
+        "id": "TC-041",
+        "domain": "쿠폰",
+        "section": "쿠폰 상태",
+        "type": "엣지케이스",
+        "title": "쿠폰을 적용하고 결제하지 않고 주문서를 나가면 쿠폰은 AVAILABLE 그대로다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "review",
+      "duplicates": [],
+      "note": "'쿠폰 상태'에 넣기 후보가 5개 — 대표 1개(TC-040) 밖이라 검토"
+    },
+    {
+      "id": "RC-42",
+      "tc": {
+        "id": "TC-042",
+        "domain": "쿠폰",
+        "section": "쿠폰 상태",
+        "type": "엣지케이스",
+        "title": "쿠폰 적용 주문의 PG 결제 승인이 실패하면 쿠폰은 AVAILABLE로 남는다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "review",
+      "duplicates": [],
+      "note": "'쿠폰 상태'에 넣기 후보가 5개 — 대표 1개(TC-040) 밖이라 검토"
+    },
+    {
+      "id": "RC-43",
+      "tc": {
+        "id": "TC-043",
+        "domain": "쿠폰",
+        "section": "쿠폰 상태",
+        "type": "엣지케이스",
+        "title": "같은 쿠폰을 적용한 두 주문을 동시에 결제하면 한 주문만 쿠폰 할인으로 결제 완료된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q6"
+      ],
+      "note": "Q6 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-44",
+      "tc": {
+        "id": "TC-044",
+        "domain": "쿠폰",
+        "section": "쿠폰 상태",
+        "type": "엣지케이스",
+        "title": "주문 A에 적용해 둔 쿠폰이 주문 B에서 먼저 USED 되면 주문 A는 쿠폰 할인으로 결제할 수 없다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q6"
+      ],
+      "note": "Q6 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-45",
+      "tc": {
+        "id": "TC-045",
+        "domain": "취소·환불",
+        "section": "취소 시 쿠폰 복구",
+        "type": "기본기능",
+        "title": "유효기간이 남은 쿠폰을 쓴 주문을 전체 취소하면 쿠폰이 AVAILABLE로 복구된다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q4"
+      ],
+      "note": "Q4 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-46",
+      "tc": {
+        "id": "TC-046",
+        "domain": "취소·환불",
+        "section": "취소 시 쿠폰 복구",
+        "type": "엣지케이스",
+        "title": "전체 취소로 복구된 쿠폰을 새 주문에 다시 쓰면 할인되고 다시 USED가 된다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q4"
+      ],
+      "note": "Q4 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-47",
+      "tc": {
+        "id": "TC-047",
+        "domain": "취소·환불",
+        "section": "취소 시 쿠폰 복구",
+        "type": "엣지케이스",
+        "title": "쿠폰을 쓴 주문을 부분 취소하면 쿠폰은 복구되지 않고 USED로 남는다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q4"
+      ],
+      "note": "Q4 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-48",
+      "tc": {
+        "id": "TC-048",
+        "domain": "취소·환불",
+        "section": "취소 시 쿠폰 복구",
+        "type": "엣지케이스",
+        "title": "쿠폰 사용 주문을 부분 취소 후 나머지까지 취소하면 환불 합계가 결제 금액 48,000원을 넘지 않는다",
+        "priority": "P1"
+      },
+      "result": "hold",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q4",
+        "Q8"
+      ],
+      "note": "Q4, Q8 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-49",
+      "tc": {
+        "id": "TC-049",
+        "domain": "취소·환불",
+        "section": "취소 시 쿠폰 복구",
+        "type": "엣지케이스",
+        "title": "유효기간 마지막 1초 전(23:59:58)에 전체 취소하면 쿠폰이 AVAILABLE로 복구된다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q4"
+      ],
+      "note": "Q4 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-50",
+      "tc": {
+        "id": "TC-050",
+        "domain": "취소·환불",
+        "section": "취소 시 쿠폰 복구",
+        "type": "엣지케이스",
+        "title": "유효기간이 지난 뒤(00:00:00)에 전체 취소하면 쿠폰은 복구되지 않는다",
+        "priority": "P2"
+      },
+      "result": "fail",
+      "mode": "api",
+      "bugs": [
+        "QAO-11"
+      ],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": false,
+        "automatable": true
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [],
+      "assumed": [
+        "Q4"
+      ],
+      "note": "Q4 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-51",
+      "tc": {
+        "id": "TC-051",
+        "domain": "주문·결제",
+        "section": "결제 금액 계산",
+        "type": "리그레이션",
+        "title": "쿠폰 없이 결제하면 최종 결제 금액이 상품 금액 + 배송비 그대로다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "review",
+      "duplicates": [
+        {
+          "id": "RG-0008",
+          "title": "결제 금액은 상품 금액 합계에 배송비를 더한 값이다",
+          "ratio": 0.5
+        }
+      ]
+    },
+    {
+      "id": "RC-52",
+      "tc": {
+        "id": "TC-052",
+        "domain": "주문·결제",
+        "section": "포인트 사용",
+        "type": "리그레이션",
+        "title": "쿠폰 없이 포인트 3,000P만 쓰는 결제가 기존처럼 된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "review",
+      "duplicates": [
+        {
+          "id": "RG-0010",
+          "title": "포인트 3,000P를 쓰면 결제 금액이 3,000원 줄고 잔액도 줄어든다",
+          "ratio": 0.44
+        }
+      ]
+    },
+    {
+      "id": "RC-53",
+      "tc": {
+        "id": "TC-053",
+        "domain": "주문·결제",
+        "section": "포인트 사용",
+        "type": "리그레이션",
+        "title": "쿠폰과 포인트를 함께 쓴 결제 후 포인트 잔액은 사용한 포인트만큼만 줄어든다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "review",
+      "duplicates": [
+        {
+          "id": "RG-0010",
+          "title": "포인트 3,000P를 쓰면 결제 금액이 3,000원 줄고 잔액도 줄어든다",
+          "ratio": 0.39
+        }
+      ]
+    },
+    {
+      "id": "RC-54",
+      "tc": {
+        "id": "TC-054",
+        "domain": "주문·결제",
+        "section": "결제 금액 요약",
+        "type": "리그레이션",
+        "title": "쿠폰 없는 회원이 포인트 2,000P를 쓰면 결제 금액 요약 값이 기존과 같다",
+        "priority": "P3"
+      },
+      "result": "blank",
+      "mode": "수동",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": false,
+        "change": true,
+        "automatable": false
+      },
+      "score": 3,
+      "hint": "defer",
+      "duplicates": []
+    },
+    {
+      "id": "RC-55",
+      "tc": {
+        "id": "TC-055",
+        "domain": "주문·결제",
+        "section": "배송비 계산",
+        "type": "리그레이션",
+        "title": "쿠폰을 적용해도 배송비 3,000원은 바뀌지 않는다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "defer",
+      "duplicates": [
+        {
+          "id": "RG-0013",
+          "title": "30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다",
+          "ratio": 0.36
+        }
+      ],
+      "assumed": [
+        "Q9"
+      ],
+      "note": "Q9 답 전 — 임시 가정 기준 결과"
+    },
+    {
+      "id": "RC-56",
+      "tc": {
+        "id": "TC-056",
+        "domain": "주문·결제",
+        "section": "PG 결제 승인",
+        "type": "리그레이션",
+        "title": "쿠폰과 포인트를 쓴 주문의 PG 승인 금액은 최종 결제 금액 48,000원과 같다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "review",
+      "duplicates": [
+        {
+          "id": "RG-0014",
+          "title": "카드 결제 승인 금액은 주문서 최종 결제 금액과 같다",
+          "ratio": 0.52
+        }
+      ]
+    },
+    {
+      "id": "RC-57",
+      "tc": {
+        "id": "TC-057",
+        "domain": "주문·결제",
+        "section": "상품권·e쿠폰 주문",
+        "type": "리그레이션",
+        "title": "쿠폰 없는 회원의 상품권 50,000원 단독 주문이 기존처럼 결제된다",
+        "priority": "P2"
+      },
+      "result": "blank",
+      "mode": "manual",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": false
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [
+        {
+          "id": "RG-0016",
+          "title": "상품권 50,000원을 단독 주문하면 결제 후 상품권 번호가 발급된다",
+          "ratio": 0.59
+        }
+      ]
+    },
+    {
+      "id": "RC-58",
+      "tc": {
+        "id": "TC-058",
+        "domain": "취소·환불",
+        "section": "취소·환불 금액",
+        "type": "리그레이션",
+        "title": "쿠폰을 쓰지 않은 주문을 전체 취소하면 결제 금액 28,000원이 전액 환불된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "review",
+      "duplicates": [
+        {
+          "id": "RG-0017",
+          "title": "결제 완료 주문을 전체 취소하면 결제 금액 전액이 환불된다",
+          "ratio": 0.67
+        }
+      ]
+    },
+    {
+      "id": "RC-59",
+      "tc": {
+        "id": "TC-059",
+        "domain": "취소·환불",
+        "section": "취소·환불 금액",
+        "type": "리그레이션",
+        "title": "쿠폰을 쓰지 않은 주문에서 상품 B 15,000원만 부분 취소하면 그 상품 금액이 환불된다",
+        "priority": "P1"
+      },
+      "result": "blank",
+      "mode": "blocked",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": false
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [
+        {
+          "id": "RG-0019",
+          "title": "상품 2개 중 1개를 부분 취소하면 그 상품 금액만 환불된다",
+          "ratio": 0.59
+        }
+      ]
+    },
+    {
+      "id": "RC-60",
+      "tc": {
+        "id": "TC-060",
+        "domain": "취소·환불",
+        "section": "취소·환불 금액",
+        "type": "리그레이션",
+        "title": "정액 5,000원 쿠폰을 쓴 주문을 전체 취소하면 실제 결제한 38,000원만 환불된다",
+        "priority": "P1"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "include",
+      "duplicates": []
+    },
+    {
+      "id": "RC-61",
+      "tc": {
+        "id": "TC-061",
+        "domain": "쿠폰",
+        "section": "쿠폰 상태",
+        "type": "리그레이션",
+        "title": "쿠폰 2장 중 1장을 써서 결제하면 쓰지 않은 쿠폰은 AVAILABLE 그대로다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 5,
+      "hint": "review",
+      "duplicates": [],
+      "note": "'쿠폰 상태'에 넣기 후보가 5개 — 대표 1개(TC-040) 밖이라 검토"
+    },
+    {
+      "id": "RC-62",
+      "tc": {
+        "id": "TC-062",
+        "domain": "쿠폰",
+        "section": "쿠폰 상태",
+        "type": "리그레이션",
+        "title": "유효기간이 지난 쿠폰은 주문서에서 자동 선택되지 않고 적용할 수 없다",
+        "priority": "P2"
+      },
+      "result": "pass",
+      "mode": "api",
+      "bugs": [],
+      "criteria": {
+        "core": false,
+        "business": true,
+        "change": true,
+        "automatable": true
+      },
+      "score": 3,
+      "hint": "review",
+      "duplicates": [],
+      "note": "'쿠폰 상태'에 넣기 후보가 5개 — 대표 1개(TC-040) 밖이라 검토"
+    },
+    {
+      "id": "RC-63",
+      "tc": {
+        "id": "TC-063",
+        "domain": "정산",
+        "section": "판매자 정산",
+        "type": "리그레이션",
+        "title": "정액 5,000원 쿠폰을 쓴 주문도 판매자 정산 기준 금액은 상품 금액 40,000원 그대로다",
+        "priority": "P2"
+      },
+      "result": "blank",
+      "mode": "수동",
+      "bugs": [],
+      "criteria": {
+        "core": true,
+        "business": true,
+        "change": true,
+        "automatable": false
+      },
+      "score": 4,
+      "hint": "defer",
+      "duplicates": [
+        {
+          "id": "RG-0025",
+          "title": "판매자 정산 기준 금액은 상품 판매 금액에서 수수료를 뺀 값이다",
+          "ratio": 0.47
+        }
+      ]
+    }
+  ],
+  "affected": [
+    {
+      "id": "RG-0008",
+      "section": "결제 금액 계산",
+      "title": "결제 금액은 상품 금액 합계에 배송비를 더한 값이다",
+      "impact": "결제 금액 계산",
+      "level": "direct"
+    },
+    {
+      "id": "RG-0009",
+      "section": "결제 금액 계산",
+      "title": "여러 판매자 상품을 함께 주문하면 판매자별 배송비가 각각 더해진다",
+      "impact": "결제 금액 계산",
+      "level": "direct"
+    },
+    {
+      "id": "RG-0010",
+      "section": "포인트 사용",
+      "title": "포인트 3,000P를 쓰면 결제 금액이 3,000원 줄고 잔액도 줄어든다",
+      "impact": "포인트 사용(차감 순서·금액)",
+      "level": "direct"
+    },
+    {
+      "id": "RG-0011",
+      "section": "포인트 사용",
+      "title": "보유 포인트보다 많이 입력하면 보유 포인트까지만 쓰인다",
+      "impact": "포인트 사용(차감 순서·금액)",
+      "level": "direct"
+    },
+    {
+      "id": "RG-0012",
+      "section": "주문서 결제 금액 요약",
+      "title": "주문서 결제 금액 요약에 상품 금액·배송비·포인트·최종 금액이 순서대로 보인다",
+      "impact": "주문서 결제 금액 요약 화면",
+      "level": "direct"
+    },
+    {
+      "id": "RG-0013",
+      "section": "배송비 계산",
+      "title": "30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다",
+      "impact": "배송비 계산",
+      "level": "indirect"
+    },
+    {
+      "id": "RG-0014",
+      "section": "PG 결제 승인",
+      "title": "카드 결제 승인 금액은 주문서 최종 결제 금액과 같다",
+      "impact": "PG 결제 승인",
+      "level": "indirect"
+    },
+    {
+      "id": "RG-0015",
+      "section": "PG 결제 승인",
+      "title": "PG 승인이 실패하면 주문이 만들어지지 않고 포인트도 차감되지 않는다",
+      "impact": "PG 결제 승인",
+      "level": "indirect"
+    },
+    {
+      "id": "RG-0016",
+      "section": "상품권 주문",
+      "title": "상품권 50,000원을 단독 주문하면 결제 후 상품권 번호가 발급된다",
+      "impact": "상품권·e쿠폰 카테고리 상품 주문",
+      "level": "indirect"
+    },
+    {
+      "id": "RG-0017",
+      "section": "주문 전체 취소",
+      "title": "결제 완료 주문을 전체 취소하면 결제 금액 전액이 환불된다",
+      "impact": "주문 전체 취소",
+      "level": "direct"
+    },
+    {
+      "id": "RG-0018",
+      "section": "주문 전체 취소",
+      "title": "포인트를 쓴 주문을 전체 취소하면 쓴 포인트가 되돌아온다",
+      "impact": "주문 전체 취소",
+      "level": "direct"
+    },
+    {
+      "id": "RG-0019",
+      "section": "주문 부분 취소",
+      "title": "상품 2개 중 1개를 부분 취소하면 그 상품 금액만 환불된다",
+      "impact": "주문 부분 취소",
+      "level": "direct"
+    },
+    {
+      "id": "RG-0020",
+      "section": "환불 금액 계산",
+      "title": "부분 취소로 무료배송 기준 아래가 되면 배송비 3,000원을 빼고 환불한다",
+      "impact": "환불 금액 계산",
+      "level": "direct"
+    },
+    {
+      "id": "RG-0022",
+      "section": "쿠폰 상태 관리",
+      "title": "같은 쿠폰은 한 번만 받을 수 있다",
+      "impact": "쿠폰 상태 관리(AVAILABLE/USED)",
+      "level": "direct"
+    },
+    {
+      "id": "RG-0023",
+      "section": "쿠폰 유효기간",
+      "title": "쿠폰함에 쿠폰 유효기간이 날짜로 보인다",
+      "impact": "쿠폰 유효기간·만료 처리",
+      "level": "indirect"
+    },
+    {
+      "id": "RG-0025",
+      "section": "판매자 정산",
+      "title": "판매자 정산 기준 금액은 상품 판매 금액에서 수수료를 뺀 값이다",
+      "impact": "판매자 정산 금액",
+      "level": "indirect"
+    }
+  ],
+  "updates": []
+}

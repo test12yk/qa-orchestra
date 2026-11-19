@@ -1,0 +1,623 @@
+{
+  "name": "커머스 회귀 스위트(샘플)",
+  "version": 1,
+  "updated_at": "2026-06-30T10:00:00+09:00",
+  "cases": [
+    {
+      "id": "RG-0001",
+      "domain": "회원",
+      "section": "로그인",
+      "type": "기본기능",
+      "title": "가입한 이메일·비밀번호로 로그인하면 메인 화면으로 이동한다",
+      "preconditions": [
+        "가입된 회원 계정"
+      ],
+      "steps": [
+        "로그인 화면에서 이메일·비밀번호 입력",
+        "로그인 누르기"
+      ],
+      "expected": [
+        "메인 화면으로 이동",
+        "상단에 회원 이름이 보인다"
+      ],
+      "priority": "P1",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0002",
+      "domain": "회원",
+      "section": "로그인",
+      "type": "엣지케이스",
+      "title": "비밀번호를 5번 틀리면 계정이 10분간 잠긴다",
+      "preconditions": [
+        "가입된 회원 계정"
+      ],
+      "steps": [
+        "틀린 비밀번호로 5번 로그인 시도"
+      ],
+      "expected": [
+        "\"10분 뒤 다시 시도\" 안내",
+        "10분 안에는 맞는 비밀번호로도 로그인 안 됨"
+      ],
+      "priority": "P2",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0003",
+      "domain": "회원",
+      "section": "회원가입",
+      "type": "기본기능",
+      "title": "필수 약관에 동의하고 이메일 인증을 마치면 가입된다",
+      "preconditions": [
+        "가입 안 된 이메일"
+      ],
+      "steps": [
+        "회원가입 화면에서 정보 입력",
+        "필수 약관 동의",
+        "이메일 인증 코드 입력"
+      ],
+      "expected": [
+        "가입 완료 화면",
+        "가입 축하 포인트 1,000P 지급"
+      ],
+      "priority": "P2",
+      "automation": "manual",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0004",
+      "domain": "상품",
+      "section": "상품 검색",
+      "type": "기본기능",
+      "title": "상품명으로 검색하면 이름이 맞는 상품이 결과에 나온다",
+      "preconditions": [
+        "'무선 이어폰' 상품 판매 중"
+      ],
+      "steps": [
+        "검색창에 '무선 이어폰' 입력"
+      ],
+      "expected": [
+        "결과 첫 화면에 '무선 이어폰' 상품이 보인다"
+      ],
+      "priority": "P2",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0005",
+      "domain": "상품",
+      "section": "상품 상세",
+      "type": "기본기능",
+      "title": "품절 상품 상세에서는 구매 버튼이 비활성이다",
+      "preconditions": [
+        "재고 0개 상품"
+      ],
+      "steps": [
+        "상품 상세 화면 열기"
+      ],
+      "expected": [
+        "'품절' 표시",
+        "장바구니·구매 버튼 비활성"
+      ],
+      "priority": "P3",
+      "automation": "manual",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0006",
+      "domain": "장바구니",
+      "section": "장바구니 담기",
+      "type": "기본기능",
+      "title": "상품을 담으면 장바구니 수량과 금액이 바로 바뀐다",
+      "preconditions": [
+        "로그인 회원",
+        "10,000원 상품"
+      ],
+      "steps": [
+        "상품 2개를 장바구니에 담기",
+        "장바구니 열기"
+      ],
+      "expected": [
+        "수량 2",
+        "상품 금액 20,000원"
+      ],
+      "priority": "P2",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0007",
+      "domain": "장바구니",
+      "section": "장바구니 담기",
+      "type": "엣지케이스",
+      "title": "재고보다 많이 담으면 재고 수량까지만 담긴다",
+      "preconditions": [
+        "재고 3개 상품"
+      ],
+      "steps": [
+        "수량 5로 담기"
+      ],
+      "expected": [
+        "\"재고가 3개 남았어요\" 안내",
+        "수량 3으로 담김"
+      ],
+      "priority": "P3",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0008",
+      "domain": "주문·결제",
+      "section": "결제 금액 계산",
+      "type": "기본기능",
+      "title": "결제 금액은 상품 금액 합계에 배송비를 더한 값이다",
+      "preconditions": [
+        "로그인 회원",
+        "상품 25,000원 + 배송비 3,000원"
+      ],
+      "steps": [
+        "장바구니에서 주문하기",
+        "주문서 결제 금액 확인"
+      ],
+      "expected": [
+        "최종 결제 금액 28,000원"
+      ],
+      "priority": "P1",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0009",
+      "domain": "주문·결제",
+      "section": "결제 금액 계산",
+      "type": "엣지케이스",
+      "title": "여러 판매자 상품을 함께 주문하면 판매자별 배송비가 각각 더해진다",
+      "preconditions": [
+        "판매자 A 10,000원(배송비 3,000원)",
+        "판매자 B 20,000원(배송비 2,500원)"
+      ],
+      "steps": [
+        "두 상품을 한 번에 주문하기"
+      ],
+      "expected": [
+        "배송비 5,500원",
+        "최종 결제 금액 35,500원"
+      ],
+      "priority": "P2",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0010",
+      "domain": "주문·결제",
+      "section": "포인트 사용",
+      "type": "기본기능",
+      "title": "포인트 3,000P를 쓰면 결제 금액이 3,000원 줄고 잔액도 줄어든다",
+      "preconditions": [
+        "포인트 5,000P 보유",
+        "상품 20,000원 + 배송비 3,000원"
+      ],
+      "steps": [
+        "주문서에서 포인트 3,000P 사용",
+        "결제하기"
+      ],
+      "expected": [
+        "최종 결제 금액 20,000원",
+        "포인트 잔액 2,000P"
+      ],
+      "priority": "P1",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0011",
+      "domain": "주문·결제",
+      "section": "포인트 사용",
+      "type": "엣지케이스",
+      "title": "보유 포인트보다 많이 입력하면 보유 포인트까지만 쓰인다",
+      "preconditions": [
+        "포인트 1,200P 보유"
+      ],
+      "steps": [
+        "포인트 5,000P 입력"
+      ],
+      "expected": [
+        "사용 포인트 1,200P로 바뀜"
+      ],
+      "priority": "P2",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0012",
+      "domain": "주문·결제",
+      "section": "주문서 결제 금액 요약",
+      "type": "기본기능",
+      "title": "주문서 결제 금액 요약에 상품 금액·배송비·포인트·최종 금액이 순서대로 보인다",
+      "preconditions": [
+        "포인트 2,000P 사용 주문"
+      ],
+      "steps": [
+        "주문서 결제 금액 요약 영역 확인"
+      ],
+      "expected": [
+        "상품 금액 → 배송비 → 포인트 사용 → 최종 결제 금액 순서"
+      ],
+      "priority": "P3",
+      "automation": "manual",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0013",
+      "domain": "주문·결제",
+      "section": "배송비 계산",
+      "type": "기본기능",
+      "title": "30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다",
+      "preconditions": [
+        "무료배송 기준 30,000원",
+        "상품 30,000원"
+      ],
+      "steps": [
+        "주문서 배송비 확인"
+      ],
+      "expected": [
+        "배송비 0원"
+      ],
+      "priority": "P2",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0014",
+      "domain": "주문·결제",
+      "section": "PG 결제 승인",
+      "type": "기본기능",
+      "title": "카드 결제 승인 금액은 주문서 최종 결제 금액과 같다",
+      "preconditions": [
+        "상품 20,000원 + 배송비 3,000원"
+      ],
+      "steps": [
+        "카드로 결제하기",
+        "PG 승인 내역 확인"
+      ],
+      "expected": [
+        "승인 금액 23,000원",
+        "주문 상태 '결제 완료'"
+      ],
+      "priority": "P1",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0015",
+      "domain": "주문·결제",
+      "section": "PG 결제 승인",
+      "type": "엣지케이스",
+      "title": "PG 승인이 실패하면 주문이 만들어지지 않고 포인트도 차감되지 않는다",
+      "preconditions": [
+        "포인트 2,000P 사용",
+        "PG 승인 실패 응답(시험 카드)"
+      ],
+      "steps": [
+        "결제하기"
+      ],
+      "expected": [
+        "\"결제에 실패했어요\" 안내",
+        "주문 없음",
+        "포인트 잔액 그대로"
+      ],
+      "priority": "P1",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0016",
+      "domain": "주문·결제",
+      "section": "상품권 주문",
+      "type": "기본기능",
+      "title": "상품권 50,000원을 단독 주문하면 결제 후 상품권 번호가 발급된다",
+      "preconditions": [
+        "상품권 50,000원 상품"
+      ],
+      "steps": [
+        "상품권 주문·결제"
+      ],
+      "expected": [
+        "결제 금액 50,000원",
+        "주문 상세에 상품권 번호 표시"
+      ],
+      "priority": "P2",
+      "automation": "manual",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0017",
+      "domain": "취소·환불",
+      "section": "주문 전체 취소",
+      "type": "기본기능",
+      "title": "결제 완료 주문을 전체 취소하면 결제 금액 전액이 환불된다",
+      "preconditions": [
+        "결제 완료 주문 28,000원"
+      ],
+      "steps": [
+        "주문 상세에서 전체 취소"
+      ],
+      "expected": [
+        "주문 상태 '취소 완료'",
+        "환불 금액 28,000원"
+      ],
+      "priority": "P1",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0018",
+      "domain": "취소·환불",
+      "section": "주문 전체 취소",
+      "type": "엣지케이스",
+      "title": "포인트를 쓴 주문을 전체 취소하면 쓴 포인트가 되돌아온다",
+      "preconditions": [
+        "포인트 3,000P 사용한 결제 완료 주문"
+      ],
+      "steps": [
+        "전체 취소"
+      ],
+      "expected": [
+        "포인트 3,000P 복구",
+        "카드 환불은 실제 결제 금액만"
+      ],
+      "priority": "P1",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0019",
+      "domain": "취소·환불",
+      "section": "주문 부분 취소",
+      "type": "기본기능",
+      "title": "상품 2개 중 1개를 부분 취소하면 그 상품 금액만 환불된다",
+      "preconditions": [
+        "상품 A 10,000원 + 상품 B 15,000원 주문(무료배송)"
+      ],
+      "steps": [
+        "상품 B만 부분 취소"
+      ],
+      "expected": [
+        "환불 금액 15,000원",
+        "상품 A는 '결제 완료' 그대로"
+      ],
+      "priority": "P1",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0020",
+      "domain": "취소·환불",
+      "section": "환불 금액 계산",
+      "type": "엣지케이스",
+      "title": "부분 취소로 무료배송 기준 아래가 되면 배송비 3,000원을 빼고 환불한다",
+      "preconditions": [
+        "상품 A 20,000원 + 상품 B 15,000원 주문(무료배송)"
+      ],
+      "steps": [
+        "상품 B 부분 취소"
+      ],
+      "expected": [
+        "환불 금액 12,000원(15,000 − 배송비 3,000)"
+      ],
+      "priority": "P2",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0021",
+      "domain": "쿠폰",
+      "section": "쿠폰 발급",
+      "type": "기본기능",
+      "title": "이벤트 페이지에서 쿠폰을 받으면 쿠폰함에 AVAILABLE로 들어온다",
+      "preconditions": [
+        "발급 가능 쿠폰 이벤트"
+      ],
+      "steps": [
+        "이벤트 페이지에서 '쿠폰 받기'",
+        "쿠폰함 열기"
+      ],
+      "expected": [
+        "쿠폰함에 쿠폰 표시",
+        "상태 AVAILABLE"
+      ],
+      "priority": "P2",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0022",
+      "domain": "쿠폰",
+      "section": "쿠폰 상태 관리",
+      "type": "기본기능",
+      "title": "같은 쿠폰은 한 번만 받을 수 있다",
+      "preconditions": [
+        "이미 받은 쿠폰"
+      ],
+      "steps": [
+        "'쿠폰 받기' 다시 누르기"
+      ],
+      "expected": [
+        "\"이미 받은 쿠폰이에요\" 안내",
+        "쿠폰함 수량 그대로"
+      ],
+      "priority": "P2",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0023",
+      "domain": "쿠폰",
+      "section": "쿠폰 유효기간",
+      "type": "기본기능",
+      "title": "쿠폰함에 쿠폰 유효기간이 날짜로 보인다",
+      "preconditions": [
+        "유효기간 2026-12-31까지인 쿠폰"
+      ],
+      "steps": [
+        "쿠폰함 열기"
+      ],
+      "expected": [
+        "'~2026.12.31' 표시"
+      ],
+      "priority": "P3",
+      "automation": "manual",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0024",
+      "domain": "배송",
+      "section": "배송 조회",
+      "type": "기본기능",
+      "title": "배송 중 주문은 주문 상세에서 송장 번호와 배송 단계가 보인다",
+      "preconditions": [
+        "배송 중 주문"
+      ],
+      "steps": [
+        "주문 상세 열기"
+      ],
+      "expected": [
+        "송장 번호 표시",
+        "배송 단계 '배송 중'"
+      ],
+      "priority": "P2",
+      "automation": "manual",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0025",
+      "domain": "정산",
+      "section": "판매자 정산",
+      "type": "기본기능",
+      "title": "판매자 정산 기준 금액은 상품 판매 금액에서 수수료를 뺀 값이다",
+      "preconditions": [
+        "상품 40,000원 판매, 수수료 10%"
+      ],
+      "steps": [
+        "정산 내역 조회"
+      ],
+      "expected": [
+        "정산 기준 금액 40,000원",
+        "정산 예정 금액 36,000원"
+      ],
+      "priority": "P2",
+      "automation": "api",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    },
+    {
+      "id": "RG-0026",
+      "domain": "리뷰",
+      "section": "리뷰 작성",
+      "type": "기본기능",
+      "title": "구매 확정한 주문에만 리뷰를 쓸 수 있다",
+      "preconditions": [
+        "구매 확정 주문",
+        "배송 중 주문"
+      ],
+      "steps": [
+        "두 주문에서 리뷰 쓰기 버튼 확인"
+      ],
+      "expected": [
+        "구매 확정 주문만 버튼 활성"
+      ],
+      "priority": "P3",
+      "automation": "manual",
+      "source": "기존 회귀 스위트",
+      "added_at": "2026-06-30",
+      "last_result": "pass"
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-06-30T10:00:00+09:00",
+      "version": 1,
+      "change": "import",
+      "ids": [
+        "RG-0001",
+        "RG-0002",
+        "RG-0003",
+        "RG-0004",
+        "RG-0005",
+        "RG-0006",
+        "RG-0007",
+        "RG-0008",
+        "RG-0009",
+        "RG-0010",
+        "RG-0011",
+        "RG-0012",
+        "RG-0013",
+        "RG-0014",
+        "RG-0015",
+        "RG-0016",
+        "RG-0017",
+        "RG-0018",
+        "RG-0019",
+        "RG-0020",
+        "RG-0021",
+        "RG-0022",
+        "RG-0023",
+        "RG-0024",
+        "RG-0025",
+        "RG-0026"
+      ],
+      "note": "가상 쇼핑몰의 쿠폰 할인 이전 회귀 스위트(샘플)"
+    }
+  ]
+}

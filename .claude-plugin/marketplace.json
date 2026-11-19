@@ -59,6 +59,12 @@
       "description": "신규 기능 QA 리포터만",
       "source": "./plugins/qa-new-reporter",
       "category": "testing"
+    },
+    {
+      "name": "qa-reg-tc-manager",
+      "description": "회귀 TC 관리자만",
+      "source": "./plugins/qa-reg-tc-manager",
+      "category": "testing"
     }
   ]
 }

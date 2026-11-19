@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>커머스 회귀 스위트(샘플)</title><style>/* Layout: 문서형 단일 컬럼(최대 1080px). 숫자 칸 → 묶음별 표(추천·범위) → 접힌 참고 목록 */
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --fg: #1b2130; --muted: #5b6477; --line: #dde2ea; --soft: #eef1f6;
+  --accent: #1f3a8a;
+  --plan: #3b6fe0; --policy: #7a4fd6; --dev: #0d8a80; --design: #c9437a; --slack: #b97e0c;
+  --red: #c4362c; --amber: #b0721a; --green: #2d8549;
+  --red-bg: #fbeceb; --amber-bg: #fbf2e4; --green-bg: #e8f4ec;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11141b; --surface: #191e28; --fg: #e5e8ee; --muted: #9aa3b4; --line: #2a3140; --soft: #1f2532;
+  --accent: #9db1ff;
+  --plan: #6f98ff; --policy: #a985ff; --dev: #38c2b5; --design: #f07aa8; --slack: #e6ad3c;
+  --red: #ff7b70; --amber: #f0b354; --green: #5ccb80;
+  --red-bg: #3a1f1d; --amber-bg: #392c18; --green-bg: #1b3324; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11141b; --surface: #191e28; --fg: #e5e8ee; --muted: #9aa3b4; --line: #2a3140; --soft: #1f2532;
+  --accent: #9db1ff;
+  --plan: #6f98ff; --policy: #a985ff; --dev: #38c2b5; --design: #f07aa8; --slack: #e6ad3c;
+  --red: #ff7b70; --amber: #f0b354; --green: #5ccb80;
+  --red-bg: #3a1f1d; --amber-bg: #392c18; --green-bg: #1b3324; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+h2 .no { font-family: var(--f-mono); font-size: .8rem; color: var(--muted); font-weight: 500; }
+h3 { font-size: .95rem; font-weight: 600; margin-bottom: 8px; }
+p { margin: 0; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.small { font-size: .8rem; font-weight: 400; }
+.eyebrow { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+header.top { display: grid; gap: 10px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); font-size: .85rem; }
+nav.toc { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .85rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 10px; }
+nav.toc a { color: var(--accent); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { text-decoration: underline; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.banner { display: grid; gap: 4px; padding: 14px 18px; border-radius: 10px; border: 1px solid var(--line); border-left-width: 5px; background: var(--surface); }
+.banner b { font-size: 1.05rem; }
+.banner.ok { border-left-color: var(--green); } .banner.ok b { color: var(--green); }
+.banner.warn { border-left-color: var(--amber); } .banner.warn b { color: var(--amber); }
+.banner ul { margin: 4px 0 0; padding-left: 18px; color: var(--muted); font-size: .88rem; }
+
+.kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 2px; }
+.kpi b { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.kpi span { font-size: .8rem; color: var(--muted); }
+.kpi.warn b { color: var(--red); }
+.kpi.caution b { color: var(--amber); }
+
+section { display: grid; gap: 14px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+ul.reqs { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: .88rem; }
+.fid { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); margin-inline: 2px 4px; }
+
+.flag { font-size: .75rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.flag.red { color: var(--red); background: var(--red-bg); }
+.flag.amber { color: var(--amber); background: var(--amber-bg); }
+.flag.green { color: var(--green); background: var(--green-bg); }
+.flag.muted { color: var(--muted); background: var(--soft); }
+.chip { display: inline-block; font-size: .75rem; padding: 0 7px; margin: 1px 3px 1px 0; border: 1px solid var(--line); border-radius: 4px; background: var(--soft); white-space: nowrap; }
+
+.tbl { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: .78rem; color: var(--muted); font-weight: 600; letter-spacing: .02em; white-space: nowrap; background: var(--soft); }
+td.c, th.c { text-align: center; }
+td.pre { white-space: pre-line; }
+
+.bar { display: flex; height: 8px; width: 120px; border-radius: 4px; overflow: hidden; background: var(--soft); margin-top: 4px; }
+.seg { display: block; height: 100%; }
+.seg.green { background: var(--green); } .seg.red { background: var(--red); } .seg.amber { background: var(--amber); } .seg.muted { background: var(--line); }
+
+@media (max-width: 760px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  h1 { font-size: 1.4rem; }
+}
+details summary { cursor: pointer; font-weight: 600; font-size: .9rem; }
+details[open] summary { margin-bottom: 10px; }
+
+.head2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 14px; align-items: start; }
+.verdict, .decision { display: grid; gap: 6px; padding: 16px 18px; border-radius: 10px; border: 1px solid var(--line); border-top-width: 5px; background: var(--surface); min-width: 0; }
+.verdict b, .decision b { font-size: 1.35rem; }
+.verdict ul { margin: 2px 0 0; padding-left: 18px; font-size: .9rem; display: grid; gap: 3px; }
+.verdict.ok, .decision.ok { border-top-color: var(--green); } .verdict.ok b, .decision.ok b { color: var(--green); }
+.verdict.warn, .decision.warn { border-top-color: var(--amber); } .verdict.warn b, .decision.warn b { color: var(--amber); }
+.verdict.bad, .decision.bad { border-top-color: var(--red); } .verdict.bad b, .decision.bad b { color: var(--red); }
+.decision.pending { border-style: dashed; border-top-style: solid; border-top-color: var(--line); }
+.decision.pending b { color: var(--muted); }
+.decision span:not(.eyebrow) { font-size: .88rem; color: var(--muted); }
+ul.ev { margin: 6px 0 0; padding-left: 18px; font-size: .85rem; color: var(--muted); display: grid; gap: 2px; }
+p.note { margin-top: 4px; font-size: .85rem; }
+b.good { color: var(--green); } b.bad { color: var(--red); }
+@media (max-width: 760px) { .head2 { grid-template-columns: minmax(0, 1fr); } }
+
+.part { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: .78rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-top: 8px; }
+.part::before, .part::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.kind { font-weight: 600; padding: 1px 10px; border-radius: 999px; background: var(--soft); color: var(--muted); }
+.kind.ok { background: var(--green-bg); color: var(--green); }
+.kind.pending { background: var(--amber-bg); color: var(--amber); }
+p.lead { font-size: 1.05rem; font-weight: 600; line-height: 1.5; }
+.verdict { border-top-color: var(--accent); }
+b.inline { font-size: inherit; }
+b.inline.ok { color: var(--green); } b.inline.warn { color: var(--amber); } b.inline.bad { color: var(--red); }
+nav.toc .sep { color: var(--line); }
+ul.keybugs { list-style: none; margin: 2px 0 4px; padding: 10px 12px; display: grid; gap: 6px; font-size: .9rem; background: var(--soft); border-radius: 8px; }
+ul.keybugs a { color: var(--accent); font-weight: 600; }
+a.kpi.link { color: inherit; text-decoration: none; }
+a.kpi.link:hover, a.kpi.link:focus-visible { border-color: var(--accent); }
+a.kpi.link span { color: var(--accent); }
+h2 a.small { color: var(--accent); text-decoration: none; font-weight: 600; margin-left: auto; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; }
+.grid2 > div { min-width: 0; }
+.green-t { color: var(--green); } .red-t { color: var(--red); } .amber-t { color: var(--amber); } .muted-t { color: var(--muted); }
+#summary { gap: 12px; }
+@media (max-width: 760px) { ul.keybugs { list-style: none; margin: 2px 0 4px; padding: 10px 12px; display: grid; gap: 6px; font-size: .9rem; background: var(--soft); border-radius: 8px; }
+ul.keybugs a { color: var(--accent); font-weight: 600; }
+a.kpi.link { color: inherit; text-decoration: none; }
+a.kpi.link:hover, a.kpi.link:focus-visible { border-color: var(--accent); }
+a.kpi.link span { color: var(--accent); }
+h2 a.small { color: var(--accent); text-decoration: none; font-weight: 600; margin-left: auto; }
+.grid2 { grid-template-columns: minmax(0, 1fr); } }
+.chip.on { color: var(--accent); border-color: var(--accent); background: var(--surface); font-weight: 600; }
+.chip.off { color: var(--muted); text-decoration: line-through; opacity: .7; }
+.banner span { color: var(--muted); font-size: .88rem; }
+</style></head>
+<body><div class="wrap"><header class="top"><span class="eyebrow">QA 오케스트라 · 회귀 TC 관리자 · 회귀 스위트</span><h1>커머스 회귀 스위트(샘플)</h1><div class="meta"><span>v1</span><span>2026-06-30 10:00</span></div></header><div class="kpis"><div class="kpi"><b>26</b><span>케이스</span></div><div class="kpi"><b>9</b><span>영역(탭)</span></div><div class="kpi"><b>8</b><span>P1</span></div><div class="kpi"><b>13</b><span>P2</span></div><div class="kpi"><b>5</b><span>P3</span></div><div class="kpi"><b>19</b><span>API</span></div><div class="kpi"><b>7</b><span>수동</span></div></div><section><h2>회원 <span class="muted small">3개</span></h2><div class="tbl"><table><thead><tr><th>CaseID</th><th>section</th><th>title</th><th class="c">우선</th><th class="c">자동화</th></tr></thead><tbody><tr><td class="mono">RG-0001</td><td>로그인</td><td>가입한 이메일·비밀번호로 로그인하면 메인 화면으로 이동한다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P1</td><td class="c">API</td></tr><tr><td class="mono">RG-0002</td><td>로그인</td><td>비밀번호를 5번 틀리면 계정이 10분간 잠긴다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">API</td></tr><tr><td class="mono">RG-0003</td><td>회원가입</td><td>필수 약관에 동의하고 이메일 인증을 마치면 가입된다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">수동</td></tr></tbody></table></div></section><section><h2>상품 <span class="muted small">2개</span></h2><div class="tbl"><table><thead><tr><th>CaseID</th><th>section</th><th>title</th><th class="c">우선</th><th class="c">자동화</th></tr></thead><tbody><tr><td class="mono">RG-0004</td><td>상품 검색</td><td>상품명으로 검색하면 이름이 맞는 상품이 결과에 나온다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">API</td></tr><tr><td class="mono">RG-0005</td><td>상품 상세</td><td>품절 상품 상세에서는 구매 버튼이 비활성이다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P3</td><td class="c">수동</td></tr></tbody></table></div></section><section><h2>장바구니 <span class="muted small">2개</span></h2><div class="tbl"><table><thead><tr><th>CaseID</th><th>section</th><th>title</th><th class="c">우선</th><th class="c">자동화</th></tr></thead><tbody><tr><td class="mono">RG-0006</td><td>장바구니 담기</td><td>상품을 담으면 장바구니 수량과 금액이 바로 바뀐다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">API</td></tr><tr><td class="mono">RG-0007</td><td>장바구니 담기</td><td>재고보다 많이 담으면 재고 수량까지만 담긴다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P3</td><td class="c">API</td></tr></tbody></table></div></section><section><h2>주문·결제 <span class="muted small">9개</span></h2><div class="tbl"><table><thead><tr><th>CaseID</th><th>section</th><th>title</th><th class="c">우선</th><th class="c">자동화</th></tr></thead><tbody><tr><td class="mono">RG-0008</td><td>결제 금액 계산</td><td>결제 금액은 상품 금액 합계에 배송비를 더한 값이다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P1</td><td class="c">API</td></tr><tr><td class="mono">RG-0009</td><td>결제 금액 계산</td><td>여러 판매자 상품을 함께 주문하면 판매자별 배송비가 각각 더해진다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">API</td></tr><tr><td class="mono">RG-0010</td><td>포인트 사용</td><td>포인트 3,000P를 쓰면 결제 금액이 3,000원 줄고 잔액도 줄어든다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P1</td><td class="c">API</td></tr><tr><td class="mono">RG-0011</td><td>포인트 사용</td><td>보유 포인트보다 많이 입력하면 보유 포인트까지만 쓰인다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">API</td></tr><tr><td class="mono">RG-0012</td><td>주문서 결제 금액 요약</td><td>주문서 결제 금액 요약에 상품 금액·배송비·포인트·최종 금액이 순서대로 보인다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P3</td><td class="c">수동</td></tr><tr><td class="mono">RG-0013</td><td>배송비 계산</td><td>30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">API</td></tr><tr><td class="mono">RG-0014</td><td>PG 결제 승인</td><td>카드 결제 승인 금액은 주문서 최종 결제 금액과 같다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P1</td><td class="c">API</td></tr><tr><td class="mono">RG-0015</td><td>PG 결제 승인</td><td>PG 승인이 실패하면 주문이 만들어지지 않고 포인트도 차감되지 않는다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P1</td><td class="c">API</td></tr><tr><td class="mono">RG-0016</td><td>상품권 주문</td><td>상품권 50,000원을 단독 주문하면 결제 후 상품권 번호가 발급된다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">수동</td></tr></tbody></table></div></section><section><h2>취소·환불 <span class="muted small">4개</span></h2><div class="tbl"><table><thead><tr><th>CaseID</th><th>section</th><th>title</th><th class="c">우선</th><th class="c">자동화</th></tr></thead><tbody><tr><td class="mono">RG-0017</td><td>주문 전체 취소</td><td>결제 완료 주문을 전체 취소하면 결제 금액 전액이 환불된다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P1</td><td class="c">API</td></tr><tr><td class="mono">RG-0018</td><td>주문 전체 취소</td><td>포인트를 쓴 주문을 전체 취소하면 쓴 포인트가 되돌아온다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P1</td><td class="c">API</td></tr><tr><td class="mono">RG-0019</td><td>주문 부분 취소</td><td>상품 2개 중 1개를 부분 취소하면 그 상품 금액만 환불된다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P1</td><td class="c">API</td></tr><tr><td class="mono">RG-0020</td><td>환불 금액 계산</td><td>부분 취소로 무료배송 기준 아래가 되면 배송비 3,000원을 빼고 환불한다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">API</td></tr></tbody></table></div></section><section><h2>쿠폰 <span class="muted small">3개</span></h2><div class="tbl"><table><thead><tr><th>CaseID</th><th>section</th><th>title</th><th class="c">우선</th><th class="c">자동화</th></tr></thead><tbody><tr><td class="mono">RG-0021</td><td>쿠폰 발급</td><td>이벤트 페이지에서 쿠폰을 받으면 쿠폰함에 AVAILABLE로 들어온다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">API</td></tr><tr><td class="mono">RG-0022</td><td>쿠폰 상태 관리</td><td>같은 쿠폰은 한 번만 받을 수 있다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">API</td></tr><tr><td class="mono">RG-0023</td><td>쿠폰 유효기간</td><td>쿠폰함에 쿠폰 유효기간이 날짜로 보인다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P3</td><td class="c">수동</td></tr></tbody></table></div></section><section><h2>배송 <span class="muted small">1개</span></h2><div class="tbl"><table><thead><tr><th>CaseID</th><th>section</th><th>title</th><th class="c">우선</th><th class="c">자동화</th></tr></thead><tbody><tr><td class="mono">RG-0024</td><td>배송 조회</td><td>배송 중 주문은 주문 상세에서 송장 번호와 배송 단계가 보인다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">수동</td></tr></tbody></table></div></section><section><h2>정산 <span class="muted small">1개</span></h2><div class="tbl"><table><thead><tr><th>CaseID</th><th>section</th><th>title</th><th class="c">우선</th><th class="c">자동화</th></tr></thead><tbody><tr><td class="mono">RG-0025</td><td>판매자 정산</td><td>판매자 정산 기준 금액은 상품 판매 금액에서 수수료를 뺀 값이다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P2</td><td class="c">API</td></tr></tbody></table></div></section><section><h2>리뷰 <span class="muted small">1개</span></h2><div class="tbl"><table><thead><tr><th>CaseID</th><th>section</th><th>title</th><th class="c">우선</th><th class="c">자동화</th></tr></thead><tbody><tr><td class="mono">RG-0026</td><td>리뷰 작성</td><td>구매 확정한 주문에만 리뷰를 쓸 수 있다<div class="muted small">기존 회귀 스위트</div></td><td class="c">P3</td><td class="c">수동</td></tr></tbody></table></div></section><section><h2>변경 이력</h2><ul class="ev"><li>v1 · 2026-06-30 10:00 · import 26개 · 가상 쇼핑몰의 쿠폰 할인 이전 회귀 스위트(샘플)</li></ul></section></div></body></html>

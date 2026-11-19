@@ -29,7 +29,8 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 - [x] 신규 기능 검토자 `new-reviewer` — 실행 전 TC 검토(요구사항·충돌·위험·영향 범위 커버, 경계값·조합, 기대 결과) · 실행 결과 검토(미실행·판정 보류·가정 위의 Pass·버그) → 담당별 보완 요청 HTML
 - [x] 신규 기능 판정관 `new-judge` — 실행 결과 검토 → 요소 8가지(실행·결함·보류·가정·요구사항·고위험·검토 지적·영향 범위) → 편입 가능/조건부/보류 추천 + 편입 조건, 사람의 결정 기록(릴리즈 기록 파일)
 - [x] 신규 기능 QA 리포터 `new-reporter` — 판정서·실행 결과 검토(+ 분석서·TC·지라 상태) → 한 장 리포트(위 1분 요약 매니저·기획용 / 아래 상세 개발·QA용), 결정 전 중간 리포트 · 결정 후 완료 리포트, HTML·MD + 승인 후 컨플루언스 페이지
-- [ ] 회귀 라인
+- [x] 회귀 TC 관리자 `reg-tc-manager` — 회귀 스위트(영역별 탭 시트·변경 이력), 신규 TC 편입 후보(기준표·결과 확정·겹침·영역 대표) → 사람 승인분만 편입, 릴리즈 회귀 범위(필수·직접·간접·제외) → 실행 시트
+- [ ] 회귀 자동화 관리자 · 회귀 검토자 · 릴리즈 판정관 · 릴리즈 QA 리포터
 
 ## 폴더
 ```
@@ -44,6 +45,7 @@ plugins/
   qa-new-reviewer/     신규 기능 검토자: agents/, tools/review.py(자동 점검·보고서), tools/templates/, defaults.json
   qa-new-judge/        신규 기능 판정관: agents/, tools/judge.py(요소 모으기·판정서·결정 기록), tools/templates/, defaults.json
   qa-new-reporter/     신규 기능 QA 리포터: agents/, tools/report.py(재료 모으기·리포트·올린 위치 기록), tools/templates/, defaults.json
+  qa-reg-tc-manager/   회귀 TC 관리자: agents/, tools/reg_suite.py(스위트·편입 후보·승인·릴리즈 범위), tools/xlsx.py, tools/templates/, defaults.json
 .claude/agents/        저장소를 받아 쓸 때를 위한 연결(plugins/*/agents 를 가리킴)
 qa-orchestra.config.json   팀 설정 견본
 samples/coupon-discount/   가상 "쿠폰 할인" 기능 (입력 5종, 기준 답안, 실행 결과)
@@ -66,6 +68,7 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 | 신규 기능 검토자만 | `/plugin install qa-new-reviewer@qa-orchestra` | `new-reviewer` + 자동 점검·보고서 스크립트 |
 | 신규 기능 판정관만 | `/plugin install qa-new-judge@qa-orchestra` | `new-judge` + 판정서·결정 기록 스크립트 |
 | 신규 기능 QA 리포터만 | `/plugin install qa-new-reporter@qa-orchestra` | `new-reporter` + 리포트 스크립트(HTML·MD·컨플루언스 본문) |
+| 회귀 TC 관리자만 | `/plugin install qa-reg-tc-manager@qa-orchestra` | `reg-tc-manager` + 스위트·편입·범위 스크립트(xlsx 읽기·쓰기 포함) |
 
 에이전트별 플러그인에는 그 에이전트가 쓰는 파일만 들어 있다(샘플·문서는 설치되지 않음). 나중에 전체를 설치하면 빠진 것만 추가된다. 비공개 저장소라면 접근 권한이 있는 GitHub 계정이 필요하다. 설치 뒤 Claude Code를 다시 시작한다.
 
@@ -104,6 +107,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 | `new-tc-writer` 신규 TC 작성가 | 기획 분석서 (없으면 문서 폴더) | TC 스프레드시트(xlsx)·CSV·HTML·MD | 문서 폴더만 줘도 되지만, 분석서가 있어야 충돌·질문이 반영된다 |
 | `new-judge` 신규 기능 판정관 | 검토자의 실행 결과 검토(review.json) (+ TC json, 지라 상태) | 판정서(HTML·MD·JSON), 사람 결정 시 릴리즈 기록 | 실행 결과 검토 review.json만 있으면 된다 |
 | `new-reporter` 신규 기능 QA 리포터 | 판정서(judgment.json) + 실행 결과 검토(review.json) (+ 분석서·TC json·지라 상태) | QA 리포트(HTML·MD·컨플루언스 본문), 승인 시 컨플루언스 페이지 | 판정서와 실행 결과 검토만 있으면 된다 |
+| `reg-tc-manager` 회귀 TC 관리자 | 기존 회귀 시트(xlsx·csv) / 신규 TC json + 실행 결과 검토 + 판정서 / 릴리즈 기능(판정서·릴리즈 기록) | 회귀 스위트 시트(영역별 탭), 편입 후보 페이지, 릴리즈 회귀 범위·실행 시트 | 기존 회귀 시트만 있어도 가져오기·보기·범위 고르기가 된다 |
 | `new-reviewer` 신규 기능 검토자 | 실행 전: 분석서 + TC json / 실행 후: + 결과 시트·자동화 결과·버그 폴더 | 검토 보고서(HTML·MD·JSON), 담당별 보완 요청 | TC json만 있어도 TC 자체 점검(기대 결과·추적·중복)은 된다 |
 
 여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(예정)를 쓴다.
@@ -143,3 +147,10 @@ python3 plugins/qa-plan-analyst/tools/render_plan_analysis.py samples/coupon-dis
 - 요약 요점에는 근거 번호(TC·버그·질문·조건)가 있어야 그려진다.
 - **컨플루언스**: `report.confluence.html`(Atlassian 형식 본문)을 만들어 두고, 사용자가 원하면 위치·제목을 보여 주고 승인받은 뒤 Atlassian 커넥터로 올린다. 설정 `confluence`(site·space_key·parent_page_id)만 바꾸면 회사 컨플루언스로 간다. 올린 페이지는 `report.py record`로 남겨 다음엔 같은 페이지를 고친다.
 - 결과 예: `samples/coupon-discount/run-01/report/` — 중간 리포트(결정 대기, 추천 편입 보류).
+
+## 회귀 TC 관리자
+- **스위트**: `suite.json`이 원본, `regression-suite.xlsx`는 Domain별 탭 + '변경 이력' 탭(신규 TC 시트 열 + 자동화·출처·편입일). 기존 회귀 시트는 `import`로 가져온다(머리글은 설정 `suite.columns`).
+- **편입 후보**: 신규 TC마다 핵심 흐름(+2)·사업 영향(+1)·변경 영향(+1)·자동화 가능(+1)으로 점수 → 3점 이상 넣기, 1점 이하 빼기. 결과가 Pass가 아니거나 질문 답 전 임시 가정으로 낸 Pass는 나중에. 영역마다 대표 1개·기능당 최대 5개(넘기려면 이유), 기존 케이스와 겹치면 관리자가 읽고 합치거나 뺀다. 이 기능으로 기대 결과가 바뀌는 기존 케이스는 '고치기' 후보.
+- **승인**: QA 매니저가 고른 번호만 `apply`로 넣는다(새 RG 번호, 변경 이력). 기능 편입 결정 전이면 거부, 이미 넣은 번호·가정 기준 결과도 거부.
+- **릴리즈 범위**: P1·지난 회귀 Fail = 필수, 이번 기능에서 편입된 케이스·직접 영향 영역 = 전부, 간접 영향 = P1·P2, 나머지 = 이번엔 제외(이유). 관리자가 놓친 연결만 조정(`overrides`). `regression-run.xlsx`에 이번에 돌릴 케이스만.
+- 결과 예: `samples/coupon-discount/regression/` — 기존 스위트 26개(가상 쇼핑몰), 쿠폰 TC 63개 → 넣기 5(기능당 최대 5·영역당 1) · 나중에 41 · 빼기 17, 2026.12 릴리즈 범위 17/26(필수 8 · 직접 5 · 간접 4 · 제외 9). 승인·편입은 하지 않음.

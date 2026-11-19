@@ -1,0 +1,56 @@
+{
+  "team": {
+    "domain": "",
+    "language": "ko"
+  },
+  "suite": {
+    "_comment": "회귀 스위트 시트 양식. 신규 TC 시트와 같은 열에 회귀용 열(자동화·출처·편입일)을 더한다. key는 바꾸지 말고 label·순서·폭만 바꾼다.",
+    "id_prefix": "RG",
+    "columns": [
+      {"key": "id", "label": "CaseID", "width": 10},
+      {"key": "domain", "label": "Domain", "width": 12},
+      {"key": "section", "label": "section", "width": 18},
+      {"key": "type", "label": "type", "width": 11},
+      {"key": "title", "label": "title", "width": 44},
+      {"key": "preconditions", "label": "precondition", "width": 32},
+      {"key": "steps", "label": "procedure", "width": 44},
+      {"key": "expected", "label": "expected result", "width": 48},
+      {"key": "priority", "label": "priority", "width": 9},
+      {"key": "automation", "label": "자동화", "width": 9},
+      {"key": "source", "label": "출처", "width": 22},
+      {"key": "added_at", "label": "편입일", "width": 11},
+      {"key": "result", "label": "결과", "width": 9},
+      {"key": "issue", "label": "이슈내용", "width": 36}
+    ],
+    "types": ["기본기능", "리그레이션", "엣지케이스"],
+    "priorities": ["P1", "P2", "P3", "P4"],
+    "results": {"pass": "Pass", "fail": "Fail"},
+    "automation": {"api": "API", "manual": "수동"},
+    "tab_by": "domain",
+    "history_tab": "변경 이력"
+  },
+  "regression": {
+    "_comment": "신규 TC 편입 기준표. 점수는 출발점이고, 다르게 추천하면 이유를 쓴다. 최종 승인은 사람.",
+    "core_priorities": ["P1"],
+    "core_keywords": ["결제", "금액", "환불", "취소", "포인트", "정산", "PG"],
+    "_core_comment": "우선순위가 core_priorities이거나 Domain·section·title에 이 낱말이 있으면 '핵심 흐름'.",
+    "business_priorities": ["P1", "P2"],
+    "weights": {"core": 2, "business": 1, "change": 1, "automatable": 1},
+    "include_at": 3,
+    "exclude_at": 1,
+    "_score_comment": "점수 ≥ include_at 이면 넣기, ≤ exclude_at 이면 빼기, 사이는 검토. 결과가 Pass가 아니거나 답이 안 온 질문의 임시 가정으로 낸 결과면 점수와 상관없이 나중에(결과 확정 후).",
+    "duplicate_ratio": 0.55,
+    "duplicate_ratio_same_section": 0.3,
+    "per_section_limit": 1,
+    "_per_section_comment": "영역(section)마다 넣기 후보는 대표 몇 개만(기본기능 → 최상위 우선순위 → 점수 순). 회귀 스위트가 신규 TC를 통째로 떠안지 않게. 넘는 것은 검토.",
+    "max_per_feature": 5,
+    "_max_per_feature_comment": "기능 하나가 스위트에 넣을 수 있는 최대 개수(점수 → 최상위 우선순위 순). 넘겨 추천하려면 candidates.json에 cap_override_reason을 쓴다.",
+    "_duplicate_comment": "같은 Domain의 기존 케이스와 제목이 이 비율 이상 비슷하면 '겹침' — 새로 넣지 말고 합치거나 기존 케이스를 고치는지 본다.",
+    "select": {
+      "_comment": "릴리즈 회귀 범위. must = 항상 실행, direct 영향 = 그 영역 전부, indirect 영향 = 아래 우선순위만.",
+      "must_priorities": ["P1"],
+      "indirect_priorities": ["P1", "P2"],
+      "always_last_failed": true
+    }
+  }
+}

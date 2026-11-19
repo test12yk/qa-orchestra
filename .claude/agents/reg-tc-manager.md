@@ -1,0 +1,1 @@
+../../plugins/qa-reg-tc-manager/agents/reg-tc-manager.md
