@@ -21,6 +21,7 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 4. 운영 결함: 심각(Critical·Major)하거나 반복되는 결함은 원인 분석 후 회귀에 편입하고, 경미한 단발 결함은 수정·확인 후 종료한다.
 
 ## 진행 상황
+- [x] 지휘자 `/qa-conductor:conduct` — 신규 라인·회귀 라인을 따로 또는 이어서 역할 에이전트 순서대로 실행, 사람 결정 지점(수동 실행·지라 등록·편입·배포 결정·컨플루언스)에서만 멈춤, 파이프라인 파일로 중간부터 다시 시작
 - [x] 문서 수집가 `doc-collector` — 링크로 가져오기·변경 감지·붙여넣기 대체 검증(노션)
 - [x] 기획 분석가 `plan-analyst` — 양식 확정, 블라인드·링크 입력 검증
 - [x] 신규 TC 작성가 `new-tc-writer` — 스프레드시트(한 탭, 기본기능·리그레이션·엣지케이스), 경계값·조합 필수, 커버리지 점검
@@ -40,6 +41,7 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 .claude-plugin/marketplace.json   배포처(플러그인 목록)
 plugins/
   qa-orchestra/        전체 묶음 (다른 플러그인을 의존성으로 설치)
+  qa-conductor/        지휘자: skills/conduct/(SKILL.md, pipeline.py — 단계 목록·기록·다시 하기)
   qa-doc-collector/    문서 수집가: agents/, tools/save_snapshot.py, defaults.json
   qa-plan-analyst/     기획 분석가: agents/, tools/render_plan_analysis.py, tools/templates/, defaults.json
   qa-bug-reporter/     버그 리포터: agents/, tools/bug_report.py(점검·지라 등록), defaults.json
@@ -67,6 +69,7 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 | 원하는 것 | 설치 명령 | 들어오는 것 |
 |---|---|---|
 | 전체 | `/plugin install qa-orchestra@qa-orchestra` | 모든 에이전트 (아래 플러그인들이 함께 설치됨) |
+| 지휘자만 | `/plugin install qa-conductor@qa-orchestra` | `/qa-conductor:conduct` 스킬 + 파이프라인 스크립트 (부를 역할 플러그인은 따로 설치) |
 | 문서 수집가만 | `/plugin install qa-doc-collector@qa-orchestra` | `doc-collector` + 저장 스크립트 |
 | 기획 분석가만 | `/plugin install qa-plan-analyst@qa-orchestra` | `plan-analyst` + 렌더러·양식 |
 | 신규 TC 작성가만 | `/plugin install qa-new-tc-writer@qa-orchestra` | `new-tc-writer` + 스프레드시트 렌더러·점검·양식 |
@@ -125,7 +128,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 | `release-judge` 릴리즈 판정관 | 회귀 검토(review.json) + 릴리즈 범위(selection.json) (+ 릴리즈 기록, 기능별 분석서) | 릴리즈 판정서(HTML·MD·JSON), 기능별 재회귀 범위(rerun-<기능>.json), 사람 결정 기록 | 회귀 검토와 범위만 있으면 된다(신규 기능 판정서가 없으면 '판정서 없음'으로 본다) |
 | `new-reviewer` 신규 기능 검토자 | 실행 전: 분석서 + TC json / 실행 후: + 결과 시트·자동화 결과·버그 폴더 | 검토 보고서(HTML·MD·JSON), 담당별 보완 요청 | TC json만 있어도 TC 자체 점검(기대 결과·추적·중복)은 된다 |
 
-여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(예정)를 쓴다.
+여러 에이전트를 이어서 돌리고 싶을 때만 지휘자(`/qa-conductor:conduct`)를 쓴다.
 
 **에이전트를 새로 만들 때**: `plugins/qa-<이름>/`에 그 에이전트가 쓰는 파일만 넣고, 배포처(`marketplace.json`)와 전체 묶음의 `dependencies`에 추가한다. 다른 플러그인 폴더의 파일을 참조하지 않는다.
 
@@ -197,3 +200,10 @@ python3 plugins/qa-plan-analyst/tools/render_plan_analysis.py samples/coupon-dis
 - **운영 결함은 이번 릴리즈 관련만**: 아직 열린 것(이번 빌드에 수정이 들어가나)과 관련 회귀 케이스가 이번 범위에 든 것.
 - **공유**: HTML·MD 기본, 승인 후 컨플루언스 페이지(설정 `confluence` 블록만 바꾸면 회사 컨플루언스). 다시 올릴 때는 같은 페이지를 고친다.
 - 결과 예: `samples/coupon-discount/regression/release-report-2026.12/` — 중간 리포트(결정 대기, 판정관 No-Go 권고). 릴리즈 불가 3개, 할 일 8개, 이번 릴리즈 관련 운영 결함 4/5건.
+
+## 지휘자
+- **부르기**: `/qa-conductor:conduct 장바구니 쿠폰 할인 QA 해줘`, `/qa-conductor:conduct 2026.12 회귀 돌려줘`, `/qa-conductor:conduct 이어서 해줘`. 저장소를 받아 쓸 때는 `/conduct`.
+- **범위**: 신규 라인(문서 수집 → 기획 분석 → TC → 실행 전 검토 → 자동화 → 수동 실행 → 버그 → 실행 결과 검토 → 판정 → 편입 결정 → 리포트), 회귀 라인(릴리즈 범위 → 회귀 자동화 → 수동 실행 → 회귀 검토 → 릴리즈 판정 → 배포 결정 → 릴리즈 리포트), 또는 둘을 이어서(편입 결정 → 회귀 편입 후보 → 승인 → 릴리즈 범위 …).
+- **멈추는 곳**: 사람이 할 곳만 — 수동 실행(테스터), 기능 편입 결정·회귀 편입 승인·배포 결정(QA 매니저), 그리고 역할이 승인을 요청한 일(지라 등록, 구글 시트·컨플루언스 올리기). 사람이 정했다고 말하기 전에는 기록하지 않는다.
+- **진행 기록**: `work/pipelines/<이름>.json`·`.md`. 단계가 끝나면 출력 파일이 있어야 기록되고, 검토 보완·기능 빼고 재회귀는 `reopen`으로 그 단계부터 다시 한다. 대화가 끊겨도 '이어서 해줘'로 이어간다.
+- 지휘자는 각 역할을 부르기만 한다 — 역할 플러그인이 설치돼 있어야 하고(전체 묶음이면 모두), 없으면 설치 명령을 알려 준다.

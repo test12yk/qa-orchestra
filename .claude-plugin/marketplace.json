@@ -13,6 +13,12 @@
       "category": "testing"
     },
     {
+      "name": "qa-conductor",
+      "description": "지휘자만 (/qa-conductor:conduct — 두 라인을 역할 순서대로 돌리고 사람 결정 지점에서 멈춤)",
+      "source": "./plugins/qa-conductor",
+      "category": "testing"
+    },
+    {
       "name": "qa-doc-collector",
       "description": "문서 수집가만",
       "source": "./plugins/qa-doc-collector",
