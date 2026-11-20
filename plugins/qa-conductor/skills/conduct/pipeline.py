@@ -144,7 +144,25 @@ def show(path):
     nxt = ready(d)
     lines = [f"# 파이프라인 {d['name']}", "", *rows, ""]
     if nxt:
-        lines += ["**지금 할 수 있는 단계**", ""] + [f"- {s['id']} {s['title']} — {'사람이 할 곳: ' if s['human'] else s['role'] + ': '}{s['how']}" for s in nxt]
+        by = {s["id"]: s for s in d["steps"]}
+
+        def prev(s):
+            # how의 경로는 처음 만든 기본값이다. 보완(v2) 등으로 바뀐 실제 출력은 앞 단계 기록을 쓴다.
+            seen, out, stack = set(), [], list(s["needs"])
+            while stack:
+                n = stack.pop(0)
+                if n in seen or n not in by:
+                    continue
+                seen.add(n)
+                if by[n]["status"] == "done":
+                    out += [f"{n}: {o}" for o in by[n]["outputs"]]
+                else:
+                    stack += by[n]["needs"]
+            return out
+        lines += ["**지금 할 수 있는 단계**", ""]
+        for s in nxt:
+            lines.append(f"- {s['id']} {s['title']} — {'사람이 할 곳: ' if s['human'] else s['role'] + ': '}{s['how']}")
+            lines += [f"  - 앞 단계 실제 출력 {p}" for p in prev(s)]
     else:
         lines += ["**모든 단계 끝남**" if all(s["status"] != "todo" for s in d["steps"]) else "**앞 단계가 끝나야 진행할 수 있음**"]
     text = "\n".join(lines) + "\n"
