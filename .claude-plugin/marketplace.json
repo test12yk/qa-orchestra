@@ -77,6 +77,12 @@
       "description": "회귀 검토자만 (회귀 Fail 원인·운영 결함 원인 분석)",
       "source": "./plugins/qa-reg-reviewer",
       "category": "testing"
+    },
+    {
+      "name": "qa-release-judge",
+      "description": "릴리즈 판정관만 (배포 Go/No-Go 추천·기능 빼면 재회귀 범위·사람 결정 기록)",
+      "source": "./plugins/qa-release-judge",
+      "category": "testing"
     }
   ]
 }

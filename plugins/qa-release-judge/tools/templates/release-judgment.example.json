@@ -1,0 +1,74 @@
+{
+  "_comment": "release-facts.json을 복사해 recommendation·conditions·alternatives를 채운 모습(샘플: 쿠폰 할인 2026.12). 사실 칸(elements·blockers·exclusions 등)은 collect가 만든 그대로 두고 필요하면 note·title만 고친다.",
+  "recommendation": {
+    "verdict": "no_go",
+    "headline": "필수 회귀 2개 결과 없음, RG-0018 P1 Fail, 쿠폰 편입 결정 전",
+    "points": [
+      "필수 회귀 결과 없음 (B-02): RG-0001 로그인 · RG-0015 PG 승인 실패 — 기능과 관계없는 필수 케이스라 쿠폰을 빼도 남는다. 수동 실행이 먼저",
+      "RG-0018 전체 취소 포인트 미복구 (B-03): P1 결함 의심, 쿠폰 변경 영향 영역이다. SHOP-201 수정(10/24)도 같은 복구 로직을 바꿔서 쿠폰을 빼도 남을 수 있다 — 개발 원인 확인 필요",
+      "쿠폰 할인 편입 결정 전 (B-01): 신규 기능 판정관 추천은 편입 보류(QAO-8 Critical) — QA 매니저 결정 필요",
+      "쿠폰 빼고 Go 가능성: B-02가 Pass이고 RG-0018 원인이 쿠폰이면 가능하다 — 뺀 빌드로 회귀 16개(자동화 8 · 수동 8) 다시 실행",
+      "조건부 4개 (B-04~B-07): 수동 7개 결과 · RG-0011 정책 질문 · RG-0020 환경 확인 · SHOP-212 수정 포함 여부"
+    ]
+  },
+  "conditions": [
+    {
+      "id": "K-01",
+      "what": "필수 수동 케이스 RG-0001·RG-0015 실행 → 결과 시트에 기록",
+      "owner": "tester",
+      "verify": "결과 시트 두 행 Pass",
+      "resolves": [
+        "B-02"
+      ]
+    },
+    {
+      "id": "K-02",
+      "what": "RG-0018 원인 확인: 쿠폰 복구 작업인지 SHOP-201 수정인지",
+      "owner": "dev",
+      "verify": "회귀 검토자 질문에 답 → 검토 갱신(원인 확정)",
+      "resolves": [
+        "B-03"
+      ]
+    },
+    {
+      "id": "K-03",
+      "what": "RG-0018 버그 등록 → 수정 → RG-0018 재실행",
+      "owner": "dev",
+      "verify": "지라 완료 + RG-0018 Pass",
+      "resolves": [
+        "B-03"
+      ]
+    },
+    {
+      "id": "K-04",
+      "what": "장바구니 쿠폰 할인 편입 결정(신규 기능 판정서)",
+      "owner": "qa-manager",
+      "verify": "신규 기능 판정서에 결정 기록",
+      "resolves": [
+        "B-01"
+      ]
+    }
+  ],
+  "alternatives": [
+    {
+      "option": "K-01 Pass이고 RG-0018이 쿠폰 때문으로 확인되면",
+      "verdict": "go_without",
+      "exclude": [
+        "장바구니 쿠폰 할인"
+      ],
+      "pros": "쿠폰 외 변경을 일정대로 배포한다",
+      "cons": "뺀 빌드로 회귀 16개(수동 8)를 다시 돌려야 한다. RG-0018이 SHOP-201 때문이면 빼도 남는다"
+    }
+  ],
+  "decisions_example": [
+    {
+      "decision": "go_without",
+      "by": "QA 매니저 (이름)",
+      "note": "사람이 말한 이유 그대로",
+      "exclude": [
+        "장바구니 쿠폰 할인"
+      ],
+      "at": "2026-11-21T10:00:00+09:00"
+    }
+  ]
+}

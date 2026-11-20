@@ -1,0 +1,1 @@
+../../plugins/qa-release-judge/agents/release-judge.md
