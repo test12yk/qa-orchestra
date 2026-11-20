@@ -83,6 +83,12 @@
       "description": "릴리즈 판정관만 (배포 Go/No-Go 추천·기능 빼면 재회귀 범위·사람 결정 기록)",
       "source": "./plugins/qa-release-judge",
       "category": "testing"
+    },
+    {
+      "name": "qa-release-reporter",
+      "description": "릴리즈 QA 리포터만 (한 장 릴리즈 리포트·컨플루언스)",
+      "source": "./plugins/qa-release-reporter",
+      "category": "testing"
     }
   ]
 }

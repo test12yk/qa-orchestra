@@ -1,0 +1,1 @@
+../../plugins/qa-release-reporter/agents/release-reporter.md

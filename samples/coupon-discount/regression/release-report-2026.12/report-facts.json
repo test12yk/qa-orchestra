@@ -1,0 +1,511 @@
+{
+  "release": "2026.12 정기 릴리즈(샘플)",
+  "generated_at": "2026-11-20T13:29:36+09:00",
+  "status": "interim",
+  "inputs": {
+    "judgment": "regression/release-judgment-2026.12/release-judgment.json",
+    "review": "regression/review-2026.12/review.json"
+  },
+  "decisions_seen": 0,
+  "recommendation": {
+    "verdict": "no_go",
+    "headline": "필수 회귀 2개 결과 없음, RG-0018 P1 Fail, 쿠폰 편입 결정 전",
+    "points": [
+      "필수 회귀 결과 없음 (B-02): RG-0001 로그인 · RG-0015 PG 승인 실패 — 기능과 관계없는 필수 케이스라 쿠폰을 빼도 남는다. 수동 실행이 먼저",
+      "RG-0018 전체 취소 포인트 미복구 (B-03): P1 결함 의심, 쿠폰 변경 영향 영역이다. SHOP-201 수정(10/24)도 같은 복구 로직을 바꿔서 쿠폰을 빼도 남을 수 있다 — 개발 원인 확인 필요",
+      "쿠폰 할인 편입 결정 전 (B-01): 신규 기능 판정관 추천은 편입 보류(QAO-8 Critical) — QA 매니저 결정 필요",
+      "쿠폰 빼고 Go 가능성: B-02가 Pass이고 RG-0018 원인이 쿠폰이면 가능하다 — 뺀 빌드로 회귀 16개(자동화 8 · 수동 8) 다시 실행",
+      "조건부 4개 (B-04~B-07): 수동 7개 결과 · RG-0011 정책 질문 · RG-0020 환경 확인 · SHOP-212 수정 포함 여부"
+    ]
+  },
+  "decision": null,
+  "exclude": [],
+  "features": [
+    {
+      "feature": "장바구니 쿠폰 할인",
+      "judgment": "run-01/judgment/judgment.json",
+      "recommendation": "hold",
+      "decision": null,
+      "decided_by": "",
+      "accepted": [],
+      "impacts": [
+        "결제 금액 계산",
+        "포인트 사용(차감 순서·금액)",
+        "주문서 결제 금액 요약 화면",
+        "주문 전체 취소",
+        "주문 부분 취소",
+        "환불 금액 계산",
+        "쿠폰 상태 관리(AVAILABLE/USED)",
+        "배송비 계산",
+        "PG 결제 승인",
+        "쿠폰 유효기간·만료 처리",
+        "상품권·e쿠폰 카테고리 상품 주문",
+        "판매자 정산 금액"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "id": "B-01",
+      "level": "block",
+      "title": "장바구니 쿠폰 할인 — 편입 결정 전(신규 기능 판정관 추천: 편입 보류)",
+      "element": "R1",
+      "refs": [
+        "run-01/judgment/judgment.json"
+      ],
+      "features": [
+        "장바구니 쿠폰 할인"
+      ]
+    },
+    {
+      "id": "B-02",
+      "level": "block",
+      "title": "필수 회귀 케이스 결과 없음: RG-0001, RG-0015 — 가입한 이메일·비밀번호로 로그인하면 메인 화면으로 이동한다 · PG 승인이 실패하면 주문이 만들어지지 않고 포인트도 차감되지 않는다",
+      "element": "R2",
+      "refs": [
+        "RG-0001",
+        "RG-0015"
+      ],
+      "features": []
+    },
+    {
+      "id": "B-03",
+      "level": "block",
+      "title": "RG-0018 P1 Fail — 포인트를 쓴 주문을 전체 취소하면 쓴 포인트가 되돌아온다 (결함 — 이번 변경으로 깨짐)",
+      "element": "R3",
+      "refs": [
+        "RG-0018"
+      ],
+      "features": [
+        "장바구니 쿠폰 할인"
+      ]
+    },
+    {
+      "id": "B-04",
+      "level": "cond",
+      "title": "그 밖의 회귀 케이스 7개 결과 없음 (RG-0009, RG-0012, RG-0013, RG-0016, RG-0021, RG-0022, RG-0025)",
+      "element": "R2",
+      "refs": [
+        "RG-0009",
+        "RG-0012",
+        "RG-0013",
+        "RG-0016",
+        "RG-0021",
+        "RG-0022",
+        "RG-0025"
+      ],
+      "features": []
+    },
+    {
+      "id": "B-05",
+      "level": "cond",
+      "title": "RG-0011 P2 Fail — 보유 포인트보다 많이 입력하면 보유 포인트까지만 쓰인다 (TC가 정책·명세와 다름? — 확인 필요)",
+      "element": "R3",
+      "refs": [
+        "RG-0011"
+      ],
+      "features": []
+    },
+    {
+      "id": "B-06",
+      "level": "cond",
+      "title": "RG-0020 P2 Fail — 부분 취소로 무료배송 기준 아래가 되면 배송비 3,000원을 빼고 환불한다 (환경·데이터 문제? — 확인 필요)",
+      "element": "R3",
+      "refs": [
+        "RG-0020"
+      ],
+      "features": []
+    },
+    {
+      "id": "B-07",
+      "level": "cond",
+      "title": "운영 결함 SHOP-212(Major·진행 중) — 이번 빌드에 수정이 들어가는지 확인: 상품권 결제 완료 후 상품권 번호가 발급되지 않음(발급사 응답 지연 시)",
+      "element": "R4",
+      "refs": [
+        "SHOP-212"
+      ],
+      "features": []
+    }
+  ],
+  "conditions": [
+    {
+      "id": "K-01",
+      "what": "필수 수동 케이스 RG-0001·RG-0015 실행 → 결과 시트에 기록",
+      "owner": "tester",
+      "verify": "결과 시트 두 행 Pass",
+      "resolves": [
+        "B-02"
+      ]
+    },
+    {
+      "id": "K-02",
+      "what": "RG-0018 원인 확인: 쿠폰 복구 작업인지 SHOP-201 수정인지",
+      "owner": "dev",
+      "verify": "회귀 검토자 질문에 답 → 검토 갱신(원인 확정)",
+      "resolves": [
+        "B-03"
+      ]
+    },
+    {
+      "id": "K-03",
+      "what": "RG-0018 버그 등록 → 수정 → RG-0018 재실행",
+      "owner": "dev",
+      "verify": "지라 완료 + RG-0018 Pass",
+      "resolves": [
+        "B-03"
+      ]
+    },
+    {
+      "id": "K-04",
+      "what": "장바구니 쿠폰 할인 편입 결정(신규 기능 판정서)",
+      "owner": "qa-manager",
+      "verify": "신규 기능 판정서에 결정 기록",
+      "resolves": [
+        "B-01"
+      ]
+    },
+    {
+      "id": "K-05",
+      "what": "나머지 수동 7개 실행(RG-0009·0012·0013·0016·0021·0022·0025)",
+      "owner": "tester",
+      "verify": "결과 시트 기록 → 회귀 검토 갱신",
+      "resolves": [
+        "B-04"
+      ]
+    },
+    {
+      "id": "K-06",
+      "what": "RG-0011 포인트 초과 입력 정책 답(보유분까지 사용 / 거부)",
+      "owner": "pm",
+      "verify": "답에 따라 회귀 TC 관리자가 케이스를 고치거나 버그 등록",
+      "resolves": [
+        "B-05"
+      ]
+    },
+    {
+      "id": "K-07",
+      "what": "RG-0020 배송비 차감 로직이 빌드에 있는지 확인 → 스테이지에서 수동 확인",
+      "owner": "dev",
+      "verify": "개발 답 + 스테이지 수동 결과",
+      "resolves": [
+        "B-06"
+      ]
+    },
+    {
+      "id": "K-08",
+      "what": "SHOP-212 수정(발급 재시도)이 이번 빌드에 들어가는지 알려 주기",
+      "owner": "release-eng",
+      "verify": "빌드 변경 목록 — 들어가면 RG-0016과 함께 확인",
+      "resolves": [
+        "B-07"
+      ]
+    }
+  ],
+  "alternatives": [
+    {
+      "option": "K-01 Pass이고 RG-0018이 쿠폰 때문으로 확인되면",
+      "verdict": "go_without",
+      "exclude": [
+        "장바구니 쿠폰 할인"
+      ],
+      "pros": "쿠폰 외 변경을 일정대로 배포한다",
+      "cons": "뺀 빌드로 회귀 16개(수동 8)를 다시 돌려야 한다. RG-0018이 SHOP-201 때문이면 빼도 남는다"
+    },
+    {
+      "option": "K-01~K-04가 끝나고 쿠폰이 편입으로 결정되면",
+      "verdict": "go_conditional",
+      "pros": "쿠폰까지 이번에 배포한다",
+      "cons": "쿠폰 판정서의 Critical 결함(QAO-8)이 먼저 풀려야 하고, B-04~B-07을 남긴 채 배포할지 정해야 한다"
+    }
+  ],
+  "regression": {
+    "scope": 17,
+    "counts": {
+      "pass": 5,
+      "fail": 3,
+      "not_run": 9,
+      "attention": 0
+    },
+    "by_category": {
+      "must": {
+        "pass": 5,
+        "fail": 1,
+        "not_run": 2
+      },
+      "direct": {
+        "pass": 0,
+        "fail": 2,
+        "not_run": 3
+      },
+      "indirect": {
+        "pass": 0,
+        "fail": 0,
+        "not_run": 4
+      }
+    },
+    "automation": 8,
+    "manual": 9,
+    "sheet_url": "https://docs.google.com/spreadsheets/d/1nLVafe4MxvcZLaBUhhl5ioILqBeugdXw7H3rTFp1UAQ/edit",
+    "suite": {
+      "path": "regression/suite/suite.json",
+      "name": "커머스 회귀 스위트(샘플)",
+      "version": 2,
+      "cases": 26
+    },
+    "run_at": "2026-11-19T17:56:28+09:00"
+  },
+  "fails": [
+    {
+      "id": "RG-0011",
+      "title": "보유 포인트보다 많이 입력하면 보유 포인트까지만 쓰인다",
+      "priority": "P2",
+      "automation": "api",
+      "message": "포인트 사용 응답: 실제 400 INSUFFICIENT_POINTS (기대 200 성공)\n사용 포인트: 실제 없음 (기대 1,200P)",
+      "cause": "tc_outdated",
+      "confidence": "low",
+      "reason": "서버는 명세대로 거부(400 INSUFFICIENT_POINTS)했다. 기존 회귀 케이스의 '보유분까지 사용'과 QA 서버 API 명세 중 어느 쪽이 지금 정책인지 문서에 근거가 없다",
+      "next": "답이 '거부'면 RG-0011 기대 결과를 고친다(기존 케이스 고치기). '보유분까지'면 결함 — 버그 리포터로 등록",
+      "owner": "회귀 TC 관리자",
+      "question": {
+        "to": "기획",
+        "ask": "보유 포인트보다 많이 입력하면 보유분까지 자동 사용(기존)인가, 거부(QA 서버 명세)인가?"
+      },
+      "blockers": [
+        "B-05"
+      ]
+    },
+    {
+      "id": "RG-0018",
+      "title": "포인트를 쓴 주문을 전체 취소하면 쓴 포인트가 되돌아온다",
+      "priority": "P1",
+      "automation": "api",
+      "message": "포인트 잔액: 실제 0P (기대 3,000P)",
+      "cause": "change",
+      "confidence": "mid",
+      "reason": "지난 회귀에서 Pass였던 전체 취소 포인트 복구가 이번에 깨졌다. 이번 쿠폰 변경이 전체 취소 흐름(쿠폰 복구)을 고쳤고, SHOP-201 수정도 취소 시 포인트 복구 로직을 바꿨다",
+      "next": "버그 리포터로 지라 등록(결과 시트 Fail 행) → 수정 → RG-0018 재실행. SHOP-201 케이스(부분 취소 후 나머지 취소)도 함께 확인",
+      "owner": "개발",
+      "question": {
+        "to": "개발",
+        "ask": "쿠폰 복구 작업이나 SHOP-201 수정에서 전체 취소 시 포인트 복구가 빠졌는지"
+      },
+      "blockers": [
+        "B-03"
+      ]
+    },
+    {
+      "id": "RG-0020",
+      "title": "부분 취소로 무료배송 기준 아래가 되면 배송비 3,000원을 빼고 환불한다",
+      "priority": "P2",
+      "automation": "api",
+      "message": "환불 금액: 실제 15,000원 (기대 12,000원)",
+      "cause": "env",
+      "confidence": "low",
+      "reason": "QA 서버는 배송비를 계산하지 않고 주문서 만들 때 넣은 값을 그대로 쓴다. 그래서 '무료배송 기준 아래가 되면 배송비를 뺀다'는 조건이 이 환경에서 만들어지지 않았을 수 있다",
+      "next": "개발 답이 '로직 있음·QA 서버에서 확인 불가'면 RG-0020을 수동으로 바꿀 후보로 넘기고 스테이지에서 수동 확인. '로직 없음'이면 결함으로 버그 등록",
+      "owner": "회귀 자동화 관리자",
+      "question": {
+        "to": "개발",
+        "ask": "부분 취소 환불에서 무료배송 기준 미달 시 배송비를 빼는 로직이 이번 빌드에 그대로 있는지(QA 서버에서 확인 가능한지)"
+      },
+      "blockers": [
+        "B-06"
+      ]
+    }
+  ],
+  "not_run": [
+    {
+      "id": "RG-0001",
+      "title": "가입한 이메일·비밀번호로 로그인하면 메인 화면으로 이동한다",
+      "priority": "P1",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0009",
+      "title": "여러 판매자 상품을 함께 주문하면 판매자별 배송비가 각각 더해진다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0012",
+      "title": "주문서 결제 금액 요약에 상품 금액·배송비·포인트·최종 금액이 순서대로 보인다",
+      "priority": "P3",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0013",
+      "title": "30,000원 이상 주문하면 기본 배송비 3,000원이 무료가 된다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0015",
+      "title": "PG 승인이 실패하면 주문이 만들어지지 않고 포인트도 차감되지 않는다",
+      "priority": "P1",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0016",
+      "title": "상품권 50,000원을 단독 주문하면 결제 후 상품권 번호가 발급된다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0021",
+      "title": "이벤트 페이지에서 쿠폰을 받으면 쿠폰함에 AVAILABLE로 들어온다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0022",
+      "title": "같은 쿠폰은 한 번만 받을 수 있다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    },
+    {
+      "id": "RG-0025",
+      "title": "판매자 정산 기준 금액은 상품 판매 금액에서 수수료를 뺀 값이다",
+      "priority": "P2",
+      "automation": "manual",
+      "why": "수동 케이스"
+    }
+  ],
+  "attention": [],
+  "rerun": [],
+  "ops": [
+    {
+      "key": "SHOP-212",
+      "url": "",
+      "severity": "Major",
+      "status": "진행 중",
+      "closed": false,
+      "summary": "상품권 결제 완료 후 상품권 번호가 발급되지 않음(발급사 응답 지연 시)",
+      "fix": "발급 재시도 추가 작업 중",
+      "root_cause": "integration",
+      "recommendation": "include",
+      "merged_into": "",
+      "why": "아직 열림 — 이번 빌드에 수정이 들어가는지 확인",
+      "related": [
+        {
+          "id": "RG-0016",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "key": "SHOP-210",
+      "url": "",
+      "severity": "Minor",
+      "status": "완료",
+      "closed": true,
+      "summary": "도서산간 추가 배송비가 판매자별로 두 번 붙음",
+      "fix": "추가 배송비 합산 로직 수정",
+      "root_cause": "code",
+      "recommendation": "include",
+      "merged_into": "",
+      "why": "관련 회귀 케이스가 이번 범위에 있음",
+      "related": [
+        {
+          "id": "RG-0013",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "key": "SHOP-201",
+      "url": "",
+      "severity": "Critical",
+      "status": "완료",
+      "closed": true,
+      "summary": "포인트 쓴 주문을 부분 취소한 뒤 나머지를 취소하면 포인트가 두 번 복구됨",
+      "fix": "취소마다 전액 복구하던 로직을 남은 사용 포인트 기준으로 수정",
+      "root_cause": "code",
+      "recommendation": "include",
+      "merged_into": "",
+      "why": "관련 회귀 케이스가 이번 범위에 있음",
+      "related": [
+        {
+          "id": "RG-0018",
+          "result": "fail"
+        },
+        {
+          "id": "RG-0019",
+          "result": "pass"
+        }
+      ]
+    },
+    {
+      "key": "SHOP-198",
+      "url": "",
+      "severity": "Minor",
+      "status": "완료",
+      "closed": true,
+      "summary": "제주 주문에 도서산간 추가 배송비 3,000원이 빠짐",
+      "fix": "도서산간 우편번호 목록 갱신",
+      "root_cause": "data",
+      "recommendation": "include",
+      "merged_into": "SHOP-210",
+      "why": "관련 회귀 케이스가 이번 범위에 있음",
+      "related": [
+        {
+          "id": "RG-0013",
+          "result": "not_run"
+        }
+      ]
+    }
+  ],
+  "ops_total": 5,
+  "outputs": [
+    {
+      "step": "회귀 TC 관리자",
+      "name": "릴리즈 회귀 범위",
+      "what": "스위트 26개 중 이번 범위 17개(필수 8 · 직접 영향 5 · 간접 영향 4)",
+      "url": "https://claude.ai/artifact/Gd4YxQkYS8UNnfAxtz4rHx",
+      "file": "regression/release-2026.12/selection.html"
+    },
+    {
+      "step": "회귀 자동화 관리자",
+      "name": "회귀 실행 결과",
+      "what": "자동화 8개 실행 결과(한 번 더 돌려 불안정 구분)",
+      "url": "https://claude.ai/artifact/3vhezcVQPh7PkrpK5E7cv8",
+      "file": "regression/automation/reports/run.html"
+    },
+    {
+      "step": "회귀 자동화 관리자 · 테스터",
+      "name": "회귀 실행 시트",
+      "what": "범위 17개의 결과·이슈내용(수동은 테스터가 채움)",
+      "url": "https://docs.google.com/spreadsheets/d/1nLVafe4MxvcZLaBUhhl5ioILqBeugdXw7H3rTFp1UAQ/edit",
+      "file": "regression/automation/reports/regression-run_자동화결과.xlsx"
+    },
+    {
+      "step": "회귀 검토자",
+      "name": "회귀 검토 보고서",
+      "what": "Fail 3개 원인·담당, 운영 결함 5건 분석",
+      "url": "https://claude.ai/artifact/RzvHaqGbtgeUG23156VdXn",
+      "file": "regression/review-2026.12/review.html"
+    },
+    {
+      "step": "릴리즈 판정관",
+      "name": "릴리즈 판정서",
+      "what": "추천 No-Go, 릴리즈 이슈 7개 · 할 일 8개",
+      "url": "https://claude.ai/artifact/TUzrqhdEHQTxfWJwksvVHg",
+      "file": "regression/release-judgment-2026.12/release-judgment.html"
+    },
+    {
+      "step": "신규 기능 판정관",
+      "name": "장바구니 쿠폰 할인 판정서",
+      "what": "편입 결정 전",
+      "url": "https://claude.ai/artifact/4NnQ7aYQ857H1mwitXP4rS",
+      "file": "run-01/judgment/judgment.html"
+    }
+  ],
+  "published": []
+}

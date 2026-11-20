@@ -33,7 +33,7 @@ QA 업무를 역할별 AI 에이전트(악기)와 지휘자로 나눠 돌리는 
 - [x] 회귀 자동화 관리자 `reg-automation` — 편입된 신규 기능 테스트를 RG 번호로 옮기기, TC가 바뀐 테스트는 고칠 때까지 실행 막기, 릴리즈 범위의 자동화 케이스 실행(Fail·자동화 오류는 한 번 더 → 불안정 구분) → 회귀 실행 시트 결과·이슈내용
 - [x] 회귀 검토자 `reg-reviewer` — 회귀 결과(자동화 + 수동 시트) → Fail마다 원인 4갈래(이번 변경·전부터 있던 결함·TC가 정책과 다름·환경) 추천 + 근거·담당별 할 일, 지라 운영 결함(읽기만) 원인·놓친 이유 → 심각도·반복이면 회귀 편입 후보(케이스 초안) → 회귀 TC 관리자 승인 편입
 - [x] 릴리즈 판정관 `release-judge` — 기능별 편입 결정 + 회귀 검토(Fail 원인·결과 없음·열린 운영 결함) → Go / 조건부 Go / 기능 빼고 Go / No-Go 추천 + 배포 전 할 일, 기능을 빼면 다시 돌릴 회귀 범위(빠진 기능 영향 + 필수) 파일, 사람의 결정 기록
-- [ ] 릴리즈 QA 리포터
+- [x] 릴리즈 QA 리포터 `release-reporter` — 릴리즈 판정서 + 회귀 검토 → 한 장 릴리즈 리포트(위 1분 요약 매니저·기획용 / 아래 상세 개발·QA용), 결정 전 중간 · 결정 후 완료, 이번 릴리즈 관련 운영 결함, HTML·MD + 승인 후 컨플루언스 페이지
 
 ## 폴더
 ```
@@ -51,6 +51,7 @@ plugins/
   qa-reg-tc-manager/   회귀 TC 관리자: agents/, tools/reg_suite.py(스위트·편입 후보·승인·릴리즈 범위), tools/xlsx.py, tools/templates/, defaults.json
   qa-reg-reviewer/     회귀 검토자: agents/, tools/reg_review.py(재료 모으기·검토 보고서·운영 편입 후보), tools/xlsx.py, tools/templates/, defaults.json
   qa-reg-automation/   회귀 자동화 관리자: agents/, tools/reg_auto.py(현황·옮기기·등록·실행·결과 기록), tools/xlsx.py, tools/templates/, defaults.json
+  qa-release-reporter/ 릴리즈 QA 리포터: agents/, tools/release_report.py(재료 모으기·리포트·올린 위치 기록), tools/templates/, defaults.json
   qa-release-judge/    릴리즈 판정관: agents/, tools/release_judge.py(요소 모으기·판정서·재회귀 범위·결정 기록), tools/templates/, defaults.json
 .claude/agents/        저장소를 받아 쓸 때를 위한 연결(plugins/*/agents 를 가리킴)
 qa-orchestra.config.json   팀 설정 견본
@@ -77,6 +78,7 @@ Claude Code 안에서 배포처를 한 번 등록한 뒤, **필요한 것만** �
 | 회귀 TC 관리자만 | `/plugin install qa-reg-tc-manager@qa-orchestra` | `reg-tc-manager` + 스위트·편입·범위 스크립트(xlsx 읽기·쓰기 포함) |
 | 회귀 검토자만 | `/plugin install qa-reg-reviewer@qa-orchestra` | `reg-reviewer` + 재료 모으기·검토 보고서 스크립트 (운영 결함은 Atlassian 커넥터로 읽기) |
 | 회귀 자동화 관리자만 | `/plugin install qa-reg-automation@qa-orchestra` | `reg-automation` + 옮기기·등록·실행·결과 기록 스크립트 (테스트 실행에 pytest 필요) |
+| 릴리즈 QA 리포터만 | `/plugin install qa-release-reporter@qa-orchestra` | `release-reporter` + 리포트 스크립트(HTML·MD·컨플루언스 본문) |
 | 릴리즈 판정관만 | `/plugin install qa-release-judge@qa-orchestra` | `release-judge` + 판정서·재회귀 범위·결정 기록 스크립트 |
 
 에이전트별 플러그인에는 그 에이전트가 쓰는 파일만 들어 있다(샘플·문서는 설치되지 않음). 나중에 전체를 설치하면 빠진 것만 추가된다. 비공개 저장소라면 접근 권한이 있는 GitHub 계정이 필요하다. 설치 뒤 Claude Code를 다시 시작한다.
@@ -119,6 +121,7 @@ doc-collector 에이전트로 이 링크들 가져와줘. 기능 이름은 coupo
 | `reg-tc-manager` 회귀 TC 관리자 | 기존 회귀 시트(xlsx·csv) / 신규 TC json + 실행 결과 검토 + 판정서 / 릴리즈 기능(판정서·릴리즈 기록) | 회귀 스위트 시트(영역별 탭), 편입 후보 페이지, 릴리즈 회귀 범위·실행 시트 | 기존 회귀 시트만 있어도 가져오기·보기·범위 고르기가 된다 |
 | `reg-automation` 회귀 자동화 관리자 | 회귀 스위트 + 릴리즈 범위·실행 시트 (+ 신규 기능 자동화 폴더, API 문서, QA 서버 주소) | 회귀 pytest 폴더(registry.json), 실행 결과 페이지, 결과·이슈내용이 채워진 회귀 실행 시트 | 스위트만 있어도 현황(status)을 본다 |
 | `reg-reviewer` 회귀 검토자 | 회귀 자동화 results.json + 스위트 + 릴리즈 범위 (+ 수동 결과 시트, 지라 운영 결함) | 회귀 검토 보고서(HTML·MD), 운영 결함 회귀 편입 후보(ops-candidates.json) | 회귀 결과만 있어도 된다(운영 결함 분석은 빼고) |
+| `release-reporter` 릴리즈 QA 리포터 | 릴리즈 판정서(release-judgment.json) + 회귀 검토(review.json) (+ 산출물 링크) | 릴리즈 QA 리포트(HTML·MD·컨플루언스 본문), 승인 시 컨플루언스 페이지 | 판정서와 회귀 검토만 있으면 된다 |
 | `release-judge` 릴리즈 판정관 | 회귀 검토(review.json) + 릴리즈 범위(selection.json) (+ 릴리즈 기록, 기능별 분석서) | 릴리즈 판정서(HTML·MD·JSON), 기능별 재회귀 범위(rerun-<기능>.json), 사람 결정 기록 | 회귀 검토와 범위만 있으면 된다(신규 기능 판정서가 없으면 '판정서 없음'으로 본다) |
 | `new-reviewer` 신규 기능 검토자 | 실행 전: 분석서 + TC json / 실행 후: + 결과 시트·자동화 결과·버그 폴더 | 검토 보고서(HTML·MD·JSON), 담당별 보완 요청 | TC json만 있어도 TC 자체 점검(기대 결과·추적·중복)은 된다 |
 
@@ -187,3 +190,10 @@ python3 plugins/qa-plan-analyst/tools/render_plan_analysis.py samples/coupon-dis
 - **기능 빼면 재회귀**: 빠진 기능의 영향 케이스 + 필수 케이스를 뺀 빌드로 다시 돌린다(빠진 기능에서 편입된 케이스는 빠지고, 나머지는 이번 결과 그대로). `rerun-<기능>.json`은 selection 형식이라 회귀 자동화 관리자 `run --selection`에 그대로 쓴다.
 - **결정**: 판정관에게 말로 전하거나, claude.ai 판정서 링크의 '결정 남기기' 칸(결정·뺄 기능·받아들이는 할 일·이유)에 남기면 판정관이 옮긴다.
 - 결과 예: `samples/coupon-discount/regression/release-judgment-2026.12/` — No-Go 추천. 필수 수동 RG-0001·0015 결과 없음(기능과 무관해 쿠폰을 빼도 남음), RG-0018 P1 Fail(쿠폰 영향 영역이지만 SHOP-201 수정 영향일 수도), 쿠폰 편입 결정 전. 선택지: 필수 Pass + RG-0018이 쿠폰 때문이면 쿠폰 빼고 Go(재회귀 16개 = 자동화 8 · 수동 8). 결정은 비워 둠.
+
+## 릴리즈 QA 리포터
+- **한 장, 위아래 구분**: 위는 1분 요약(매니저·기획용). 한 줄 요약, 릴리즈 불가 이슈, 내용별 요점, 결정 상태, 숫자, 배포 전에 할 일, 선택지. 아래는 상세(개발·QA용). 기능 판정, 범위별 회귀 결과, Fail 원인·다음 할 일, 결과 없는 케이스, 뺀 빌드 재회귀, 운영 결함, QA 산출물.
+- **결정 전에도**: 판정서에 결정이 없으면 '중간 리포트 · 결정 대기', 결정이 기록되면 '릴리즈 완료 리포트'.
+- **운영 결함은 이번 릴리즈 관련만**: 아직 열린 것(이번 빌드에 수정이 들어가나)과 관련 회귀 케이스가 이번 범위에 든 것.
+- **공유**: HTML·MD 기본, 승인 후 컨플루언스 페이지(설정 `confluence` 블록만 바꾸면 회사 컨플루언스). 다시 올릴 때는 같은 페이지를 고친다.
+- 결과 예: `samples/coupon-discount/regression/release-report-2026.12/` — 중간 리포트(결정 대기, 판정관 No-Go 권고). 릴리즈 불가 3개, 할 일 8개, 이번 릴리즈 관련 운영 결함 4/5건.

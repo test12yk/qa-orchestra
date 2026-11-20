@@ -1,0 +1,14 @@
+{
+  "name": "qa-release-reporter",
+  "description": "QA 릴리즈 QA 리포터: 릴리즈 판정서와 회귀 검토를 모아 팀·기획·개발에 돌릴 한 장짜리 릴리즈 QA 리포트(위 1분 요약 + 아래 상세)를 만든다. 결정 전엔 중간 리포트, 결정 뒤엔 릴리즈 완료 리포트. HTML·MD를 만들고, 승인받아 컨플루언스 페이지로도 올린다",
+  "version": "0.1.0",
+  "author": {
+    "name": "test12yk"
+  },
+  "keywords": [
+    "qa",
+    "release",
+    "report",
+    "confluence"
+  ]
+}
