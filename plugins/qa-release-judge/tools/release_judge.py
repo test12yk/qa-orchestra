@@ -460,7 +460,7 @@ def render(path, outdir, cfg):
         auto = sum(1 for r in x["rerun"] if r["automation"] == "api")
         rows = "".join(f'<tr><td class="mono">{e(r["id"])}</td><td>{e(r["title"])}</td><td class="c">{e(r["priority"])}</td>'
                        f'<td>{"자동화" if r["automation"] == "api" else "수동"}</td><td>{e(r["why"])}</td></tr>' for r in x["rerun"])
-        keep = "".join(f'<tr><td class="mono">{e(k["id"])}</td><td>{e(k["title"])}</td><td>{e(k["result"] or "결과 없음")}</td><td>{e(k["why"])}</td></tr>' for k in x["keep"] + x["drop"])
+        keep = "".join(f'<tr><td class="mono">{e(k["id"])}</td><td>{e(k["title"])}</td><td>{e(k.get("result") or "결과 없음")}</td><td>{e(k["why"])}</td></tr>' for k in x["keep"] + x["drop"])
         ex_html.append(f'<div class="card"><h3>{e(x["feature"])} 뺀 빌드</h3><div class="split"><span>다시 돌림 <b>{len(x["rerun"])}</b>(자동화 {auto} · 수동 {len(x["rerun"]) - auto})</span>'
                        f'<span>결과 그대로 <b>{len(x["keep"])}</b></span><span>빠짐 <b>{len(x["drop"])}</b></span><span class="muted mono small">{e(x["file"])}</span></div></div>'
                        f'<div class="tbl"><table><thead><tr><th>CaseID</th><th>title</th><th class="c">우선</th><th>실행</th><th>왜 다시 돌리나</th></tr></thead><tbody>{rows}</tbody></table></div>'
